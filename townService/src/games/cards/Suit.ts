@@ -33,5 +33,5 @@ export function parseSuit(suit: string): Suit {
       return osuit;
     }
   });
-  throw new Error("Input argument is not a valid suit!"); 
+  throw new Error("Input argument is not a valid suit!");
 }
