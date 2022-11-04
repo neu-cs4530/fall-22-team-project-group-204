@@ -4,29 +4,16 @@ import { GameStatus } from "./GameStatus";
 import { Suit, SUITS } from "../../cards/Suit";
 import { Value, VALUES } from "../../cards/Value";
 import HumanPlayer from "./HumanPlayer";
+import Player from "./Player";
 
-export default class DealerPlayer {
+export default class DealerPlayer extends HumanPlayer {
 
   public _masterDeck: Card[];
 
-  public _hand: Hand;
-
-  public _status: GameStatus;
-
-  public get hand(): Hand {
-    return this._hand;
-  }
-
-  private set hand(value: Hand) {
-    this._hand = value;
-  }
-
-	constructor() {
-    // 2 decks seems like a reasonable default
+  constructor() {
+    super()
     this._masterDeck = this.getDecks(2).flat()
-    this.shuffleDecks();
-    this._hand = new Hand();
-    this._status = GameStatus.Waiting
+    this.shuffleDecks()
   }
 
   public getDeck(): Card[] {
@@ -66,6 +53,10 @@ export default class DealerPlayer {
 
   }
 
+  private getStarterHand(): [Card, Boolean][] {
+    return [[this.popCard(), true], [this.popCard(), false]]
+  }
+
   // Deals 2 cards to every player in the input array, and then deals 2 cards
   // to itself. Throws an error if the input array is empty
   public dealCards(players: HumanPlayer[]): void {
@@ -76,12 +67,10 @@ export default class DealerPlayer {
       if (this._masterDeck.length < 2) {
         throw new Error("")
       }
-      player.hand = new Hand([this.popCard(), this.popCard()]);
+      player.hand = new Hand(this.getStarterHand());
     })
 
-    this._hand.cards = [this.popCard(), this.popCard()];
+    this.hand.cards = this.getStarterHand();
 
   }
-
-
 }

@@ -9,7 +9,7 @@ Value.Six, Value.Seven, Value.Eight, Value.Nine, Value.Ten, Value.Jack, Value.Qu
 Value.King, Value.Ace];
 
 let valueStringLookup: Map<Value, Array<string>> = new Map([
-  [Value.Ace, ["Ace", "1", "One"]],
+  [Value.Ace, ["Ace", "1", "One", "11", "Eleven"]],
   [Value.Two, ["Two", "2"]],
   [Value.Three, ["Three", "3"]],
   [Value.Four, ["Four", "4"]],
@@ -19,16 +19,18 @@ let valueStringLookup: Map<Value, Array<string>> = new Map([
   [Value.Eight, ["Eight", "8"]],
   [Value.Nine, ["Nine", "9"]],
   [Value.Ten, ["Ten", "10"]],
-  [Value.Jack, ["Jack", "11", "Eleven"]],
-  [Value.Queen, ["Queen", "12", "Twelve"]],
-  [Value.King, ["King", "13", "Thirteen"]]]);
+  [Value.Jack, ["Jack", "10", "Ten"]],
+  [Value.Queen, ["Queen", "10", "Ten"]],
+  [Value.King, ["King", "10", "Ten"]]]);
 
 export function getValueString(value: Value): string {
-  const sval = valueStringLookup.get(value)
-  if (!sval) {
+  // it technically could still be undefined so I am not going
+  // to give it an official type declaration
+  const valueAsString = valueStringLookup.get(value)
+  if (!valueAsString) {
     throw new Error("Input argument is not a valid value!");
   }
-  return sval[0]
+  return valueAsString[0]
 }
 
 export function parseValueFromString(value: string): Value {
@@ -40,20 +42,20 @@ export function parseValueFromString(value: string): Value {
   throw new Error("Input argument is not a valid value!");
 }
 
-let valueNumLookup: Map<Value, number> = new Map([
-  [Value.Ace, 1],
-  [Value.Two, 2],
-  [Value.Three, 3],
-  [Value.Four, 4],
-  [Value.Five, 5],
-  [Value.Six, 6],
-  [Value.Seven, 7],
-  [Value.Eight, 8],
-  [Value.Nine, 9],
-  [Value.Ten, 10],
-  [Value.Jack, 11],
-  [Value.Queen, 12],
-  [Value.King, 13]]);  
+let valueNumLookup: Map<Value, Array<number>> = new Map([
+  [Value.Ace, [1, 11]],
+  [Value.Two, [2]],
+  [Value.Three, [3]],
+  [Value.Four, [4]],
+  [Value.Five, [5]],
+  [Value.Six, [6]],
+  [Value.Seven, [7]],
+  [Value.Eight, [8]],
+  [Value.Nine, [9]],
+  [Value.Ten, [10]],
+  [Value.Jack, [10]],
+  [Value.Queen, [10]],
+  [Value.King, [10]]]);
 
 
 export function parseValue(value: number): Value {
@@ -66,10 +68,11 @@ export function parseValue(value: number): Value {
 
 }
 
-export function getValueNumber(value: Value): number {
-  const nval = valueNumLookup.get(value);
-  if (!nval) {
+export function getValueNumbers(value: Value): Array<number> {
+  const valueAsNums = valueNumLookup.get(value);
+  // if it is null or undefined throw error
+  if (!valueAsNums) {
     throw new Error("Input argument is not a valid value!");
   }
-  return nval;
+  return valueAsNums;
 }

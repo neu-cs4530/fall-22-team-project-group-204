@@ -1,11 +1,10 @@
 import Hand from "./Hand";
 import { GameStatus } from "./GameStatus";
+import Player from "./Player";
 
-export default class HumanPlayer {
+export default class HumanPlayer extends Player {
 
   private _hand: Hand;
-
-  public _status: GameStatus;
 
   public get hand(): Hand {
     return this._hand;
@@ -16,8 +15,8 @@ export default class HumanPlayer {
   }
 
 	constructor() {
+    super(GameStatus.Waiting);
     this._hand = new Hand();
-    this._status = GameStatus.Waiting;
   }
 
 

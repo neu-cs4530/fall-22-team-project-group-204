@@ -3,6 +3,7 @@ import { Value, VALUES } from "../../cards/Value";
 import { GameStatus } from "../players/GameStatus";
 import DealerPlayer from "../players/DealerPlayer";
 import HumanPlayer from "../players/HumanPlayer";
+import Player from "../players/Player";
 
 export default class BlackJack {
 
@@ -13,31 +14,37 @@ export default class BlackJack {
   // i need to abstract this out to a Player[] where
   // a player is a interface that HumanPlayer and SpectatorPlayer implement.
   // I think that will be easier once I finish implementing this though
-  public _players: HumanPlayer[];
-
-  private _mainPlayer: HumanPlayer;
+  public _players: Player[];
 
   constructor() {
     this._dealer = new DealerPlayer();
-
-    this._mainPlayer = new HumanPlayer();
     // We assume that there is at least one human player. I am going to start with the
     // assumption of one Player but will make sure to expand tests to cover 2 players
-    this._players = [this._mainPlayer];
+    this._players = [];
   }
 
   // update everyones status to Playing
   private updateToPlaying(): void {
-    this._dealer._status = GameStatus.Playing
+    this._dealer.status = GameStatus.Playing
     this._players.forEach(player => {
-      player._status = GameStatus.Playing
+      player.status = GameStatus.Playing
     });
+  }
+
+  private getActiveHumanPlayers(): HumanPlayer[] {
+    const humanPlayers: HumanPlayer[] = [];
+    this._players.forEach(player => {
+      if (player.status === GameStatus.Waiting) {
+        humanPlayers.push(player as HumanPlayer)
+      }
+    });
+    return humanPlayers;
   }
 
   public playGame(): void {
     // maybe check that there is more than 1 player before i start the gameplay loop?
     this.updateToPlaying();
-    this._dealer.dealCards(this._players);
+    this._dealer.dealCards(this.getActiveHumanPlayers());
 
     // dealer asks first person if they want to hit or stay
 
