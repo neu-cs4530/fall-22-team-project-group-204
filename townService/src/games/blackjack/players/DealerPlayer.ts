@@ -5,6 +5,7 @@ import { Suit, SUITS } from "../../cards/Suit";
 import { Value, VALUES } from "../../cards/Value";
 import HumanPlayer from "./HumanPlayer";
 import Player from "./Player";
+import CardFactory from "../../cards/CardFactory";
 
 export default class DealerPlayer extends HumanPlayer {
 
@@ -16,20 +17,10 @@ export default class DealerPlayer extends HumanPlayer {
     this.shuffleDecks()
   }
 
-  public getDeck(): Card[] {
-    const deck: Card[] = [];
-    SUITS.forEach(suit => {
-      VALUES.forEach(value => {
-        deck.push(new Card(value, suit));
-      })
-    })
-    return deck;
-  }
-
   public getDecks(amount: number): Card[][] {
     const decks: Card[][] = [];
     Array(amount).fill(0).forEach((_, i) => {
-      decks.push(this.getDeck())
+      decks.push(CardFactory.getDeck())
     })
     return decks;
   }

@@ -7,13 +7,9 @@ export default class Card {
 
   public _suit: Suit;
 
-  public _hidden?: Boolean;
-
-  // figure defaulting to hidden is a reasonable
-  constructor(value: Value, suit: Suit, hidden: Boolean = true) {
+  constructor(value: Value, suit: Suit) {
     this._value = value;
     this._suit = suit;
-    this._hidden = hidden;
   }
 
   public toString(): string {
