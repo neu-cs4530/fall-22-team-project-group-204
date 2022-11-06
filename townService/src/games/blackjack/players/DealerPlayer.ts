@@ -6,6 +6,7 @@ import { Value, VALUES } from "../../cards/Value";
 import HumanPlayer from "./HumanPlayer";
 import Player from "./Player";
 import CardFactory from "../../cards/CardFactory";
+import { BlackjackAction } from "../blackjack/BlackjackAction";
 
 export default class DealerPlayer extends HumanPlayer {
 
@@ -44,8 +45,8 @@ export default class DealerPlayer extends HumanPlayer {
 
   }
 
-  private getStarterHand(): [Card, Boolean][] {
-    return [[this.popCard(), true], [this.popCard(), false]]
+  private getStarterHand(isFirstHidden: Boolean = false): [Card, Boolean][] {
+    return [[this.popCard(), isFirstHidden], [this.popCard(), false]]
   }
 
   // Deals 2 cards to every player in the input array, and then deals 2 cards
@@ -61,7 +62,31 @@ export default class DealerPlayer extends HumanPlayer {
       player.hand = new Hand(this.getStarterHand());
     })
 
-    this.hand.cards = this.getStarterHand();
+    this.hand.cards = this.getStarterHand(true);
 
+  }
+
+  public doTurns(players: HumanPlayer[]): void {
+    if (!players || players.length === 0) {
+      throw new Error("Can't play Blackjack with 0 people!");
+    }
+    players.forEach(async player => {
+      const l = await player.doTurn();
+      // If they hit or stay do the correct thing
+      const chosenAction: BlackjackAction = BlackjackAction.Hit;
+      // replace if with switch statement (i forgot the syntax)
+      if (chosenAction === BlackjackAction.Hit) {
+
+
+      } else if (chosenAction === BlackjackAction.Stay) {
+        // do nothing
+
+      }
+
+
+
+
+    })
+    // Have dealer do his own turn then return
   }
 }

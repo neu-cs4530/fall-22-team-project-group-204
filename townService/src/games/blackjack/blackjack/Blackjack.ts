@@ -41,10 +41,14 @@ export default class BlackJack {
     return humanPlayers;
   }
 
+
+
   public playGame(): void {
     // maybe check that there is more than 1 player before i start the gameplay loop?
     this.updateToPlaying();
     this._dealer.dealCards(this.getActiveHumanPlayers());
+
+    this._dealer.doTurns(this.getActiveHumanPlayers());
 
     // dealer asks first person if they want to hit or stay
 
