@@ -1,0 +1,72 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "blackjackmap.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "fileStates": {
+        "": {
+            "scaleInDock": 1
+        },
+        "Map.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "Table.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "blackjackmap.tmx": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 514.5,
+                "y": 150.5
+            }
+        },
+        "blackjackmap.tmx#BlackJackMapTileset": {
+            "scaleInDock": 1
+        },
+        "blackjackmap.tmx#Blackjack": {
+            "scaleInDock": 1
+        },
+        "blackjackmap.tmx#Table": {
+            "scaleInDock": 1
+        },
+        "blackjackmap.tmx#arabic": {
+            "scaleInDock": 1
+        },
+        "blackjackmap.tmx#pokertablebig": {
+            "scaleInDock": 1
+        },
+        "frontend/public/assets/tilesets/arabic.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "frontend/public/assets/tilesets/pokertablebig.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        }
+    },
+    "last.exportedFilePath": "C:/Users/zacha/OneDrive/Documents/GitHub/fall-22-team-project-group-204/frontend/public/assets/tilemaps",
+    "last.imagePath": "C:/Users/zacha/OneDrive/Documents/GitHub/fall-22-team-project-group-204/frontend/public/assets/tilesets",
+    "map.lastUsedExportFilter": "JSON map files (*.tmj *.json)",
+    "map.lastUsedFormat": "tmx",
+    "openFiles": [
+        "blackjackmap.tmx"
+    ],
+    "project": "BlackjackMap.tiled-project",
+    "recentFiles": [
+        "blackjackmap.tmx",
+        "frontend/public/assets/tilesets/pokertablebig.tsx",
+        "frontend/public/assets/tilesets/arabic.tsx",
+        "Table.tsx",
+        "Map.tsx"
+    ],
+    "tileset.embedInMap": true,
+    "tileset.lastUsedFormat": "tsx"
+}

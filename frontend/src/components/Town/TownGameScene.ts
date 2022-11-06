@@ -119,7 +119,15 @@ export default class TownGameScene extends Phaser.Scene {
       '16_Grocery_store_32x32',
       this._resourcePathPrefix + '/assets/tilesets/16_Grocery_store_32x32.png',
     );
-    this.load.tilemapTiledJSON('map', this._resourcePathPrefix + '/assets/tilemaps/indoors.json');
+    this.load.image('Blackjack', this._resourcePathPrefix + '/assets/tilesets/Blackjack.png');
+    this.load.image(
+      'BlackjackTable',
+      this._resourcePathPrefix + '/assets/tilesets/BlackjackTable.png',
+    );
+    this.load.tilemapTiledJSON(
+      'map',
+      this._resourcePathPrefix + 'assets/tilemaps/blackjackmap.json',
+    );
     this.load.atlas(
       'atlas',
       this._resourcePathPrefix + '/assets/atlas/atlas.png',
@@ -318,6 +326,8 @@ export default class TownGameScene extends Phaser.Scene {
       '13_Conference_Hall_32x32',
       '14_Basement_32x32',
       '16_Grocery_store_32x32',
+      'Blackjack',
+      'BlackjackTable',
     ].map(v => this.map.addTilesetImage(v));
 
     // Parameters: layer name (or index) from Tiled, tileset, x, y
