@@ -1,12 +1,12 @@
-import { Suit, SUITS } from "../../cards/Suit";
-import { Value, VALUES } from "../../cards/Value";
-import { GameStatus } from "../players/GameStatus";
-import DealerPlayer from "../players/DealerPlayer";
-import HumanPlayer from "../players/HumanPlayer";
-import Player from "../players/Player";
+/* eslint-disable @typescript-eslint/naming-convention */
+import { Suit, SUITS } from '../../cards/Suit';
+import { Value, VALUES } from '../../cards/Value';
+import { GameStatus } from '../players/GameStatus';
+import DealerPlayer from '../players/DealerPlayer';
+import HumanPlayer from '../players/HumanPlayer';
+import Player from '../players/Player';
 
 export default class BlackJack {
-
   // Going to have this DealerPlayer class handle the responsiblites of the Dealer and the Player.
   // I thought about this for a while, and think this is the best solution, if anyone disagrees lmk.
   public _dealer: DealerPlayer;
@@ -25,9 +25,9 @@ export default class BlackJack {
 
   // update everyones status to Playing
   private updateToPlaying(): void {
-    this._dealer.status = GameStatus.Playing
+    this._dealer.status = GameStatus.Playing;
     this._players.forEach(player => {
-      player.status = GameStatus.Playing
+      player.status = GameStatus.Playing;
     });
   }
 
@@ -35,20 +35,22 @@ export default class BlackJack {
     const humanPlayers: HumanPlayer[] = [];
     this._players.forEach(player => {
       if (player.status === GameStatus.Waiting) {
-        humanPlayers.push(player as HumanPlayer)
+        humanPlayers.push(player as HumanPlayer);
       }
     });
     return humanPlayers;
   }
-
-
 
   public playGame(): void {
     // maybe check that there is more than 1 player before i start the gameplay loop?
     this.updateToPlaying();
     this._dealer.dealCards(this.getActiveHumanPlayers());
 
+    // this is the equivilant of doing one round
+    // so do a while loop, expecting that it will return early if someone wins
     this._dealer.doTurns(this.getActiveHumanPlayers());
+
+    // after each iteration, check if the game is over and end it if so
 
     // dealer asks first person if they want to hit or stay
 
@@ -71,11 +73,5 @@ export default class BlackJack {
     //      OR
     //    their is only one player with GameStatus.Playing, and there does not
     //    exist a player with GameStatus.Won
-
   }
-
-
-
-
-
 }
