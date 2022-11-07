@@ -1,3 +1,6 @@
-export enum BlackjackAction {
-  Hit, Stay
-};
+enum BlackjackAction {
+  Hit,
+  Stay,
+}
+
+export default BlackjackAction;

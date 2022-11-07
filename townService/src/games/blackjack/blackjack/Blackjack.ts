@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { Suit, SUITS } from '../../cards/Suit';
-import { Value, VALUES } from '../../cards/Value';
-import { GameStatus } from '../players/GameStatus';
+import GameStatus from '../players/GameStatus';
 import DealerPlayer from '../players/DealerPlayer';
 import HumanPlayer from '../players/HumanPlayer';
 import Player from '../players/Player';
@@ -41,37 +39,42 @@ export default class BlackJack {
     return humanPlayers;
   }
 
+  private getPlayersStillInGame(): HumanPlayer[] {
+    return this._players.filter(
+      player => player.status === GameStatus.Playing || player.status === GameStatus.Won,
+    ) as HumanPlayer[];
+  }
+
+  private getWinner(): Player {
+    const playersStillInGame: HumanPlayer[] = this.getPlayersStillInGame();
+
+    if (playersStillInGame.length === 0) {
+      throw new Error('There are no players in the game, so there is no winner!');
+    }
+
+    return playersStillInGame[0];
+  }
+
+  private isGameOver(): boolean {
+    const playersStillInGame: HumanPlayer[] = this.getPlayersStillInGame();
+
+    if (playersStillInGame.length === 0) {
+      throw new Error("There are no players in the game, can't determine if game is over");
+    }
+
+    return playersStillInGame.length === 1;
+  }
+
   public playGame(): void {
     // maybe check that there is more than 1 player before i start the gameplay loop?
     this.updateToPlaying();
     this._dealer.dealCards(this.getActiveHumanPlayers());
 
-    // this is the equivilant of doing one round
-    // so do a while loop, expecting that it will return early if someone wins
-    this._dealer.doTurns(this.getActiveHumanPlayers());
+    while (!this.isGameOver()) {
+      this._dealer.doTurns(this.getActiveHumanPlayers());
+    }
 
-    // after each iteration, check if the game is over and end it if so
-
-    // dealer asks first person if they want to hit or stay
-
-    // we will essentially have to make a bunch of async functions
-    // and have the flow of the game be controller by await statements
-
-    // that allows us some flexibilty when we go to connect this to the actual game
-    // and it also allows me to hotswap command line input
-
-    // but essentially ask every player if they want to hit or stay
-    // then dealer hits or stays (based on 17 rule)
-
-    // and we just keep doing this loop, updating the status of the players as we go
-
-    // if any player goes over 21, we set their status to GameStatus.Lost and skip over
-    // them in the main gameplay loop.
-
-    // We know someone won either when:
-    //    they get 21 (and their status is set to GameStatus.Won)
-    //      OR
-    //    their is only one player with GameStatus.Playing, and there does not
-    //    exist a player with GameStatus.Won
+    // we have nothing to do with this currently, but just want to show the intended usage
+    const winner: Player = this.getWinner();
   }
 }

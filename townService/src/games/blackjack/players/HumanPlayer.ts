@@ -3,11 +3,10 @@
 /* eslint-disable prettier/prettier */
 import { setTimeout } from "timers";
 import { ReadLine, createInterface } from "readline";
-import { rawListeners } from "process";
 import Hand from "./Hand";
-import { GameStatus } from "./GameStatus";
+import GameStatus from "./GameStatus";
 import Player from "./Player";
-import { BlackjackAction } from "../blackjack/BlackjackAction";
+import BlackjackAction from "../blackjack/BlackjackAction";
 import Card from "../../cards/Card";
 
 export default class HumanPlayer extends Player {

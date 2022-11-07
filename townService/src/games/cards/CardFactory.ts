@@ -1,15 +1,14 @@
-import Card from "./Card";
-import { Suit } from "./Suit";
-import { Value, VALUES } from "./Value";
+import Card from './Card';
+import Suit from './Suit';
+import Value, { VALUES } from './Value';
 
 // this is essentially a factory that is sort of like a singleton
 export default class CardFactory {
-
   private static _cards: Map<Suit, Array<Card>> = new Map<Suit, Array<Card>>([
     [Suit.Clubs, VALUES.map(value => new Card(value, Suit.Clubs))],
     [Suit.Diamonds, VALUES.map(value => new Card(value, Suit.Diamonds))],
-    [Suit.Hearts,  VALUES.map(value => new Card(value, Suit.Hearts))],
-    [Suit.Spades,  VALUES.map(value => new Card(value, Suit.Spades))]
+    [Suit.Hearts, VALUES.map(value => new Card(value, Suit.Hearts))],
+    [Suit.Spades, VALUES.map(value => new Card(value, Suit.Spades))],
   ]);
 
   public static getCard(value: Value, suit: Suit): Card {
@@ -17,7 +16,7 @@ export default class CardFactory {
     if (!cards) {
       throw new Error(`Invalid suit: ${suit}`);
     }
-    const card = cards.find(card => card._value === value);
+    const card = cards.find(potentialCard => potentialCard._value === value);
     if (!card) {
       throw new Error(`Invalid value: ${suit}`);
     }
@@ -31,6 +30,4 @@ export default class CardFactory {
     });
     return cards;
   }
-
-
 }

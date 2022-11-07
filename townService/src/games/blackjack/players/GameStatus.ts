@@ -1,3 +1,9 @@
-export enum GameStatus {
-  Waiting, Playing, Lost, Won, Spectator
+enum GameStatus {
+  Waiting,
+  Playing,
+  Lost,
+  Won,
+  Spectator,
 }
+
+export default GameStatus;

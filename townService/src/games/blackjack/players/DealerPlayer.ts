@@ -2,14 +2,10 @@
 /* eslint-disable class-methods-use-this */
 import Card from '../../cards/Card';
 import Hand from './Hand';
-import { GameStatus } from './GameStatus';
-import { Suit, SUITS } from '../../cards/Suit';
-import { Value, VALUES } from '../../cards/Value';
+import GameStatus from './GameStatus';
 import HumanPlayer from './HumanPlayer';
-import Player from './Player';
 import CardFactory from '../../cards/CardFactory';
-import { BlackjackAction } from '../blackjack/BlackjackAction';
-import { SocketAddress } from 'net';
+import BlackjackAction from '../blackjack/BlackjackAction';
 
 export default class DealerPlayer extends HumanPlayer {
   public _masterDeck: Card[];

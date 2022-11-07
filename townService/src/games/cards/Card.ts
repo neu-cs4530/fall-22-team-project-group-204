@@ -1,8 +1,7 @@
-import { getSuitString, parseSuit, Suit } from "./Suit";
-import { getValueString, parseValueFromString, Value, getValueNumbers } from "./Value";
+import Suit, { getSuitString, parseSuit } from './Suit';
+import Value, { getValueString, parseValueFromString, getValueNumbers } from './Value';
 
 export default class Card {
-
   public _value: Value;
 
   public _suit: Suit;
@@ -19,5 +18,4 @@ export default class Card {
   public getNumericValue(): Array<number> {
     return getValueNumbers(this._value);
   }
-
 }
