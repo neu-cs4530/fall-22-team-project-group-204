@@ -1,3 +1,4 @@
+/* eslint-disable no-else-return */
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable class-methods-use-this */
 import Card from '../../cards/Card';
@@ -81,7 +82,10 @@ export default class DealerPlayer extends HumanPlayer {
     if (!players || players.length === 0) {
       throw new Error("Can't play Blackjack with 0 people!");
     }
-    players.forEach(async player => {
+
+    // https://stackoverflow.com/a/2641374
+    // is the link to the explanation of why i am using players.some() here
+    const gameOver = players.some(async player => {
       // If they hit or stay do the correct thing
       const chosenAction: BlackjackAction = await player.doTurn();
       // replace if with switch statement (i forgot the syntax)
@@ -91,11 +95,18 @@ export default class DealerPlayer extends HumanPlayer {
 
       if (player.has21()) {
         player.status = GameStatus.Won;
+        return true;
         // need to break/end game right here
       } else if (player.hasBusted()) {
         player.status = GameStatus.Lost;
       }
+
+      return false;
     });
+
+    if (gameOver) {
+      return;
+    }
 
     if (this.willHit()) {
       super.addCard(this.popCard());
