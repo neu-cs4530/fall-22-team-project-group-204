@@ -1,4 +1,3 @@
-/* eslint-disable import/no-named-as-default */
 /* eslint-disable @typescript-eslint/naming-convention */
 import GameStatus from '../players/GameStatus';
 import DealerPlayer from '../players/DealerPlayer';

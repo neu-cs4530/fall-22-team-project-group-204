@@ -13,7 +13,7 @@ export default class Hand {
     this._cards = value;
   }
 
-  public getNumericScore(): number[] {
+  public getNumericScores(): number[] {
     const scores: number[] = [0];
     // need to figure out a better name than cardInfo
 

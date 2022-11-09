@@ -1,10 +1,18 @@
-import Suit, { getSuitString, parseSuit } from './Suit';
-import Value, { getValueString, parseValueFromString, getValueNumbers } from './Value';
+import Suit, { getSuitString } from './Suit';
+import Value, { getValueString, getValueNumbers } from './Value';
 
 export default class Card {
-  public _value: Value;
+  public readonly _value: Value;
 
-  public _suit: Suit;
+  get value(): Value {
+    return this._value;
+  }
+
+  public readonly _suit: Suit;
+
+  get suit(): Suit {
+    return this._suit;
+  }
 
   constructor(value: Value, suit: Suit) {
     this._value = value;
@@ -12,7 +20,7 @@ export default class Card {
   }
 
   public toString(): string {
-    return getValueString(this._value) + getSuitString(this._suit);
+    return getSuitString(this._suit) + getValueString(this._value);
   }
 
   public getNumericValue(): Array<number> {

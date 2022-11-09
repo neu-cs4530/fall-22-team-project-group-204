@@ -68,6 +68,7 @@
     "nanoid": "^4.0.0",
     "socket.io": "^4.5.1",
     "swagger-ui-express": "^4.4.0",
+    "timers": "^0.1.1",
     "tsoa": "^4.1.0",
     "twilio": "^3.78.0"
   }
