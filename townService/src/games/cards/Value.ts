@@ -51,7 +51,7 @@ const valueStringLookup: Map<Value, Array<string>> = new Map([
 export function getValueString(value: Value): string {
   // it technically could still be undefined so I am not going
   // to give it an official type declaration
-  const valueAsString = valueStringLookup.get(value);
+  const valueAsString: string[] = valueStringLookup.get(value) ?? [];
   if (!valueAsString) {
     throw new Error('Input argument is not a valid value!');
   }
