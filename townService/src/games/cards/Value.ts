@@ -33,19 +33,19 @@ export const VALUES: Value[] = [
 ];
 
 const valueStringLookup: Map<Value, Array<string>> = new Map([
-  [Value.Ace, ['Ace', '1', 'One', '11', 'Eleven']],
-  [Value.Two, ['Two', '2']],
-  [Value.Three, ['Three', '3']],
-  [Value.Four, ['Four', '4']],
-  [Value.Five, ['Five', '5']],
-  [Value.Six, ['Six', '6']],
-  [Value.Seven, ['Seven', '7']],
-  [Value.Eight, ['Eight', '8']],
-  [Value.Nine, ['Nine', '9']],
-  [Value.Ten, ['Ten', '10']],
-  [Value.Jack, ['Jack', '10', 'Ten']],
-  [Value.Queen, ['Queen', '10', 'Ten']],
-  [Value.King, ['King', '10', 'Ten']],
+  [Value.Ace, ['A', 'Ace', '1', 'One', '11', 'Eleven']],
+  [Value.Two, ['2', 'Two']],
+  [Value.Three, ['3', 'Three']],
+  [Value.Four, ['4', 'Four']],
+  [Value.Five, ['5', 'Five']],
+  [Value.Six, ['6', 'Six']],
+  [Value.Seven, ['7', 'Seven']],
+  [Value.Eight, ['8', 'Eight']],
+  [Value.Nine, ['9', 'Nine']],
+  [Value.Ten, ['10', 'Ten']],
+  [Value.Jack, ['J', 'Jack', '10', 'Ten']],
+  [Value.Queen, ['Q', 'Queen', '10', 'Ten']],
+  [Value.King, ['K', 'King', '10', 'Ten']],
 ]);
 
 export function getValueString(value: Value): string {
@@ -59,11 +59,11 @@ export function getValueString(value: Value): string {
 }
 
 export function parseValueFromString(value: string): Value {
-  valueStringLookup.forEach((svals, val) => {
-    if (svals.some(s => s === value)) {
-      return val;
+  for (const [key, valueArray] of valueStringLookup) {
+    if (valueArray.some(valueString => valueString === value)) {
+      return key;
     }
-  });
+  }
   throw new Error('Input argument is not a valid value!');
 }
 
@@ -84,11 +84,11 @@ const valueNumLookup: Map<Value, Array<number>> = new Map([
 ]);
 
 export function parseValue(value: number): Value {
-  valueNumLookup.forEach((val, num) => {
-    if (num === value) {
-      return val;
+  for (const [key, valueArray] of valueNumLookup) {
+    if (valueArray.some(valueNum => valueNum === value)) {
+      return key;
     }
-  });
+  }
   throw new Error('Input argument is not a valid value!');
 }
 

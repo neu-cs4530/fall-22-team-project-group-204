@@ -21,6 +21,10 @@ export default class HumanPlayer extends Player {
     this._hand = value;
   }
 
+  public set status(value: GameStatus) {
+    super.status = value;
+  }
+
   constructor() {
     super(GameStatus.Waiting);
     this._hand = new Hand();
@@ -47,7 +51,7 @@ export default class HumanPlayer extends Player {
     return this.getNumericScore().filter(score => score > 21).length > 0;
   }
 
-  public parseNextMove(answerText: string): BlackjackAction {
+  public static parseNextMove(answerText: string): BlackjackAction {
     const answerTextCleaned = answerText.toLowerCase();
     switch (answerTextCleaned) {
       case 'h':
@@ -81,7 +85,7 @@ export default class HumanPlayer extends Player {
   public async getBlackjackAction(): Promise<BlackjackAction> {
     return new Promise((resolve, reject) => {
       setTimeout(async () => {
-        resolve(this.parseNextMove(await this.getNextMove()));
+        resolve(HumanPlayer.parseNextMove(await this.getNextMove()));
       }, 150);
       // I tried to use setTimeout here to simulate async code, but it didnt work
     });

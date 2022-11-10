@@ -12,7 +12,7 @@ const suitLookup: Map<Suit, Array<string>> = new Map([
   [Suit.Diamonds, ['♦', 'Diamonds']],
   [Suit.Spades, ['♠', 'Spades']],
   [Suit.Hearts, ['♥', 'Hearts']],
-  [Suit.Clubs, ['♣', 'Suits']],
+  [Suit.Clubs, ['♣', 'Clubs']],
 ]);
 
 export function getSuitString(suit: Suit): string {
@@ -32,11 +32,11 @@ export function getSuitStringFormal(suit: Suit): string {
 }
 
 export function parseSuit(suit: string): Suit {
-  suitLookup.forEach((ssuits, osuit) => {
-    if (ssuits.some(s => s === suit)) {
-      return osuit;
+  for (const [key, value] of suitLookup) {
+    if (value.some(suitString => suitString === suit)) {
+      return key;
     }
-  });
+  }
   throw new Error('Input argument is not a valid suit!');
 }
 

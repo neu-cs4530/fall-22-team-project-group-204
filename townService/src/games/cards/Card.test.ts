@@ -20,7 +20,7 @@ describe('Card', () => {
 
     it('Suit getter works correctly', () => {
       const sevenOfDiamonds = new Card(Value.Seven, Suit.Diamonds);
-      expect(sevenOfDiamonds.suit).toBe(Value.Seven);
+      expect(sevenOfDiamonds.suit).toBe(Suit.Diamonds);
     });
 
   });
@@ -45,10 +45,10 @@ describe('Card', () => {
   describe('getNumericValue', () => {
     it('Card.getNumericValue() works properly', () => {
       const sevenOfDiamonds = new Card(Value.Seven, Suit.Diamonds);
-      expect(sevenOfDiamonds.getNumericValue).toBe([7]);
+      expect(sevenOfDiamonds.getNumericValue()).toBe([7]);
 
       const aceOfSpades = new Card(Value.Ace, Suit.Spades);
-      expect(aceOfSpades.getNumericValue).toBe([1, 11]);
+      expect(aceOfSpades.getNumericValue()).toBe([1, 11]);
 
       const fiveOfClubs = new Card(Value.Five, Suit.Clubs);
       expect(fiveOfClubs.getNumericValue()).toBe([5]);
