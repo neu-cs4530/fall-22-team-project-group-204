@@ -13,24 +13,29 @@ export default class Hand {
     this._cards = value;
   }
 
+  public addCard(card: Card, isFaceUp = true): void {
+    this._cards.push([card, isFaceUp]);
+  }
+
   public getNumericScores(): number[] {
-    const scores: number[] = [0];
+    let scores: number[] = [0];
     // need to figure out a better name than cardInfo
 
-    this._cards.forEach(cardInfo => {
+    for (const cardInfo of this._cards) {
       const values = cardInfo[0].getNumericValue();
-      const scoresCopy = new Array<number>(...scores);
+      let scoresCopy = [...scores];
       const valueOne = values[0];
 
-      scores.map(score => score + valueOne);
+      scores = scores.map(score => score + valueOne);
 
       if (values.length === 2) {
         const valueTwo = values[1];
-        scoresCopy.map(score => score + valueTwo);
+        scoresCopy = scoresCopy.map(score => score + valueTwo);
         scores.push(...scoresCopy);
       }
-    });
-    return scores;
+    }
+
+    return scores.filter((item, index) => scores.indexOf(item) === index);
   }
 
   constructor(cards: [Card, boolean][] = []) {

@@ -21,6 +21,10 @@ export default class HumanPlayer extends Player {
     this._hand = value;
   }
 
+  public get status(): GameStatus {
+    return super.status;
+  }
+
   public set status(value: GameStatus) {
     super.status = value;
   }
@@ -37,7 +41,12 @@ export default class HumanPlayer extends Player {
   public getNumericScore(): Array<number> {
     let scores = this._hand.getNumericScores();
     if (scores.length > 1) {
-      scores = scores.filter(score => score < 22);
+      const filteredScores = scores.filter(score => score < 22);
+      if (filteredScores.length > 0) {
+        scores = filteredScores;
+      } else {
+        scores = [Math.min(...scores)];
+      }
     }
     return scores;
   }
@@ -48,7 +57,7 @@ export default class HumanPlayer extends Player {
   }
 
   public hasBusted(): boolean {
-    return this.getNumericScore().filter(score => score > 21).length > 0;
+    return this.getNumericScore().filter(score => score < 22).length === 0;
   }
 
   public static parseNextMove(answerText: string): BlackjackAction {
@@ -83,7 +92,7 @@ export default class HumanPlayer extends Player {
 
   // I will have to mock this function to test
   public async getBlackjackAction(): Promise<BlackjackAction> {
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       setTimeout(async () => {
         resolve(HumanPlayer.parseNextMove(await this.getNextMove()));
       }, 150);

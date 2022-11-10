@@ -22,38 +22,34 @@ describe('Card', () => {
       const sevenOfDiamonds = new Card(Value.Seven, Suit.Diamonds);
       expect(sevenOfDiamonds.suit).toBe(Suit.Diamonds);
     });
-
   });
 
   describe('toString', () => {
     it('Card.toString() works properly', () => {
       const sevenOfDiamonds = new Card(Value.Seven, Suit.Diamonds);
-      expect(sevenOfDiamonds.toString()).toBe("♦7");
+      expect(sevenOfDiamonds.toString()).toBe('♦7');
 
       const aceOfSpades = new Card(Value.Ace, Suit.Spades);
-      expect(aceOfSpades.toString()).toBe("♠A");
+      expect(aceOfSpades.toString()).toBe('♠A');
 
       const twoOfHearts = new Card(Value.Two, Suit.Hearts);
-      expect(twoOfHearts.toString()).toBe("♥2");
+      expect(twoOfHearts.toString()).toBe('♥2');
 
       const fiveOfClubs = new Card(Value.Five, Suit.Clubs);
-      expect(fiveOfClubs.toString()).toBe("♣5");
-
+      expect(fiveOfClubs.toString()).toBe('♣5');
     });
   });
 
   describe('getNumericValue', () => {
     it('Card.getNumericValue() works properly', () => {
       const sevenOfDiamonds = new Card(Value.Seven, Suit.Diamonds);
-      expect(sevenOfDiamonds.getNumericValue()).toBe([7]);
+      expect(sevenOfDiamonds.getNumericValue()).toStrictEqual([7]);
 
       const aceOfSpades = new Card(Value.Ace, Suit.Spades);
-      expect(aceOfSpades.getNumericValue()).toBe([1, 11]);
+      expect(aceOfSpades.getNumericValue()).toStrictEqual([1, 11]);
 
       const fiveOfClubs = new Card(Value.Five, Suit.Clubs);
-      expect(fiveOfClubs.getNumericValue()).toBe([5]);
+      expect(fiveOfClubs.getNumericValue()).toStrictEqual([5]);
     });
   });
-
-
 });
