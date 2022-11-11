@@ -1,4 +1,4 @@
-import Suit, { getSuitString } from './Suit';
+import Suit, { getSuitSymbolString } from './Suit';
 import Value, { getValueString, getValueNumbers } from './Value';
 
 export default class Card {
@@ -20,7 +20,7 @@ export default class Card {
   }
 
   public toString(): string {
-    return getSuitString(this._suit) + getValueString(this._value);
+    return getSuitSymbolString(this._suit) + getValueString(this._value);
   }
 
   public getNumericValue(): Array<number> {
