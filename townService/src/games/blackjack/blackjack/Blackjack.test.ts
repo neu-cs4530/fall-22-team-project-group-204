@@ -1,0 +1,79 @@
+/* eslint-disable no-promise-executor-return */
+/* eslint-disable prettier/prettier */
+
+import DealerPlayer from "../players/DealerPlayer";
+import GameStatus from "../players/GameStatus";
+import HumanPlayer from "../players/HumanPlayer";
+import BlackJack from "./Blackjack";
+import BlackjackAction from "./BlackjackAction";
+
+// We are effectively testing both the DealerPlayer class and the
+// Player class here
+describe('DealerPlayer', () => {
+  let blackjackInstance: BlackJack;
+  let playerOne: HumanPlayer;
+  let playerTwo: HumanPlayer;
+  let players: HumanPlayer[];
+
+  beforeEach(() => {
+    playerOne = new HumanPlayer();
+    playerTwo = new HumanPlayer();
+    players = [playerOne, playerTwo];
+    blackjackInstance = new BlackJack(players);
+    playerOne.getBlackjackAction = jest.fn().mockReturnValue(BlackjackAction.Hit);
+    playerTwo.getBlackjackAction = jest.fn().mockReturnValue(BlackjackAction.Stay);
+    playerOne.doTurn = jest.fn().mockReturnValue(BlackjackAction.Hit);
+    playerTwo.doTurn = jest.fn().mockReturnValue(BlackjackAction.Stay);
+  });
+
+
+  describe('constructor', () => {
+    it('Constructs a DealerPlayer properly', () => {
+      const newBlackjackInstance = new BlackJack();
+      expect(newBlackjackInstance.players).toStrictEqual([]);
+      expect(newBlackjackInstance.dealer).not.toBeNull();
+      expect(newBlackjackInstance.dealer).toBeInstanceOf(DealerPlayer);
+
+      const newPlayerOne = new HumanPlayer();
+      const newPlayerTwo = new HumanPlayer();
+      const newPlayerThree = new HumanPlayer();
+      const newPlayers = [newPlayerOne, newPlayerTwo, newPlayerThree];
+      const anotherBlackjackInstance = new BlackJack(newPlayers);
+
+      expect(anotherBlackjackInstance.players).toStrictEqual(newPlayers);
+      expect(anotherBlackjackInstance.dealer).not.toBeNull();
+      expect(anotherBlackjackInstance.dealer).toBeInstanceOf(DealerPlayer);
+    });
+  });
+
+  describe('getters', () => {
+    it('Dealer getter works correctly', () => {
+      expect(blackjackInstance.dealer).toBeInstanceOf(DealerPlayer);
+      expect(blackjackInstance.dealer.hand.cards).toStrictEqual([]);
+    });
+
+    it('Players getter works properly', () => {
+      expect(blackjackInstance.players).toStrictEqual(players);
+      const newBlackjackInstance = new BlackJack();
+      expect(newBlackjackInstance.players).toStrictEqual([]);
+    });
+  });
+
+
+  describe('class methods', () => {
+    describe('playGame', () => {
+      it('Correctly plays Blackjack', async () => {
+        await blackjackInstance.playGame();
+        expect(blackjackInstance.players).toStrictEqual(players);
+        expect(blackjackInstance.dealer).toBeInstanceOf(DealerPlayer);
+
+        const fullPlayers = [...blackjackInstance.players, blackjackInstance.dealer];
+        const someoneWon = fullPlayers.some(player => player.status === GameStatus.Won);
+        expect(someoneWon).toBe(true);
+      });
+
+    });
+  });
+
+});
+

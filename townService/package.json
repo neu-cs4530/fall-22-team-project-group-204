@@ -16,6 +16,7 @@
   "homepage": "https://github.com/neu-se/covey.town#readme",
   "scripts": {
     "test": "jest ",
+    "test-blackjack": "jest townService/src/games --forceExit",
     "start": "npm run build:live",
     "prestart": "tsoa spec-and-routes",
     "build": "tsc -p .",

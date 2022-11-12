@@ -85,7 +85,7 @@ describe('DealerPlayer', () => {
     describe('shuffleDeck', () => {
       it('Shuffles a deck properly', () => {
         const deck = CardFactory.getDeck();
-        const shuffledDeck = dealerPlayer.shuffleDeck(deck);
+        const shuffledDeck = DealerPlayer.shuffleDeck(deck);
         expect(shuffledDeck).not.toStrictEqual(deck);
         expect(deck).toStrictEqual(CardFactory.getDeck());
         expect(shuffledDeck).toStrictEqual(expect.arrayContaining(deck));

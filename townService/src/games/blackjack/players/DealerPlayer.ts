@@ -1,6 +1,3 @@
-/* eslint-disable no-else-return */
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable class-methods-use-this */
 import Card from '../../cards/Card';
 import Hand from './Hand';
 import GameStatus from './GameStatus';
@@ -48,7 +45,7 @@ export default class DealerPlayer extends HumanPlayer {
     return decks;
   }
 
-  public shuffleDeck(deck: Card[]): Card[] {
+  public static shuffleDeck(deck: Card[]): Card[] {
     return deck
       .map(card => ({ card, sort: Math.random() }))
       .sort((a, b) => a.sort - b.sort)
@@ -56,10 +53,10 @@ export default class DealerPlayer extends HumanPlayer {
   }
 
   public shuffleDecks(): void {
-    this._masterDeck = this.shuffleDeck(this._masterDeck);
+    this._masterDeck = DealerPlayer.shuffleDeck(this._masterDeck);
   }
 
-  private popCard(): Card {
+  private _popCard(): Card {
     const card = this._masterDeck.pop();
     if (!card) {
       throw new Error('No more cards left!');
@@ -67,10 +64,10 @@ export default class DealerPlayer extends HumanPlayer {
     return card;
   }
 
-  private getStarterHand(isFirstHidden = true): [Card, boolean][] {
+  private _getStarterHand(isFirstHidden = true): [Card, boolean][] {
     return [
-      [this.popCard(), isFirstHidden],
-      [this.popCard(), true],
+      [this._popCard(), isFirstHidden],
+      [this._popCard(), true],
     ];
   }
 
@@ -84,13 +81,13 @@ export default class DealerPlayer extends HumanPlayer {
       if (this._masterDeck.length < 2) {
         throw new Error('');
       }
-      player.hand = new Hand(this.getStarterHand());
+      player.hand = new Hand(this._getStarterHand());
     });
 
-    this.hand.cards = this.getStarterHand(false);
+    this.hand.cards = this._getStarterHand(false);
   }
 
-  private willHit(): boolean {
+  private _willHit(): boolean {
     const scores = super.getNumericScore().filter(score => score < 18);
     return scores.length > 0;
   }
@@ -99,21 +96,37 @@ export default class DealerPlayer extends HumanPlayer {
     await this.doTurns(players);
   }
 
+  private _setEveryoneElseToLost(players: HumanPlayer[], dealerWon = false): void {
+    players.forEach(player => {
+      player.status = GameStatus.Lost;
+    });
+
+    if (dealerWon) {
+      super.status = GameStatus.Lost;
+    }
+  }
+
   public async doHumanTurns(players: HumanPlayer[]): Promise<void> {
-    for (const player of players) {
+    const activePlayers = players.filter(player => player.status !== GameStatus.Lost);
+    for (const player of activePlayers) {
       // If they hit or stay do the correct thing
-      // eslint-disable-next-line no-await-in-loop
       const chosenAction: BlackjackAction = await player.doTurn();
       // replace if with switch statement (i forgot the syntax)
       if (chosenAction === BlackjackAction.Hit) {
-        player.addCard(this.popCard());
+        player.addCard(this._popCard());
       }
       if (player.has21()) {
         player.status = GameStatus.Won;
+        this._setEveryoneElseToLost(players.filter(p => p !== player));
         return;
-        // need to break/end game right here
-      } else if (player.hasBusted()) {
+      }
+      if (player.hasBusted()) {
         player.status = GameStatus.Lost;
+      }
+
+      if (players.filter(p => p !== player).every(p => p.status === GameStatus.Lost)) {
+        player.status = GameStatus.Won;
+        return;
       }
     }
   }
@@ -122,7 +135,7 @@ export default class DealerPlayer extends HumanPlayer {
     super.addCard(newCard, super.hand.cards.length !== 0);
   }
 
-  private isGameOver(players: HumanPlayer[]): boolean {
+  private static _isGameOver(players: HumanPlayer[]): boolean {
     return (
       players.some(player => player.status === GameStatus.Won) ||
       players.every(player => player.status === GameStatus.Lost)
@@ -136,16 +149,17 @@ export default class DealerPlayer extends HumanPlayer {
 
     await this.doHumanTurns(players);
 
-    if (this.isGameOver(players)) {
+    if (DealerPlayer._isGameOver(players)) {
       return;
     }
 
-    if (this.willHit()) {
-      super.addCard(this.popCard());
+    if (this._willHit()) {
+      super.addCard(this._popCard());
     }
 
     if (super.has21()) {
       super.status = GameStatus.Won;
+      this._setEveryoneElseToLost(players);
     } else if (super.hasBusted()) {
       super.status = GameStatus.Lost;
     }
