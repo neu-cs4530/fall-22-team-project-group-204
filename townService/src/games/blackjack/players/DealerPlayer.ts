@@ -13,15 +13,36 @@ export default class DealerPlayer extends HumanPlayer {
 
   constructor() {
     super();
-    this._masterDeck = this.getDecks(2).flat();
+    this._masterDeck = DealerPlayer.getDecks(2).flat();
     this.shuffleDecks();
   }
 
-  public getDecks(amount: number): Card[][] {
+  public get hand(): Hand {
+    return super.hand;
+  }
+
+  public set hand(value: Hand) {
+    super.hand = value;
+  }
+
+  public get status(): GameStatus {
+    return super.status;
+  }
+
+  public set status(status: GameStatus) {
+    super.status = status;
+  }
+
+  public get deck(): Card[] {
+    return this._masterDeck;
+  }
+
+  public static getDecks(amount: number): Card[][] {
     const decks: Card[][] = [];
     Array(amount)
       .fill(0)
-      .forEach((_, i) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      .forEach(_ => {
         decks.push(CardFactory.getDeck());
       });
     return decks;
@@ -46,10 +67,10 @@ export default class DealerPlayer extends HumanPlayer {
     return card;
   }
 
-  private getStarterHand(isFirstHidden = false): [Card, boolean][] {
+  private getStarterHand(isFirstHidden = true): [Card, boolean][] {
     return [
       [this.popCard(), isFirstHidden],
-      [this.popCard(), false],
+      [this.popCard(), true],
     ];
   }
 
@@ -66,7 +87,7 @@ export default class DealerPlayer extends HumanPlayer {
       player.hand = new Hand(this.getStarterHand());
     });
 
-    this.hand.cards = this.getStarterHand(true);
+    this.hand.cards = this.getStarterHand(false);
   }
 
   private willHit(): boolean {
@@ -74,37 +95,48 @@ export default class DealerPlayer extends HumanPlayer {
     return scores.length > 0;
   }
 
-  public doRound(players: HumanPlayer[]): void {
-    return this.doTurns(players);
+  public async doRound(players: HumanPlayer[]): Promise<void> {
+    await this.doTurns(players);
   }
 
-  public doTurns(players: HumanPlayer[]): void {
-    if (!players || players.length === 0) {
-      throw new Error("Can't play Blackjack with 0 people!");
-    }
-
-    // https://stackoverflow.com/a/2641374
-    // is the link to the explanation of why i am using players.some() here
-    const gameOver = players.some(async player => {
+  public async doHumanTurns(players: HumanPlayer[]): Promise<void> {
+    for (const player of players) {
       // If they hit or stay do the correct thing
+      // eslint-disable-next-line no-await-in-loop
       const chosenAction: BlackjackAction = await player.doTurn();
       // replace if with switch statement (i forgot the syntax)
       if (chosenAction === BlackjackAction.Hit) {
         player.addCard(this.popCard());
       }
-
       if (player.has21()) {
         player.status = GameStatus.Won;
-        return true;
+        return;
         // need to break/end game right here
       } else if (player.hasBusted()) {
         player.status = GameStatus.Lost;
       }
+    }
+  }
 
-      return false;
-    });
+  public addCard(newCard: Card): void {
+    super.addCard(newCard, super.hand.cards.length !== 0);
+  }
 
-    if (gameOver) {
+  private isGameOver(players: HumanPlayer[]): boolean {
+    return (
+      players.some(player => player.status === GameStatus.Won) ||
+      players.every(player => player.status === GameStatus.Lost)
+    );
+  }
+
+  public async doTurns(players: HumanPlayer[]): Promise<void> {
+    if (!players || players.length === 0) {
+      throw new Error("Can't play Blackjack with 0 people!");
+    }
+
+    await this.doHumanTurns(players);
+
+    if (this.isGameOver(players)) {
       return;
     }
 

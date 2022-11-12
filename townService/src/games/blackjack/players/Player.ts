@@ -7,8 +7,10 @@ export default abstract class Player {
     return this._status;
   }
 
-  public set status(value: GameStatus) {
-    this._status = value;
+  // This is protected because Spectator shouldn't be able
+  // to set their status
+  protected set status(status: GameStatus) {
+    this._status = status;
   }
 
   constructor(status: GameStatus) {
