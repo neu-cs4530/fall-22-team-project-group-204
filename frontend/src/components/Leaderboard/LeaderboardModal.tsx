@@ -14,17 +14,7 @@ export default function LeaderboardModal(): JSX.Element {
   const coveyTownController = useTownController();
   // State for keeping track of whether key is pressed
   const [showModal, setShowModal] = useState<boolean>(false);
-  // If pressed key is our target key then set to true
-  function downHandler({ key }: { key: any }) {
-    if (key === 'Shift') {
-      setShowModal(!showModal);
-      if (coveyTownController.paused) {
-        coveyTownController.unPause();
-      } else {
-        coveyTownController.pause();
-      }
-    }
-  }
+
   // If released key is our target key then set to false
   const closeModal = () => {
     setShowModal(false);
@@ -32,6 +22,16 @@ export default function LeaderboardModal(): JSX.Element {
   };
 
   useEffect(() => {
+    const downHandler = ({ key }: { key: any }) => {
+      if (key === 'Shift') {
+        setShowModal(!showModal);
+        if (coveyTownController.paused) {
+          coveyTownController.unPause();
+        } else {
+          coveyTownController.pause();
+        }
+      }
+    };
     window.addEventListener('keydown', downHandler);
     // Remove event listeners on cleanup
     return () => {
