@@ -6,7 +6,7 @@ import SocialSidebar from '../SocialSidebar/SocialSidebar';
 import NewConversationModal from './interactables/NewCoversationModal';
 import TownGameScene from './TownGameScene';
 import BlackjackModal from './interactables/BlackjackModal';
-import LeaderboardModal from './interactables/LeaderboardModal';
+import LeaderboardModal from '../Leaderboard/LeaderboardModal';
 
 export default function TownMap(): JSX.Element {
   const coveyTownController = useTownController();
@@ -51,6 +51,7 @@ export default function TownMap(): JSX.Element {
     <div id='app-container'>
       <NewConversationModal />
       <BlackjackModal />
+      <LeaderboardModal />
       <div id='map-container' />
       <div id='social-container'>
         <SocialSidebar />
