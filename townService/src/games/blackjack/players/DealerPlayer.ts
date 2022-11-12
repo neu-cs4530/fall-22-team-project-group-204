@@ -6,7 +6,7 @@ import CardFactory from '../../cards/CardFactory';
 import BlackjackAction from '../blackjack/BlackjackAction';
 
 export default class DealerPlayer extends HumanPlayer {
-  public _masterDeck: Card[];
+  private _masterDeck: Card[];
 
   constructor() {
     super();

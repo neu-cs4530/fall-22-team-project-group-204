@@ -2,13 +2,13 @@ import Suit, { getSuitSymbolString } from './Suit';
 import Value, { getValueString, getValueNumbers } from './Value';
 
 export default class Card {
-  public readonly _value: Value;
+  private readonly _value: Value;
 
   get value(): Value {
     return this._value;
   }
 
-  public readonly _suit: Suit;
+  private readonly _suit: Suit;
 
   get suit(): Suit {
     return this._suit;

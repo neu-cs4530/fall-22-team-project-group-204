@@ -16,7 +16,7 @@ export default class CardFactory {
     if (!cards) {
       throw new Error(`Invalid suit: ${suit}`);
     }
-    const card = cards.find(potentialCard => potentialCard._value === value);
+    const card = cards.find(potentialCard => potentialCard.value === value);
     if (!card) {
       throw new Error(`Invalid value: ${suit}`);
     }

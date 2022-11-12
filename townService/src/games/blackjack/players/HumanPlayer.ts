@@ -67,15 +67,11 @@ export default class HumanPlayer extends Player {
       case 'hit':
       case '1':
         return BlackjackAction.Hit;
-        break;
       case 's':
       case 'stay':
       case '0':
-        return BlackjackAction.Stay;
-        break;
       default:
         return BlackjackAction.Stay;
-        break;
     }
   }
 
