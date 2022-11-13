@@ -116,38 +116,38 @@
           "y": 92
         },
         {
-              "type": "GamingArea",
-              "height": 128,
-              "id": 3,
-              "name": "BlackjackTable",
-              "rotation": 0,
-              "visible": true,
-              "width": 192,
-              "x": 608,
-              "y": 92
-       },
-       {
-              "type": "GamingArea",
-              "height": 128,
-              "id": 4,
-              "name": "BlackjackTable",
-              "rotation": 0,
-              "visible": true,
-              "width": 192,
-              "x": 128,
-              "y": 412
-       },
-       {
-              "type": "GamingArea",
-              "height": 128,
-              "id": 5,
-              "name": "BlackjackTable",
-              "rotation": 0,
-              "visible": true,
-              "width": 192,
-              "x": 608,
-              "y": 412
-       }
+          "type": "GamingArea",
+          "height": 128,
+          "id": 3,
+          "name": "BlackjackTable",
+          "rotation": 0,
+          "visible": true,
+          "width": 192,
+          "x": 608,
+          "y": 92
+        },
+        {
+          "type": "GamingArea",
+          "height": 128,
+          "id": 4,
+          "name": "BlackjackTable",
+          "rotation": 0,
+          "visible": true,
+          "width": 192,
+          "x": 128,
+          "y": 412
+        },
+        {
+          "type": "GamingArea",
+          "height": 128,
+          "id": 5,
+          "name": "BlackjackTable",
+          "rotation": 0,
+          "visible": true,
+          "width": 192,
+          "x": 608,
+          "y": 412
+        }
       ],
       "opacity": 1,
       "type": "objectgroup",
