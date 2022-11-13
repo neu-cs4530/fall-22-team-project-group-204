@@ -1,19 +1,4 @@
-import {
-  Button,
-  Modal,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Tfoot,
-  Th,
-  Thead,
-  Tr,
-} from '@chakra-ui/react';
+import { Button, Modal, ModalContent, ModalFooter, ModalHeader } from '@chakra-ui/react';
 import { createColumnHelper } from '@tanstack/react-table';
 import React, { useEffect, useState } from 'react';
 import useTownController from '../../hooks/useTownController';
