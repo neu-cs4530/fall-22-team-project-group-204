@@ -1,3 +1,7 @@
+# Auth
+*.env
+townService/*.env
+
 # Logs
 logs
 *.log
