@@ -15,6 +15,7 @@ module.exports = {
   },
   ignorePatterns: ['/*.*'],
   rules: {
+    'no-await-in-loop': 'off',
     'prettier/prettier': 'error',
     'no-underscore-dangle': 0,
     'no-param-reassign': 0,
