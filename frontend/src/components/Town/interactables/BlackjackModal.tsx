@@ -73,6 +73,7 @@ export function Chip({ chipValue, x, y }: { chipValue: number; x: number; y: num
       variant='ghost'
       position='relative'
       colorScheme='ghost'
+      // _focus={{ boxShadow: 'none' }} # do we want box shadow when clicking chips?
       top={y + 'px'}
       left={x + 'px'}
       icon={<Image width='40px' src={chip} />}
