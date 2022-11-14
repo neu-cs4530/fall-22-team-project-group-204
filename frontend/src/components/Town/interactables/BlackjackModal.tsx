@@ -10,6 +10,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Text,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect } from 'react';
 import { useInteractable } from '../../../classes/TownController';
@@ -66,25 +67,18 @@ export function Card({ cardId, x, y }: { cardId: number; x: number; y: number })
 }
 
 export function Chip({ chipValue, x, y }: { chipValue: number; x: number; y: number }) {
-  // const ref = useRef();
-  // const [isModalOpen, setIsModalOpen] = useState(false);
-  // useOutsideClick({
-  //   handler: () => setIsModalOpen(false),
-  // });
-
   const chip = `assets/blackjack/chips/chip_${chipValue}.png`;
   return (
     <IconButton
       variant='ghost'
+      position='relative'
       colorScheme='ghost'
       top={y + 'px'}
       left={x + 'px'}
-      icon={<Image width='40px' position='absolute' src={chip} />}
+      icon={<Image width='40px' src={chip} />}
       aria-label={''}
     />
   );
-  // <Image width='40px' position='absolute' src={chip} top={y + 'px'} left={x + 'px'} />
-  // );
 }
 
 export function Blackjack() {
@@ -96,13 +90,37 @@ export function Blackjack() {
       backgroundRepeat='no-repeat'
       backgroundSize='cover'
       position='relative'>
+      <Button size='sm' left='200px' top='500px' colorScheme='gray' position='relative'>
+        Hit
+      </Button>
+      <Button size='sm' left='240px' top='500px' colorScheme='gray' position='relative'>
+        Stand
+      </Button>
       <Card cardId={33} x={450} y={400} />
       <Card cardId={22} x={470} y={425} />
-      <Chip chipValue={1} x={610} y={480} />
-      <Chip chipValue={5} x={640} y={480} />
-      <Chip chipValue={25} x={670} y={480} />
-      <Chip chipValue={100} x={700} y={480} />
-      <Chip chipValue={500} x={730} y={480} />
+      <Chip chipValue={1} x={510} y={480} />
+      <Chip chipValue={5} x={540} y={480} />
+      <Chip chipValue={25} x={570} y={480} />
+      <Chip chipValue={100} x={600} y={480} />
+      <Chip chipValue={500} x={630} y={480} />
+      <Text as='b' fontSize='md' left='325px' top='450px' position='relative'>
+        1
+      </Text>
+      <Text as='b' fontSize='md' left='385px' top='450px' position='relative'>
+        5
+      </Text>
+      <Text as='b' fontSize='md' left='440px' top='450px' position='relative'>
+        25
+      </Text>
+      <Text as='b' fontSize='md' left='485px' top='450px' position='relative'>
+        100
+      </Text>
+      <Text as='b' fontSize='md' left='525px' top='450px' position='relative'>
+        500
+      </Text>
+      <Button size='sm' left='350px' top='535px' colorScheme='gray' position='relative'>
+        Bet
+      </Button>
     </Box>
   );
 }
