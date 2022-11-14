@@ -5,6 +5,7 @@ import { PlayerLocation } from '../../types/CoveyTownSocket';
 import { Callback } from '../VideoCall/VideoFrontend/types';
 import Interactable from './Interactable';
 import ConversationArea from './interactables/ConversationArea';
+import GamingArea from './interactables/GamingArea';
 import Transporter from './interactables/Transporter';
 import ViewingArea from './interactables/ViewingArea';
 
@@ -17,6 +18,8 @@ function interactableTypeForObjectType(type: string): any {
     return Transporter;
   } else if (type == 'ViewingArea') {
     return ViewingArea;
+  } else if (type == 'GamingArea') {
+    return GamingArea;
   } else {
     throw new Error(`Unknown object type: ${type}`);
   }
@@ -481,6 +484,19 @@ export default class TownGameScene extends Phaser.Scene {
     // Help text that has a "fixed" position on the screen
     this.add
       .text(16, 16, `Arrow keys to move`, {
+        font: '18px monospace',
+        color: '#000000',
+        padding: {
+          x: 20,
+          y: 10,
+        },
+        backgroundColor: '#ffffff',
+      })
+      .setScrollFactor(0)
+      .setDepth(30);
+
+    this.add
+      .text(500, 16, `Shift to view leaderboard`, {
         font: '18px monospace',
         color: '#000000',
         padding: {
