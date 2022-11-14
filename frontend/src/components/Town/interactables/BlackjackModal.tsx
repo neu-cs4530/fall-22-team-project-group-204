@@ -156,10 +156,10 @@ export default function BlackjackModal(): JSX.Element {
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Blackjack!</ModalHeader>
+        <ModalCloseButton />
         <ModalBody>
           <Blackjack />
         </ModalBody>
-        <ModalCloseButton />
         <ModalFooter>
           <Button colorScheme='blue' mr={3} onClick={closeModal}>
             Done
