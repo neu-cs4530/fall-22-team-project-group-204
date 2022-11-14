@@ -14,10 +14,12 @@ import {
   ServerToClientEvents,
   SocketData,
   ViewingArea as ViewingAreaModel,
+  GamingArea as GamingAreaModel,
 } from '../types/CoveyTownSocket';
 import ConversationArea from './ConversationArea';
 import InteractableArea from './InteractableArea';
 import ViewingArea from './ViewingArea';
+import GamingArea from './GamingArea';
 
 /**
  * The Town class implements the logic for each town: managing the various events that
@@ -284,6 +286,34 @@ export default class Town {
   }
 
   /**
+   * Creates a new gaming area in this town if there is not currently an active
+   * gaming area with the same ID. The gaming area ID must match the name of a
+   * gaming area that exists in this town's map, and the gaming area must not
+   * already have a dealerHand or playerHands
+   *
+   * If successful creating the gaming area, this method:
+   *    Adds any players who are in the region defined by the gaming area to it
+   *    Notifies all players in the town that the gaming area has been updated by
+   *      emitting an interactableUpdate event
+   *
+   * @param gamingArea Information describing the gaming area to create.
+   *
+   * @returns True if the gaming area was created or false if there is no known
+   * gaming area with the specified ID or if there is already an active gaming area
+   * with the specified ID or if there is no video URL specified
+   */
+  public addGamingArea(gamingArea: GamingAreaModel): boolean {
+    const area = this._interactables.find(eachArea => eachArea.id === gamingArea.id) as GamingArea;
+    if (!area || area.playerHands || area.dealerHand) {
+      return false;
+    }
+    area.updateModel(gamingArea);
+    area.addPlayersWithinBounds(this._players);
+    this._broadcastEmitter.emit('interactableUpdate', area.toModel());
+    return true;
+  }
+
+  /**
    * Fetch a player's session based on the provided session token. Returns undefined if the
    * session token is not valid.
    *
@@ -352,7 +382,16 @@ export default class Town {
         ConversationArea.fromMapObject(eachConvAreaObj, this._broadcastEmitter),
       );
 
-    this._interactables = this._interactables.concat(viewingAreas).concat(conversationAreas);
+    const gamingAreas = objectLayer.objects
+      .filter(eachObject => eachObject.type === 'GamingArea')
+      .map(eachGamingAreaObj =>
+        GamingArea.fromMapObject(eachGamingAreaObj, this._broadcastEmitter),
+      );
+
+    this._interactables = this._interactables
+      .concat(viewingAreas)
+      .concat(conversationAreas)
+      .concat(gamingAreas);
     this._validateInteractables();
   }
 

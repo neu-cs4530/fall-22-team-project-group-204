@@ -17,7 +17,7 @@ export default class GamingArea extends Interactable {
       { color: '#FFFFFF', backgroundColor: '#000000' },
     );
     this._labelText.setVisible(false);
-    // this.townController.getViewingAreaController(this);
+    this.townController.getGamingAreaController(this);
     if (this._scene.cursorKeys.shift.isDown) {
       //TODO
     }
