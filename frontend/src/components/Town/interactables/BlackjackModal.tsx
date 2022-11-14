@@ -1,5 +1,8 @@
 import {
+  Box,
   Button,
+  IconButton,
+  Image,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -7,12 +10,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Image,
-  Container,
-  Box,
 } from '@chakra-ui/react';
-import { CardMedia } from '@material-ui/core';
-import { identity } from 'lodash';
 import React, { useCallback, useEffect } from 'react';
 import { useInteractable } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
@@ -67,6 +65,28 @@ export function Card({ cardId, x, y }: { cardId: number; x: number; y: number })
   return <Image width='64px' position='absolute' src={card} top={y + 'px'} left={x + 'px'} />;
 }
 
+export function Chip({ chipValue, x, y }: { chipValue: number; x: number; y: number }) {
+  // const ref = useRef();
+  // const [isModalOpen, setIsModalOpen] = useState(false);
+  // useOutsideClick({
+  //   handler: () => setIsModalOpen(false),
+  // });
+
+  const chip = `assets/blackjack/chips/chip_${chipValue}.png`;
+  return (
+    <IconButton
+      variant='ghost'
+      colorScheme='ghost'
+      top={y + 'px'}
+      left={x + 'px'}
+      icon={<Image width='40px' position='absolute' src={chip} />}
+      aria-label={''}
+    />
+  );
+  // <Image width='40px' position='absolute' src={chip} top={y + 'px'} left={x + 'px'} />
+  // );
+}
+
 export function Blackjack() {
   return (
     <Box
@@ -77,8 +97,12 @@ export function Blackjack() {
       backgroundSize='cover'
       position='relative'>
       <Card cardId={33} x={450} y={400} />
-      <Card cardId={22} x={475} y={425} />
-      {/*<Image src='assets/blackjack/blackjack_background.jpg' boxSize='100%' objectFit='cover' />*/}
+      <Card cardId={22} x={470} y={425} />
+      <Chip chipValue={1} x={610} y={480} />
+      <Chip chipValue={5} x={640} y={480} />
+      <Chip chipValue={25} x={670} y={480} />
+      <Chip chipValue={100} x={700} y={480} />
+      <Chip chipValue={500} x={730} y={480} />
     </Box>
   );
 }
