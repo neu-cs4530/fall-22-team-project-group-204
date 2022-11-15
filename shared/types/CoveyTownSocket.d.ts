@@ -50,14 +50,14 @@ export type ChatMessage = {
   dateCreated: Date;
 };
 
-export interface Card {
+export interface PlayingCard {
   value: string;
   suit: string;
 };
 
 export interface PlayerHand {
   id: string;
-  hand: Card[];
+  hand: PlayingCard[];
 };
 
 export interface ConversationArea {
@@ -81,7 +81,7 @@ export interface ViewingArea {
 
 export interface GamingArea {
   id: string;
-  dealerHand: Card[];
+  dealerHand: PlayingCard[];
   playerHands: PlayerHand[];
 }
 

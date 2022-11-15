@@ -14,16 +14,17 @@ describe('HumanPlayer', () => {
   let player: HumanPlayer;
 
   beforeEach(() => {
-    player = new HumanPlayer();
+    player = new HumanPlayer('player');
   });
 
   describe('constructor', () => {
     it('Constructs a HumanPlayer properly', () => {
       expect(() => {
-        new HumanPlayer();
+        new HumanPlayer('player');
       }).not.toThrowError();
-      const newPlayer = new HumanPlayer();
+      const newPlayer = new HumanPlayer('player');
       expect(newPlayer.status).toBe(GameStatus.Waiting);
+      expect(newPlayer.id).toBe('player');
     });
   });
 

@@ -17,7 +17,7 @@ import {
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
   GamingArea as GamingAreaModel,
-  Card,
+  PlayingCard,
   PlayerHand,
 } from '../types/CoveyTownSocket';
 import { isConversationArea, isViewingArea, isGamingArea } from '../types/TypeUtils';
@@ -635,7 +635,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     if (existingController) {
       return existingController;
     } else {
-      const dealerHand: Card[] = [];
+      const dealerHand: PlayingCard[] = [];
       const playerHands: PlayerHand[] = [];
       const newController = new GamingAreaController({
         id: gamingArea.name,

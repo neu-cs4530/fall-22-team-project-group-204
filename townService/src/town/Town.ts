@@ -4,7 +4,7 @@ import { BroadcastOperator } from 'socket.io';
 import IVideoClient from '../lib/IVideoClient';
 import Player from '../lib/Player';
 import TwilioVideo from '../lib/TwilioVideo';
-import { isViewingArea } from '../TestUtils';
+import { isGamingArea, isViewingArea } from '../TestUtils';
 import {
   ChatMessage,
   ConversationArea as ConversationAreaModel,
@@ -155,6 +155,15 @@ export default class Town {
         );
         if (viewingArea) {
           (viewingArea as ViewingArea).updateModel(update);
+        }
+      }
+      if (isGamingArea(update)) {
+        newPlayer.townEmitter.emit('interactableUpdate', update);
+        const gamingArea = this._interactables.find(
+          eachInteractable => eachInteractable.id === update.id,
+        );
+        if (gamingArea) {
+          (gamingArea as GamingArea).updateModel(update);
         }
       }
     });
@@ -367,6 +376,7 @@ export default class Town {
     const objectLayer = map.layers.find(
       eachLayer => eachLayer.name === 'Objects',
     ) as ITiledMapObjectLayer;
+    // objectLayer.objects.forEach(x => console.log(x.name));
     if (!objectLayer) {
       throw new Error(`Unable to find objects layer in map`);
     }
@@ -388,6 +398,7 @@ export default class Town {
         GamingArea.fromMapObject(eachGamingAreaObj, this._broadcastEmitter),
       );
 
+    // console.log(`length: ${gamingAreas.length}`);
     this._interactables = this._interactables
       .concat(viewingAreas)
       .concat(conversationAreas)

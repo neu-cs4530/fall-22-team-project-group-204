@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 import TypedEventEmitter from 'typed-emitter';
 import { GamingArea } from '../types/CoveyTownSocket';
-import { Card, PlayerHand } from '../types/CoveyTownSocket';
+import { PlayingCard, PlayerHand } from '../types/CoveyTownSocket';
 
 /**
  * The events that a GamingAreaController can emit
@@ -14,7 +14,7 @@ export type GamingAreaEvents = {
    */
   cardUpdateChange: (playerId: string, hit: boolean) => void;
 
-  dealerHandChange: (dealerHand: Card[]) => void;
+  dealerHandChange: (dealerHand: PlayingCard[]) => void;
   playerHandsChange: (playerHands: PlayerHand[]) => void;
 };
 
@@ -45,7 +45,7 @@ export default class GamingAreaController extends (EventEmitter as new () => Typ
   }
 
   /**
-   * Returns a list of Suit/Value pairs in the dealer's hand
+   * Returns a list of PlayingCards in the dealer's hand
    */
   public get dealerHand() {
     return this._model.dealerHand;
@@ -54,7 +54,7 @@ export default class GamingAreaController extends (EventEmitter as new () => Typ
   /**
    * Sets the dealer's hand
    */
-  public set dealerHand(dealerHand: Card[]) {
+  public set dealerHand(dealerHand: PlayingCard[]) {
     if (this.dealerHand != dealerHand) {
       this._model.dealerHand = dealerHand;
       this.emit('dealerHandChange', this.dealerHand);
@@ -62,14 +62,14 @@ export default class GamingAreaController extends (EventEmitter as new () => Typ
   }
 
   /**
-   * Returns a list of Suit/Value pairs for each player's hand
+   * Returns a list of PlayerHands
    */
   public get playerHands() {
     return this._model.playerHands;
   }
 
   /**
-   * Sets the dealer's hand
+   * Sets the players' hands
    */
   public set playerHands(playerHands: PlayerHand[]) {
     if (this.playerHands != playerHands) {
@@ -86,6 +86,24 @@ export default class GamingAreaController extends (EventEmitter as new () => Typ
    */
   public advanceTurn(playerId: string, hit: boolean): void {
     this.emit('cardUpdateChange', playerId, hit);
+  }
+
+  /**
+   * Joins the game of blackjack if the player isn't already in the game
+   * Leaves the game of blackjack if the player is already in the game
+   *
+   * @param playerId id of player trying to join
+   */
+  public toggleJoinGame(playerId: string) {
+    const player = this.playerHands.find(playerHand => playerHand.id === playerId);
+    if (!player) {
+      console.log('joined');
+      this.playerHands.push({ id: playerId, hand: [] });
+    } else if (player) {
+      console.log('left');
+      this.playerHands = this.playerHands.filter(playerHand => playerHand.id !== playerId);
+    }
+    this.emit('playerHandsChange', this.playerHands);
   }
 
   /**
