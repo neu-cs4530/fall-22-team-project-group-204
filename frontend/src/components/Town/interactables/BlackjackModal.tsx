@@ -11,8 +11,6 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
-  Image,
-  Box,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useInteractable, useGamingAreaController } from '../../../classes/TownController';
