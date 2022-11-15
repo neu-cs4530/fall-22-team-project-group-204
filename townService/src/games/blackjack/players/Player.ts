@@ -3,6 +3,8 @@ import GameStatus from './GameStatus';
 export default abstract class Player {
   private _status: GameStatus;
 
+  private _id: string;
+
   public get status(): GameStatus {
     return this._status;
   }
@@ -13,7 +15,16 @@ export default abstract class Player {
     this._status = status;
   }
 
-  constructor(status: GameStatus) {
+  public get id(): string {
+    return this._id;
+  }
+
+  protected set id(id: string) {
+    this._id = id;
+  }
+
+  constructor(status: GameStatus, id: string) {
     this._status = status;
+    this._id = id;
   }
 }

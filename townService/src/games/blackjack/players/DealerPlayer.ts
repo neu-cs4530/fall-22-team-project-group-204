@@ -8,8 +8,8 @@ import BlackjackAction from '../blackjack/BlackjackAction';
 export default class DealerPlayer extends HumanPlayer {
   private _masterDeck: Card[];
 
-  constructor() {
-    super();
+  constructor(id: string) {
+    super(id);
     this._masterDeck = DealerPlayer.getDecks(2).flat();
     this.shuffleDecks();
   }
@@ -20,6 +20,14 @@ export default class DealerPlayer extends HumanPlayer {
 
   public set hand(value: Hand) {
     super.hand = value;
+  }
+
+  public get id(): string {
+    return super.id;
+  }
+
+  public set id(value: string) {
+    super.id = value;
   }
 
   public get status(): GameStatus {

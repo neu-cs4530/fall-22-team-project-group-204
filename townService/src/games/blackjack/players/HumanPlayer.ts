@@ -21,6 +21,14 @@ export default class HumanPlayer extends Player {
     this._hand = value;
   }
 
+  public get id(): string {
+    return super.id;
+  }
+
+  public set id(value: string) {
+    super.id = value;
+  }
+
   public get status(): GameStatus {
     return super.status;
   }
@@ -29,9 +37,10 @@ export default class HumanPlayer extends Player {
     super.status = value;
   }
 
-  constructor() {
-    super(GameStatus.Waiting);
+  constructor(id: string) {
+    super(GameStatus.Waiting, id);
     this._hand = new Hand();
+    this.id = id;
   }
 
   public addCard(newCard: Card, newCardHiddenStatus = true): void {

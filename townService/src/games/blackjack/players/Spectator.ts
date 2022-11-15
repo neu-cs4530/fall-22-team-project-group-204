@@ -3,6 +3,6 @@ import GameStatus from './GameStatus';
 
 export default class Spectator extends Player {
   constructor() {
-    super(GameStatus.Spectator);
+    super(GameStatus.Spectator, id: string);
   }
 }
