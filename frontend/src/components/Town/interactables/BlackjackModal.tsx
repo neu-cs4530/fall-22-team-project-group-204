@@ -11,8 +11,6 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
-  Image,
-  Box,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useInteractable, useGamingAreaController } from '../../../classes/TownController';
@@ -115,7 +113,6 @@ export function PlayingCard({ cardId, x, y }: { cardId: number; x: number; y: nu
   return <Image width='64px' position='absolute' src={card} top={y + 'px'} left={x + 'px'} />;
 }
 
-
 export function Chip({ chipValue, x, y }: { chipValue: number; x: number; y: number }) {
   const chip = `assets/blackjack/chips/chip_${chipValue}.png`;
   return (
@@ -167,8 +164,8 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
       <Button size='sm' left='240px' top='500px' colorScheme='gray' position='relative'>
         Stand
       </Button>
-      <Card cardId={33} x={450} y={400} />
-      <Card cardId={22} x={470} y={425} />
+      <PlayingCard cardId={33} x={450} y={400} />
+      <PlayingCard cardId={22} x={470} y={425} />
       <Chip chipValue={1} x={510} y={480} />
       <Chip chipValue={5} x={540} y={480} />
       <Chip chipValue={25} x={570} y={480} />
