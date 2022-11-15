@@ -2,6 +2,7 @@
 import {
   Box,
   Button,
+  Container,
   IconButton,
   Image,
   Modal,
@@ -114,12 +115,21 @@ export function PlayingCardImage({ cardId, x, y }: { cardId: number; x: number; 
   return <Image width='64px' position='absolute' src={card} top={y + 'px'} left={x + 'px'} />;
 }
 
+export function Hand({ cards, x, y }: { cards: PlayingCard[]; x: number; y: number }) {
+  const hand = cards.map((card, index) => {
+    return (
+      <PlayingCardImage key={index} cardId={cardToId(card)} x={x + index * 25} y={y + index * 25} />
+    );
+  });
+  return <Container>{hand}</Container>;
+}
+
 export function Chip({ chipValue, x, y }: { chipValue: number; x: number; y: number }) {
   const chip = `assets/blackjack/chips/chip_${chipValue}.png`;
   return (
     <IconButton
       variant='ghost'
-      position='relative'
+      position='absolute'
       colorScheme='ghost'
       // _focus={{ boxShadow: 'none' }} # do we want box shadow when clicking chips?
       top={y + 'px'}
@@ -217,29 +227,36 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
       <Button size='sm' left='240px' top='500px' colorScheme='gray' position='relative'>
         Stand
       </Button>
-      <PlayingCardImage cardId={33} x={450} y={400} />
-      <PlayingCardImage cardId={22} x={470} y={425} />
-      <Chip chipValue={1} x={510} y={480} />
-      <Chip chipValue={5} x={540} y={480} />
-      <Chip chipValue={25} x={570} y={480} />
-      <Chip chipValue={100} x={600} y={480} />
-      <Chip chipValue={500} x={630} y={480} />
-      <Text as='b' fontSize='md' left='325px' top='450px' position='relative'>
+      <Hand
+        cards={[
+          { value: 'Seven', suit: 'Clubs' },
+          { value: 'Ace', suit: 'Spades' },
+        ]}
+        x={450}
+        y={400}
+      />
+      <Hand cards={dealerHand} x={450} y={100} />
+      <Chip chipValue={1} x={600} y={480} />
+      <Chip chipValue={5} x={650} y={480} />
+      <Chip chipValue={25} x={700} y={480} />
+      <Chip chipValue={100} x={750} y={480} />
+      <Chip chipValue={500} x={800} y={480} />
+      <Text as='b' fontSize='md' left='615px' top='450px' position='absolute'>
         1
       </Text>
-      <Text as='b' fontSize='md' left='385px' top='450px' position='relative'>
+      <Text as='b' fontSize='md' left='665px' top='450px' position='absolute'>
         5
       </Text>
-      <Text as='b' fontSize='md' left='440px' top='450px' position='relative'>
+      <Text as='b' fontSize='md' left='710px' top='450px' position='absolute'>
         25
       </Text>
-      <Text as='b' fontSize='md' left='485px' top='450px' position='relative'>
+      <Text as='b' fontSize='md' left='755px' top='450px' position='absolute'>
         100
       </Text>
-      <Text as='b' fontSize='md' left='525px' top='450px' position='relative'>
+      <Text as='b' fontSize='md' left='805px' top='450px' position='absolute'>
         500
       </Text>
-      <Button size='sm' left='350px' top='535px' colorScheme='gray' position='relative'>
+      <Button size='sm' left='697px' top='535px' colorScheme='gray' position='absolute'>
         Bet
       </Button>
     </Box>
