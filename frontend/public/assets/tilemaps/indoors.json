@@ -15945,7 +15945,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":28,
                              "id":6,
                              "name":"",
@@ -32845,7 +32845,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":25.995583882738,
                              "id":1,
                              "name":"",
@@ -32876,7 +32876,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":25.4474842225598,
                              "id":1,
                              "name":"",
@@ -32907,7 +32907,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":26.1521837856461,
                              "id":2,
                              "name":"",
@@ -32944,7 +32944,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":32.3378799505144,
                              "id":1,
                              "name":"",
@@ -32984,7 +32984,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"collision",
+                             "type":"collision",
                              "height":31.319980581612,
                              "id":1,
                              "name":"",
@@ -33021,7 +33021,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":31.5548804359741,
                              "id":1,
                              "name":"",
@@ -33061,7 +33061,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":31.7897802903362,
                              "id":1,
                              "name":"",
@@ -33466,7 +33466,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":32.3378799505144,
                              "id":1,
                              "name":"",
@@ -33497,7 +33497,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":31.8680802417902,
                              "id":1,
                              "name":"",
@@ -33528,7 +33528,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":18.7136883975132,
                              "id":1,
                              "name":"",
@@ -33559,7 +33559,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":15.659990290806,
                              "id":1,
                              "name":"",
@@ -33590,7 +33590,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":15.581690339352,
                              "id":1,
                              "name":"",
@@ -33621,7 +33621,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":16.1297899995302,
                              "id":1,
                              "name":"",
@@ -33652,7 +33652,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":22.4720860673066,
                              "id":1,
                              "name":"",
@@ -33683,7 +33683,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":9.23939427157555,
                              "id":1,
                              "name":"",
