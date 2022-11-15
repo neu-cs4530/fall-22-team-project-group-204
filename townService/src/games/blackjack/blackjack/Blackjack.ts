@@ -1,7 +1,12 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
+import mock from 'jest-mock-extended/lib/Mock';
+import { TownEmitter } from 'src/types/CoveyTownSocket';
 import GameStatus from '../players/GameStatus';
 import DealerPlayer from '../players/DealerPlayer';
 import HumanPlayer from '../players/HumanPlayer';
 import Player from '../players/Player';
+// eslint-disable-next-line import/no-cycle
+import GamingArea from '../../../town/GamingArea';
 
 export default class BlackJack {
   // Going to have this DealerPlayer class handle the responsiblites of the Dealer and the Player.
@@ -21,11 +26,24 @@ export default class BlackJack {
     return this._players;
   }
 
-  constructor(players: Player[] = []) {
+  // contains a reference to the GamingArea for sending notifications of changes
+  private _gamingArea: GamingArea;
+
+  // default GamingArea should never be used, but is good for testing purpose where gamingArea
+  // is irrelevant
+  constructor(
+    players: Player[] = [],
+    gamingArea: GamingArea = new GamingArea(
+      { id: 'invalidId', dealerHand: [], playerHands: [] },
+      { x: 0, y: 0, width: 0, height: 0 },
+      mock<TownEmitter>(), // NOTE: may need to change in the future
+    ),
+  ) {
     this._dealer = new DealerPlayer();
     // We assume that there is at least one human player. I am going to start with the
     // assumption of one Player but will make sure to expand tests to cover 2 players
     this._players = players;
+    this._gamingArea = gamingArea;
   }
 
   public addPlayer(player: Player): void {
@@ -60,6 +78,8 @@ export default class BlackJack {
     this._updateToPlaying();
 
     this._dealer.dealCards(players);
+
+    this._gamingArea.updateFromBlackjack(this._dealer, players);
 
     while (!BlackJack._isGameOver([...players, this._dealer])) {
       await this._dealer.doTurns(players);

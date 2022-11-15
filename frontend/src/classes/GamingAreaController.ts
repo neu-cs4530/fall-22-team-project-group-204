@@ -97,10 +97,8 @@ export default class GamingAreaController extends (EventEmitter as new () => Typ
   public toggleJoinGame(playerId: string) {
     const player = this.playerHands.find(playerHand => playerHand.id === playerId);
     if (!player) {
-      console.log('joined');
       this.playerHands.push({ id: playerId, hand: [] });
     } else if (player) {
-      console.log('left');
       this.playerHands = this.playerHands.filter(playerHand => playerHand.id !== playerId);
     }
     this.emit('playerHandsChange', this.playerHands);

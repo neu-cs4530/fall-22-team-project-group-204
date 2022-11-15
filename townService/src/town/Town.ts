@@ -376,7 +376,6 @@ export default class Town {
     const objectLayer = map.layers.find(
       eachLayer => eachLayer.name === 'Objects',
     ) as ITiledMapObjectLayer;
-    // objectLayer.objects.forEach(x => console.log(x.name));
     if (!objectLayer) {
       throw new Error(`Unable to find objects layer in map`);
     }
@@ -398,7 +397,6 @@ export default class Town {
         GamingArea.fromMapObject(eachGamingAreaObj, this._broadcastEmitter),
       );
 
-    // console.log(`length: ${gamingAreas.length}`);
     this._interactables = this._interactables
       .concat(viewingAreas)
       .concat(conversationAreas)

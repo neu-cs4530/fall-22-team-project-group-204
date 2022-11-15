@@ -30,19 +30,19 @@ function cardToId(card: PlayingCard): number {
   const value = card.value;
   const suit = card.suit;
   const valueMap = new Map<string, number>([
-    ['Ace', 13],
-    ['King', 12],
-    ['Queen', 11],
-    ['Jack', 10],
-    ['Ten', 9],
-    ['Nine', 8],
-    ['Eight', 7],
-    ['Seven', 6],
-    ['Six', 5],
-    ['Five', 4],
-    ['Four', 3],
-    ['Three', 2],
-    ['Two', 1],
+    ['A', 13],
+    ['K', 12],
+    ['Q', 11],
+    ['J', 10],
+    ['10', 9],
+    ['9', 8],
+    ['8', 7],
+    ['7', 6],
+    ['6', 5],
+    ['5', 4],
+    ['4', 3],
+    ['3', 2],
+    ['2', 1],
   ]);
 
   const cardValueId = valueMap.get(value);
@@ -67,7 +67,7 @@ function cardToId(card: PlayingCard): number {
     }
     return cardId;
   }
-  throw new Error('Value not found in table');
+  throw new Error('Value not found in table: ' + value);
 }
 
 // export function Card({ value, suit }: { value: Value; suit: Suit }) {
@@ -234,8 +234,8 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
       </Button>
       <Hand
         cards={[
-          { value: 'Seven', suit: 'Clubs' },
-          { value: 'Ace', suit: 'Spades' },
+          { value: '7', suit: 'Clubs' },
+          { value: 'A', suit: 'Spades' },
         ]}
         x={450}
         y={400}

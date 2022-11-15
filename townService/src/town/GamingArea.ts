@@ -7,10 +7,13 @@ import {
   PlayerHand,
 } from '../types/CoveyTownSocket';
 import InteractableArea from './InteractableArea';
+// eslint-disable-next-line import/no-cycle
 import BlackJack from '../games/blackjack/blackjack/Blackjack';
 import DealerPlayer from '../games/blackjack/players/DealerPlayer';
 import HumanPlayer from '../games/blackjack/players/HumanPlayer';
 import Hand from '../games/blackjack/players/Hand';
+import Suit from '../games/cards/Suit';
+import Value from '../games/cards/Value';
 
 export default class GamingArea extends InteractableArea {
   private _dealerHand: PlayingCard[];
@@ -43,7 +46,7 @@ export default class GamingArea extends InteractableArea {
     super(id, coordinates, townEmitter);
     this._dealerHand = dealerHand;
     this._playerHands = playerHands;
-    this._game = new BlackJack();
+    this._game = new BlackJack([], this);
     this._gameIsActive = false;
   }
 
@@ -85,9 +88,72 @@ export default class GamingArea extends InteractableArea {
   public static handToListOfPlayingCards(hand: Hand): PlayingCard[] {
     const playingCards: PlayingCard[] = [];
     hand.cards.forEach(card => {
-      playingCards.push({ suit: card[0].suit.toString(), value: card[0].value.toString() });
+      const { suit, value } = card[0];
+      playingCards.push({
+        suit: GamingArea.suitToString(suit),
+        value: GamingArea.valueToString(value),
+      });
     });
     return playingCards;
+  }
+
+  /**
+   * Converts a Suit to a string
+   * @param suit Suit of the card
+   * @returns a string representative
+   */
+  public static suitToString(suit: Suit): string {
+    switch (suit) {
+      case Suit.Clubs:
+        return 'Clubs';
+      case Suit.Diamonds:
+        return 'Diamonds';
+      case Suit.Hearts:
+        return 'Hearts';
+      case Suit.Spades:
+        return 'Spades';
+      default:
+        return 'unknown';
+    }
+  }
+
+  /**
+   * Converts a value to a string
+   *
+   * @param value Value of the card
+   * @returns a string representative
+   */
+  public static valueToString(value: Value): string {
+    switch (value) {
+      case Value.Ace:
+        return 'A';
+      case Value.King:
+        return 'K';
+      case Value.Queen:
+        return 'Q';
+      case Value.Jack:
+        return 'J';
+      case Value.Ten:
+        return '10';
+      case Value.Nine:
+        return '9';
+      case Value.Eight:
+        return '8';
+      case Value.Seven:
+        return '7';
+      case Value.Six:
+        return '6';
+      case Value.Five:
+        return '5';
+      case Value.Four:
+        return '4';
+      case Value.Three:
+        return '3';
+      case Value.Two:
+        return '2';
+      default:
+        return 'unknown';
+    }
   }
 
   /**
