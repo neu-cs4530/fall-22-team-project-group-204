@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Box,
   Button,
@@ -17,14 +18,14 @@ import { useInteractable, useGamingAreaController } from '../../../classes/TownC
 import useTownController from '../../../hooks/useTownController';
 import GamingAreaController from '../../../classes/GamingAreaController';
 import GamingArea from './GamingArea';
-import { Card } from '../../../types/CoveyTownSocket';
+import { PlayingCard } from '../../../types/CoveyTownSocket';
 
 // i need to figure out how the back and front end communicate :C
 
 // import Value, { getValueNumbers } from '../../../../../townService/src/games/cards/Value';
 // import Suit from '../../../../../townService/src/games/cards/Suit';
 
-function cardToId(card: Card): number {
+function cardToId(card: PlayingCard): number {
   const value = card.value;
   const suit = card.suit;
   const valueMap = new Map<string, number>([
@@ -107,12 +108,11 @@ function cardToId(card: Card): number {
 //   return <Image src={card} />;
 // }
 
-export function PlayingCard({ cardId, x, y }: { cardId: number; x: number; y: number }) {
+export function PlayingCardImage({ cardId, x, y }: { cardId: number; x: number; y: number }) {
   const cardIdString = ('0' + cardId).slice(-2);
   const card = `assets/blackjack/playingcards/playingcards_${cardIdString}.png`;
   return <Image width='64px' position='absolute' src={card} top={y + 'px'} left={x + 'px'} />;
 }
-
 
 export function Chip({ chipValue, x, y }: { chipValue: number; x: number; y: number }) {
   const chip = `assets/blackjack/chips/chip_${chipValue}.png`;
@@ -130,15 +130,51 @@ export function Chip({ chipValue, x, y }: { chipValue: number; x: number; y: num
   );
 }
 
+export function JoinLeaveButton({ joinLeaveFunc }: { joinLeaveFunc: () => void }) {
+  const [joinLeave, setJoinLeave] = useState<boolean>(true);
+
+  if (joinLeave) {
+    return (
+      <Button
+        size='sm'
+        left='50px'
+        top='50px'
+        colorScheme='gray'
+        position='absolute'
+        onClick={() => {
+          setJoinLeave(false);
+          joinLeaveFunc();
+        }}>
+        Join
+      </Button>
+    );
+  } else {
+    return (
+      <Button
+        size='sm'
+        left='50px'
+        top='50px'
+        colorScheme='gray'
+        position='absolute'
+        onClick={() => {
+          setJoinLeave(true);
+          joinLeaveFunc();
+        }}>
+        Leave
+      </Button>
+    );
+  }
+}
+
 export function Blackjack({ controller }: { controller: GamingAreaController }) {
   const townController = useTownController();
-  const [dealerHand, setDealerHand] = useState<Card[]>(controller.dealerHand);
+  const [dealerHand, setDealerHand] = useState<PlayingCard[]>(controller.dealerHand);
   useEffect(() => {
     console.log(controller.id);
   });
 
   useEffect(() => {
-    const setNewDealerHand = (hand: Card[]) => {
+    const setNewDealerHand = (hand: PlayingCard[]) => {
       setDealerHand(hand);
     };
     controller.addListener('dealerHandChange', setNewDealerHand);
@@ -147,6 +183,7 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
     };
   }, [controller, townController]);
 
+  townController.emitGamingAreaUpdate(controller);
   const hit = () => {
     controller.advanceTurn(townController.userID, true);
   };
@@ -159,14 +196,29 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
       backgroundRepeat='no-repeat'
       backgroundSize='cover'
       position='relative'>
-      <Button size='sm' left='200px' top='500px' colorScheme='gray' position='relative'>
+      <JoinLeaveButton
+        joinLeaveFunc={() => {
+          controller.toggleJoinGame(townController.userID);
+          townController.emitGamingAreaUpdate(controller);
+        }}
+      />
+      <Button
+        size='sm'
+        left='200px'
+        top='500px'
+        colorScheme='gray'
+        position='relative'
+        onClick={() => {
+          hit();
+          townController.emitGamingAreaUpdate(controller);
+        }}>
         Hit
       </Button>
       <Button size='sm' left='240px' top='500px' colorScheme='gray' position='relative'>
         Stand
       </Button>
-      <Card cardId={33} x={450} y={400} />
-      <Card cardId={22} x={470} y={425} />
+      <PlayingCardImage cardId={33} x={450} y={400} />
+      <PlayingCardImage cardId={22} x={470} y={425} />
       <Chip chipValue={1} x={510} y={480} />
       <Chip chipValue={5} x={540} y={480} />
       <Chip chipValue={25} x={570} y={480} />

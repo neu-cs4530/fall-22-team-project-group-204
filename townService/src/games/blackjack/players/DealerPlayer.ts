@@ -9,7 +9,7 @@ export default class DealerPlayer extends HumanPlayer {
   private _masterDeck: Card[];
 
   constructor() {
-    super();
+    super('dealer');
     this._masterDeck = DealerPlayer.getDecks(2).flat();
     this.shuffleDecks();
   }
