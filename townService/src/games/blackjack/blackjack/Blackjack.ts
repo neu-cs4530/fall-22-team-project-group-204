@@ -22,7 +22,7 @@ export default class BlackJack {
   }
 
   constructor(players: Player[] = []) {
-    this._dealer = new DealerPlayer();
+    this._dealer = new DealerPlayer('1');
     // We assume that there is at least one human player. I am going to start with the
     // assumption of one Player but will make sure to expand tests to cover 2 players
     this._players = players;

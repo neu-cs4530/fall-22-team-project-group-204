@@ -14,15 +14,15 @@ describe('HumanPlayer', () => {
   let player: HumanPlayer;
 
   beforeEach(() => {
-    player = new HumanPlayer();
+    player = new HumanPlayer('0');
   });
 
   describe('constructor', () => {
     it('Constructs a HumanPlayer properly', () => {
       expect(() => {
-        new HumanPlayer();
+        new HumanPlayer('1');
       }).not.toThrowError();
-      const newPlayer = new HumanPlayer();
+      const newPlayer = new HumanPlayer('2');
       expect(newPlayer.status).toBe(GameStatus.Waiting);
     });
   });

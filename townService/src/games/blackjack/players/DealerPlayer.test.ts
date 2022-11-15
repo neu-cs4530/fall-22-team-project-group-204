@@ -20,9 +20,9 @@ describe('DealerPlayer', () => {
   let players: HumanPlayer[];
 
   beforeEach(() => {
-    dealerPlayer = new DealerPlayer();
-    playerOne = new HumanPlayer();
-    playerTwo = new HumanPlayer();
+    dealerPlayer = new DealerPlayer('0');
+    playerOne = new HumanPlayer('1');
+    playerTwo = new HumanPlayer('2');
     players = [playerOne, playerTwo];
     playerOne.getBlackjackAction = jest.fn().mockReturnValue(BlackjackAction.Hit);
     playerTwo.getBlackjackAction = jest.fn().mockReturnValue(BlackjackAction.Stay);
@@ -36,7 +36,7 @@ describe('DealerPlayer', () => {
 
   describe('constructor', () => {
     it('Constructs a DealerPlayer properly', () => {
-      const newDealerPlayer = new DealerPlayer();
+      const newDealerPlayer = new DealerPlayer('0');
       expect(newDealerPlayer.status).toBe(GameStatus.Waiting);
     });
   });
@@ -105,9 +105,9 @@ describe('DealerPlayer', () => {
 
     describe('dealCards', () => {
       it('Deals a card properly', () => {
-        const playerThree = new HumanPlayer();
+        const playerThree = new HumanPlayer('3');
         expect(playerThree.hand.cards).toStrictEqual([]);
-        const playerFour = new HumanPlayer();
+        const playerFour = new HumanPlayer('4');
         expect(playerFour.hand.cards).toStrictEqual([]);
 
         dealerPlayer.dealCards([playerThree, playerFour]);
