@@ -1,5 +1,8 @@
 import {
+  Box,
   Button,
+  IconButton,
+  Image,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -7,6 +10,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Text,
   Image,
   Box,
 } from '@chakra-ui/react';
@@ -111,6 +115,23 @@ export function PlayingCard({ cardId, x, y }: { cardId: number; x: number; y: nu
   return <Image width='64px' position='absolute' src={card} top={y + 'px'} left={x + 'px'} />;
 }
 
+
+export function Chip({ chipValue, x, y }: { chipValue: number; x: number; y: number }) {
+  const chip = `assets/blackjack/chips/chip_${chipValue}.png`;
+  return (
+    <IconButton
+      variant='ghost'
+      position='relative'
+      colorScheme='ghost'
+      // _focus={{ boxShadow: 'none' }} # do we want box shadow when clicking chips?
+      top={y + 'px'}
+      left={x + 'px'}
+      icon={<Image width='40px' src={chip} />}
+      aria-label={''}
+    />
+  );
+}
+
 export function Blackjack({ controller }: { controller: GamingAreaController }) {
   const townController = useTownController();
   const [dealerHand, setDealerHand] = useState<Card[]>(controller.dealerHand);
@@ -131,6 +152,7 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
   const hit = () => {
     controller.advanceTurn(townController.userID, true);
   };
+
   return (
     <Box
       backgroundImage='assets/blackjack/blackjack_background.jpg'
@@ -139,12 +161,37 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
       backgroundRepeat='no-repeat'
       backgroundSize='cover'
       position='relative'>
-      <PlayingCard cardId={33} x={450} y={400} />
-      <PlayingCard cardId={cardToId({ value: 'Ace', suit: 'Hearts' })} x={475} y={425} />
-      <Button top='30px' left='30px' position='absolute'>
+      <Button size='sm' left='200px' top='500px' colorScheme='gray' position='relative'>
         Hit
       </Button>
-      {/*<Image src='assets/blackjack/blackjack_background.jpg' boxSize='100%' objectFit='cover' />*/}
+      <Button size='sm' left='240px' top='500px' colorScheme='gray' position='relative'>
+        Stand
+      </Button>
+      <Card cardId={33} x={450} y={400} />
+      <Card cardId={22} x={470} y={425} />
+      <Chip chipValue={1} x={510} y={480} />
+      <Chip chipValue={5} x={540} y={480} />
+      <Chip chipValue={25} x={570} y={480} />
+      <Chip chipValue={100} x={600} y={480} />
+      <Chip chipValue={500} x={630} y={480} />
+      <Text as='b' fontSize='md' left='325px' top='450px' position='relative'>
+        1
+      </Text>
+      <Text as='b' fontSize='md' left='385px' top='450px' position='relative'>
+        5
+      </Text>
+      <Text as='b' fontSize='md' left='440px' top='450px' position='relative'>
+        25
+      </Text>
+      <Text as='b' fontSize='md' left='485px' top='450px' position='relative'>
+        100
+      </Text>
+      <Text as='b' fontSize='md' left='525px' top='450px' position='relative'>
+        500
+      </Text>
+      <Button size='sm' left='350px' top='535px' colorScheme='gray' position='relative'>
+        Bet
+      </Button>
     </Box>
   );
 }
@@ -179,10 +226,10 @@ export function BlackjackModal({ gamingArea }: { gamingArea: GamingArea }): JSX.
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Blackjack!</ModalHeader>
+        <ModalCloseButton />
         <ModalBody>
           <Blackjack controller={gamingAreaController} />
         </ModalBody>
-        <ModalCloseButton />
         <ModalFooter>
           <Button colorScheme='blue' mr={3} onClick={closeModal}>
             Done
