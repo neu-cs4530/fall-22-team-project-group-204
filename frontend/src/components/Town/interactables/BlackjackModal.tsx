@@ -121,7 +121,12 @@ export function Hand({ cards, x, y }: { cards: PlayingCard[]; x: number; y: numb
       <PlayingCardImage key={index} cardId={cardToId(card)} x={x + index * 25} y={y + index * 25} />
     );
   });
-  return <Container>{hand}</Container>;
+  return (
+    <Container>
+      <Image position='absolute' src='assets/blackjack/marker.png' top={y} left={x} width='50px' />
+      {hand}
+    </Container>
+  );
 }
 
 export function Chip({ chipValue, x, y }: { chipValue: number; x: number; y: number }) {
@@ -236,6 +241,10 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
         y={400}
       />
       <Hand cards={dealerHand} x={450} y={100} />
+      <Hand cards={[]} x={100} y={175} />
+      <Hand cards={[]} x={100} y={325} />
+      <Hand cards={[]} x={860} y={175} />
+      <Hand cards={[]} x={860} y={325} />
       <Chip chipValue={1} x={600} y={480} />
       <Chip chipValue={5} x={650} y={480} />
       <Chip chipValue={25} x={700} y={480} />
