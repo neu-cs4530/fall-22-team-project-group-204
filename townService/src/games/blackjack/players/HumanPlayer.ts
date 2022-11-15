@@ -13,6 +13,12 @@ export default class HumanPlayer extends Player {
 
   private _hand: Hand;
 
+  private _id: string;
+
+  public get id(): string {
+    return this._id;
+  }
+
   public get hand(): Hand {
     return this._hand;
   }
@@ -29,9 +35,10 @@ export default class HumanPlayer extends Player {
     super.status = value;
   }
 
-  constructor() {
+  constructor(id: string) {
     super(GameStatus.Waiting);
     this._hand = new Hand();
+    this._id = id;
   }
 
   public addCard(newCard: Card, newCardHiddenStatus = true): void {

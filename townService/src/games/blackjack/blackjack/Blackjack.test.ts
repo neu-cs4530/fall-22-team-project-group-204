@@ -16,8 +16,8 @@ describe('DealerPlayer', () => {
   let players: HumanPlayer[];
 
   beforeEach(() => {
-    playerOne = new HumanPlayer();
-    playerTwo = new HumanPlayer();
+    playerOne = new HumanPlayer('one');
+    playerTwo = new HumanPlayer('two');
     players = [playerOne, playerTwo];
     blackjackInstance = new BlackJack(players);
     playerOne.getBlackjackAction = jest.fn().mockReturnValue(BlackjackAction.Hit);
@@ -34,9 +34,9 @@ describe('DealerPlayer', () => {
       expect(newBlackjackInstance.dealer).not.toBeNull();
       expect(newBlackjackInstance.dealer).toBeInstanceOf(DealerPlayer);
 
-      const newPlayerOne = new HumanPlayer();
-      const newPlayerTwo = new HumanPlayer();
-      const newPlayerThree = new HumanPlayer();
+      const newPlayerOne = new HumanPlayer("one");
+      const newPlayerTwo = new HumanPlayer("two");
+      const newPlayerThree = new HumanPlayer("three");
       const newPlayers = [newPlayerOne, newPlayerTwo, newPlayerThree];
       const anotherBlackjackInstance = new BlackJack(newPlayers);
 
