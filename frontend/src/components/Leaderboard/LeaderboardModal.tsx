@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button, Modal, ModalContent, ModalFooter, ModalHeader } from '@chakra-ui/react';
 import { createColumnHelper } from '@tanstack/react-table';
 import React, { useEffect, useState } from 'react';
