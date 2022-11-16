@@ -5,6 +5,7 @@ import { PlayerLocation } from '../../types/CoveyTownSocket';
 import { Callback } from '../VideoCall/VideoFrontend/types';
 import Interactable from './Interactable';
 import ConversationArea from './interactables/ConversationArea';
+import GamingArea from './interactables/GamingArea';
 import Transporter from './interactables/Transporter';
 import ViewingArea from './interactables/ViewingArea';
 
@@ -17,6 +18,8 @@ function interactableTypeForObjectType(type: string): any {
     return Transporter;
   } else if (type == 'ViewingArea') {
     return ViewingArea;
+  } else if (type == 'GamingArea') {
+    return GamingArea;
   } else {
     throw new Error(`Unknown object type: ${type}`);
   }
@@ -119,7 +122,15 @@ export default class TownGameScene extends Phaser.Scene {
       '16_Grocery_store_32x32',
       this._resourcePathPrefix + '/assets/tilesets/16_Grocery_store_32x32.png',
     );
-    this.load.tilemapTiledJSON('map', this._resourcePathPrefix + '/assets/tilemaps/indoors.json');
+    this.load.image('Blackjack', this._resourcePathPrefix + '/assets/tilesets/Blackjack.png');
+    this.load.image(
+      'BlackjackTable',
+      this._resourcePathPrefix + '/assets/tilesets/BlackjackTable.png',
+    );
+    this.load.tilemapTiledJSON(
+      'map',
+      this._resourcePathPrefix + 'assets/tilemaps/blackjackmap.json',
+    );
     this.load.atlas(
       'atlas',
       this._resourcePathPrefix + '/assets/atlas/atlas.png',
@@ -318,6 +329,8 @@ export default class TownGameScene extends Phaser.Scene {
       '13_Conference_Hall_32x32',
       '14_Basement_32x32',
       '16_Grocery_store_32x32',
+      'Blackjack',
+      'BlackjackTable',
     ].map(v => this.map.addTilesetImage(v));
 
     // Parameters: layer name (or index) from Tiled, tileset, x, y
@@ -471,6 +484,19 @@ export default class TownGameScene extends Phaser.Scene {
     // Help text that has a "fixed" position on the screen
     this.add
       .text(16, 16, `Arrow keys to move`, {
+        font: '18px monospace',
+        color: '#000000',
+        padding: {
+          x: 20,
+          y: 10,
+        },
+        backgroundColor: '#ffffff',
+      })
+      .setScrollFactor(0)
+      .setDepth(30);
+
+    this.add
+      .text(500, 16, `Shift to view leaderboard`, {
         font: '18px monospace',
         color: '#000000',
         padding: {
