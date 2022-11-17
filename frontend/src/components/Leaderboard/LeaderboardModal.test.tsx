@@ -25,15 +25,11 @@ describe('Leaderboard Modal', () => {
   let renderData: RenderResult;
   let mockedTownController: MockProxy<TownController>;
 
-  const openLeaderboardModal = async (params: {
-    friendlyName: string;
-    isPubliclyListed: boolean;
-    townID: string;
-  }) => {
+  const openLeaderboardModal = async () => {
     mockedTownController = mockTownController({
-      friendlyName: params.friendlyName,
-      townID: params.townID,
-      townIsPubliclyListed: params.isPubliclyListed,
+      friendlyName: nanoid(),
+      townID: nanoid(),
+      townIsPubliclyListed: true,
     });
 
     renderData = render(
@@ -51,13 +47,17 @@ describe('Leaderboard Modal', () => {
     mockUseDisclosure.onClose.mockReset();
   });
 
-  it('Displays a heading Blackjack Leaderboard', async () => {
-    const params = {
-      friendlyName: nanoid(),
-      isPubliclyListed: true,
-      townID: nanoid(),
-    };
-    await openLeaderboardModal(params);
+  it('Displays a Blackjack Leaderboard Modal', async () => {
+    await openLeaderboardModal();
     await waitFor(() => expect(renderData.getByText('Blackjack Leaderboard')).toBeInTheDocument());
+    const rankingText = await renderData.findAllByText('Ranking');
+    expect(rankingText).toHaveLength(2);
+    const nameText = await renderData.findAllByText('Name');
+    expect(nameText).toHaveLength(2);
+    const winsText = await renderData.findAllByText('Wins');
+    expect(winsText).toHaveLength(2);
+    const rewardText = await renderData.findAllByText('Reward');
+    expect(rewardText).toHaveLength(2);
+    renderData.unmount();
   }, 10000);
 });
