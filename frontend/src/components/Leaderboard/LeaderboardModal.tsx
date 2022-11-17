@@ -1,7 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Button, Modal, ModalContent, ModalFooter, ModalHeader } from '@chakra-ui/react';
+import {
+  Button,
+  Modal,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  useDisclosure,
+} from '@chakra-ui/react';
 import { createColumnHelper } from '@tanstack/react-table';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import useTownController from '../../hooks/useTownController';
 import { DataTable } from './DataTable';
 
@@ -77,22 +84,21 @@ export default function LeaderboardModal(): JSX.Element {
   ];
 
   const coveyTownController = useTownController();
-  // State for keeping track of whether key is pressed
-  const [showModal, setShowModal] = useState<boolean>(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
-  // If released key is our target key then set to false
-  const closeModal = () => {
-    setShowModal(false);
+  const closeLeaderboardModal = useCallback(() => {
+    onClose();
     coveyTownController.unPause();
-  };
+  }, [onClose, coveyTownController]);
 
   useEffect(() => {
     const downHandler = ({ key }: { key: any }) => {
       if (key === 'Shift') {
-        setShowModal(!showModal);
         if (coveyTownController.paused) {
+          onClose();
           coveyTownController.unPause();
         } else {
+          onOpen();
           coveyTownController.pause();
         }
       }
@@ -126,18 +132,12 @@ export default function LeaderboardModal(): JSX.Element {
   ];
 
   return (
-    <Modal
-      size='xl'
-      isOpen={showModal}
-      onClose={() => {
-        closeModal();
-      }}
-      scrollBehavior='inside'>
+    <Modal size='xl' isOpen={isOpen} onClose={closeLeaderboardModal} scrollBehavior='inside'>
       <ModalContent>
         <ModalHeader>Blackjack Leaderboard</ModalHeader>
         <DataTable columns={columns} data={data} />
         <ModalFooter>
-          <Button colorScheme='blue' mr={3} onClick={closeModal}>
+          <Button colorScheme='blue' mr={3} onClick={closeLeaderboardModal}>
             Done
           </Button>
         </ModalFooter>
