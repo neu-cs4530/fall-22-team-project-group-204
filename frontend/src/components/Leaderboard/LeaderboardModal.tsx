@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Button,
   Modal,
@@ -92,7 +91,7 @@ export default function LeaderboardModal(): JSX.Element {
   }, [onClose, coveyTownController]);
 
   useEffect(() => {
-    const downHandler = ({ key }: { key: any }) => {
+    const downHandler = ({ key }: { key: unknown }) => {
       if (key === 'Shift') {
         if (coveyTownController.paused) {
           onClose();
