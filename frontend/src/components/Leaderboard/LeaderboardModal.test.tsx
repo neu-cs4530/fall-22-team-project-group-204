@@ -1,5 +1,5 @@
 import { ChakraProvider, UseDisclosureReturn } from '@chakra-ui/react';
-import { render, RenderResult, waitFor } from '@testing-library/react';
+import { fireEvent, render, RenderResult, waitFor } from '@testing-library/react';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
 import React from 'react';
@@ -24,6 +24,7 @@ jest.mock('@chakra-ui/react', () => {
 describe('Leaderboard Modal', () => {
   let renderData: RenderResult;
   let mockedTownController: MockProxy<TownController>;
+  let doneButton: HTMLElement;
 
   const openLeaderboardModal = async () => {
     mockedTownController = mockTownController({
@@ -41,6 +42,7 @@ describe('Leaderboard Modal', () => {
     );
 
     await waitFor(() => renderData.getByText('Blackjack Leaderboard'));
+    doneButton = renderData.getByTestId('donebutton');
   };
 
   beforeEach(async () => {
@@ -59,5 +61,10 @@ describe('Leaderboard Modal', () => {
     const rewardText = await renderData.findAllByText('Reward');
     expect(rewardText).toHaveLength(2);
     renderData.unmount();
+  }, 10000);
+  it('Leaderboard Modal closes when Done button is clicked', async () => {
+    await openLeaderboardModal();
+    fireEvent.click(doneButton);
+    await waitFor(() => expect(mockUseDisclosure.onClose).toBeCalled());
   }, 10000);
 });

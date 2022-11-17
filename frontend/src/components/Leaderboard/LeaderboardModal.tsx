@@ -136,7 +136,11 @@ export default function LeaderboardModal(): JSX.Element {
         <ModalHeader>Blackjack Leaderboard</ModalHeader>
         <DataTable columns={columns} data={data} />
         <ModalFooter>
-          <Button colorScheme='blue' mr={3} onClick={closeLeaderboardModal}>
+          <Button
+            colorScheme='blue'
+            data-testid='donebutton'
+            mr={3}
+            onClick={closeLeaderboardModal}>
             Done
           </Button>
         </ModalFooter>
