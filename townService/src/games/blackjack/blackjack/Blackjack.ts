@@ -54,12 +54,12 @@ export default class BlackJack {
     return players.some(player => player.status === GameStatus.Won);
   }
 
-  public async playGame(skipDealing = false): Promise<void> {
+  public async playGame(doDealing = true): Promise<void> {
     // maybe check that there is more than 1 player before i start the gameplay loop?
     const players: HumanPlayer[] = this._getActiveHumanPlayers();
     this._updateToPlaying();
 
-    if (skipDealing) {
+    if (doDealing) {
       this._dealer.dealCards(players);
     }
 

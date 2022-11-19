@@ -10,6 +10,7 @@ export default class DealerPlayer extends HumanPlayer {
 
   constructor() {
     super();
+    // change this to 6
     this._masterDeck = DealerPlayer.getDecks(2).flat();
     this.shuffleDecks();
   }
@@ -115,6 +116,7 @@ export default class DealerPlayer extends HumanPlayer {
       if (chosenAction === BlackjackAction.Hit) {
         player.addCard(this._popCard());
       }
+      // move these three checks into a helper method
       if (player.has21()) {
         player.status = GameStatus.Won;
         this._setEveryoneElseToLost(players.filter(p => p !== player));
@@ -136,6 +138,7 @@ export default class DealerPlayer extends HumanPlayer {
   }
 
   private _isGameOver(players: HumanPlayer[]): boolean {
+    // make this a method and set said players GameStatus to Won
     const allButOneBusted =
       players.filter(player => player.status === GameStatus.Lost).length === players.length - 1 &&
       this.status === GameStatus.Lost;
