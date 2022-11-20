@@ -20,7 +20,7 @@ describe('DealerPlayer', () => {
   let players: HumanPlayer[];
 
   beforeEach(() => {
-    dealerPlayer = new DealerPlayer(GameStatus.Waiting, '1');
+    dealerPlayer = new DealerPlayer(GameStatus.Waiting, '0');
     playerOne = new HumanPlayer(GameStatus.Waiting, '1');
     playerTwo = new HumanPlayer(GameStatus.Waiting, '2');
     players = [playerOne, playerTwo];
@@ -36,9 +36,9 @@ describe('DealerPlayer', () => {
 
   describe('constructor', () => {
     it('Constructs a DealerPlayer properly', () => {
-      const newDealerPlayer = new DealerPlayer(GameStatus.Waiting, '1');
+      const newDealerPlayer = new DealerPlayer(GameStatus.Waiting, '0');
       expect(newDealerPlayer.status).toBe(GameStatus.Waiting);
-      expect(newDealerPlayer.id).toBe('1');
+      expect(newDealerPlayer.id).toBe('0');
     });
   });
 
@@ -64,7 +64,7 @@ describe('DealerPlayer', () => {
     });
 
     it('id getter works properly', () => {
-      expect(dealerPlayer.id).toBe('1');
+      expect(dealerPlayer.id).toBe('0');
     });
   });
 
@@ -85,9 +85,9 @@ describe('DealerPlayer', () => {
       expect(dealerPlayer.hand.cards).toStrictEqual(cards);
     });
     it('id setter works properly', () => {
-      expect(dealerPlayer.id).toBe('1');
-      dealerPlayer.id = '0';
       expect(dealerPlayer.id).toBe('0');
+      dealerPlayer.id = 'dealer';
+      expect(dealerPlayer.id).toBe('dealer');
     });
   });
 
