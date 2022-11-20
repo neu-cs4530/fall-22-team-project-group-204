@@ -20,9 +20,9 @@ describe('DealerPlayer', () => {
   let players: HumanPlayer[];
 
   beforeEach(() => {
-    dealerPlayer = new DealerPlayer();
-    playerOne = new HumanPlayer();
-    playerTwo = new HumanPlayer();
+    dealerPlayer = new DealerPlayer(GameStatus.Waiting, '0');
+    playerOne = new HumanPlayer(GameStatus.Waiting, '1');
+    playerTwo = new HumanPlayer(GameStatus.Waiting, '2');
     players = [playerOne, playerTwo];
     playerOne.getBlackjackAction = jest.fn().mockReturnValue(BlackjackAction.Hit);
     playerTwo.getBlackjackAction = jest.fn().mockReturnValue(BlackjackAction.Stay);
@@ -36,8 +36,9 @@ describe('DealerPlayer', () => {
 
   describe('constructor', () => {
     it('Constructs a DealerPlayer properly', () => {
-      const newDealerPlayer = new DealerPlayer();
+      const newDealerPlayer = new DealerPlayer(GameStatus.Waiting, '0');
       expect(newDealerPlayer.status).toBe(GameStatus.Waiting);
+      expect(newDealerPlayer.id).toBe('0');
     });
   });
 
@@ -48,7 +49,7 @@ describe('DealerPlayer', () => {
 
     it('Deck getter works properly', () => {
       expect(dealerPlayer.deck).not.toStrictEqual([]);
-      expect(dealerPlayer.deck.length).toBe(104);
+      expect(dealerPlayer.deck.length).toBe(312);
     });
 
     DealerPlayer.getDecks(2).flat().forEach((card, index) => {
@@ -60,6 +61,10 @@ describe('DealerPlayer', () => {
     it('Hand getter works properly', () => {
       expect(dealerPlayer.hand).toBeInstanceOf(Hand);
       expect(dealerPlayer.hand.cards).toStrictEqual([]);
+    });
+
+    it('id getter works properly', () => {
+      expect(dealerPlayer.id).toBe('0');
     });
   });
 
@@ -78,6 +83,11 @@ describe('DealerPlayer', () => {
       dealerPlayer.hand = newHand;
       expect(dealerPlayer.hand).toBe(newHand);
       expect(dealerPlayer.hand.cards).toStrictEqual(cards);
+    });
+    it('id setter works properly', () => {
+      expect(dealerPlayer.id).toBe('0');
+      dealerPlayer.id = 'dealer';
+      expect(dealerPlayer.id).toBe('dealer');
     });
   });
 
@@ -105,9 +115,9 @@ describe('DealerPlayer', () => {
 
     describe('dealCards', () => {
       it('Deals a card properly', () => {
-        const playerThree = new HumanPlayer();
+        const playerThree = new HumanPlayer(GameStatus.Waiting, '3');
         expect(playerThree.hand.cards).toStrictEqual([]);
-        const playerFour = new HumanPlayer();
+        const playerFour = new HumanPlayer(GameStatus.Waiting, '4');
         expect(playerFour.hand.cards).toStrictEqual([]);
 
         dealerPlayer.dealCards([playerThree, playerFour]);
@@ -172,7 +182,4 @@ describe('DealerPlayer', () => {
     });
 
   })
-
-
 });
-

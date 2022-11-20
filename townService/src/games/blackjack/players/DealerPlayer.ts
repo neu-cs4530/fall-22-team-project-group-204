@@ -1,3 +1,4 @@
+import { nanoid } from 'nanoid';
 import Card from '../../cards/Card';
 import Hand from './Hand';
 import GameStatus from './GameStatus';
@@ -8,9 +9,9 @@ import BlackjackAction from '../blackjack/BlackjackAction';
 export default class DealerPlayer extends HumanPlayer {
   private _masterDeck: Card[];
 
-  constructor() {
-    super();
-    this._masterDeck = DealerPlayer.getDecks(2).flat();
+  constructor(status: GameStatus = GameStatus.Waiting, id: string = nanoid()) {
+    super(status, id);
+    this._masterDeck = DealerPlayer.getDecks(6).flat();
     this.shuffleDecks();
   }
 
@@ -32,6 +33,14 @@ export default class DealerPlayer extends HumanPlayer {
 
   public get deck(): Card[] {
     return this._masterDeck;
+  }
+
+  public get id(): string {
+    return super.id;
+  }
+
+  public set id(value: string) {
+    super.id = value;
   }
 
   public static getDecks(amount: number): Card[][] {
