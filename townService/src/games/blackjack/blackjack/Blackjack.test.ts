@@ -22,9 +22,9 @@ describe('DealerPlayer', () => {
   let players: HumanPlayer[];
 
   beforeEach(() => {
-    playerOne = new HumanPlayer();
-    playerTwo = new HumanPlayer();
-    playerThree = new HumanPlayer();
+    playerOne = new HumanPlayer(GameStatus.Waiting, '1');
+    playerTwo = new HumanPlayer(GameStatus.Waiting, '2');
+    playerThree = new HumanPlayer(GameStatus.Waiting, '3');
     players = [playerOne, playerTwo, playerThree];
     blackjackInstance = new BlackJack(players);
     playerOne.getBlackjackAction = jest.fn().mockReturnValue(BlackjackAction.Hit);
@@ -42,9 +42,9 @@ describe('DealerPlayer', () => {
       expect(newBlackjackInstance.dealer).not.toBeNull();
       expect(newBlackjackInstance.dealer).toBeInstanceOf(DealerPlayer);
 
-      const newPlayerOne = new HumanPlayer();
-      const newPlayerTwo = new HumanPlayer();
-      const newPlayerThree = new HumanPlayer();
+      const newPlayerOne = new HumanPlayer(GameStatus.Waiting, '1');
+      const newPlayerTwo = new HumanPlayer(GameStatus.Waiting, '2');
+      const newPlayerThree = new HumanPlayer(GameStatus.Waiting, '3');
       const newPlayers = [newPlayerOne, newPlayerTwo, newPlayerThree];
       const anotherBlackjackInstance = new BlackJack(newPlayers);
 
@@ -65,6 +65,7 @@ describe('DealerPlayer', () => {
       const newBlackjackInstance = new BlackJack();
       expect(newBlackjackInstance.players).toStrictEqual([]);
     });
+
   });
 
   describe('class methods', () => {
@@ -93,52 +94,52 @@ describe('DealerPlayer', () => {
        * one player gets 22
        *
        */
-      it('Blackjack Edge Case #1 Player wins & all others bust', async () => {
-        playerOne.getBlackjackAction = jest.fn().mockReturnValue(BlackjackAction.Stay);
-        playerOne.doTurn = jest.fn().mockReturnValue(BlackjackAction.Stay);
+      // it('Blackjack Edge Case #1 Player wins & all others bust', async () => {
+      //   playerOne.getBlackjackAction = jest.fn().mockReturnValue(BlackjackAction.Stay);
+      //   playerOne.doTurn = jest.fn().mockReturnValue(BlackjackAction.Stay);
 
-        const handArray: [Card, boolean][] = [
-          [CardFactory.getCard(Value.Ace, Suit.Hearts), true],
-          [CardFactory.getCard(Value.Ace, Suit.Diamonds), false],
-        ];
-        const handArray2: [Card, boolean][] = [
-          [CardFactory.getCard(Value.Queen, Suit.Clubs), true],
-          [CardFactory.getCard(Value.King, Suit.Diamonds), false],
-          [CardFactory.getCard(Value.Seven, Suit.Diamonds), false],
-        ];
-        const handArray3: [Card, boolean][] = [
-          [CardFactory.getCard(Value.King, Suit.Hearts), true],
-          [CardFactory.getCard(Value.King, Suit.Spades), false],
-          [CardFactory.getCard(Value.Five, Suit.Spades), false],
-        ];
-        const handArray4: [Card, boolean][] = [
-          [CardFactory.getCard(Value.King, Suit.Hearts), true],
-          [CardFactory.getCard(Value.King, Suit.Spades), false],
-          [CardFactory.getCard(Value.Eight, Suit.Spades), false],
-        ];
+      //   const handArray: [Card, boolean][] = [
+      //     [CardFactory.getCard(Value.Ace, Suit.Hearts), true],
+      //     [CardFactory.getCard(Value.Ace, Suit.Diamonds), false],
+      //   ];
+      //   const handArray2: [Card, boolean][] = [
+      //     [CardFactory.getCard(Value.Queen, Suit.Clubs), true],
+      //     [CardFactory.getCard(Value.King, Suit.Diamonds), false],
+      //     [CardFactory.getCard(Value.Seven, Suit.Diamonds), false],
+      //   ];
+      //   const handArray3: [Card, boolean][] = [
+      //     [CardFactory.getCard(Value.King, Suit.Hearts), true],
+      //     [CardFactory.getCard(Value.King, Suit.Spades), false],
+      //     [CardFactory.getCard(Value.Five, Suit.Spades), false],
+      //   ];
+      //   const handArray4: [Card, boolean][] = [
+      //     [CardFactory.getCard(Value.King, Suit.Hearts), true],
+      //     [CardFactory.getCard(Value.King, Suit.Spades), false],
+      //     [CardFactory.getCard(Value.Eight, Suit.Spades), false],
+      //   ];
 
-        const hand = new Hand(handArray);
-        playerOne.hand = hand;
-        const hand2 = new Hand(handArray2);
-        playerTwo.hand = hand2;
-        const hand3 = new Hand(handArray3);
-        playerThree.hand = hand3;
-        blackjackInstance.dealer.hand = new Hand(handArray4);
-        expect(playerOne.getNumericScore()).toStrictEqual([2, 12]);
-        expect(playerTwo.getNumericScore()).toStrictEqual([27]);
-        expect(playerThree.getNumericScore()).toStrictEqual([25]);
-        expect(blackjackInstance.dealer.getNumericScore()).toStrictEqual([28]);
-        await blackjackInstance.playGame(false);
-        expect(playerOne.getNumericScore()).toStrictEqual([2, 12]);
-        expect(playerOne.status).toBe(GameStatus.Won);
-        expect(playerTwo.getNumericScore()).toStrictEqual([27]);
-        expect(playerTwo.status).toBe(GameStatus.Lost);
-        expect(playerThree.getNumericScore()).toStrictEqual([25]);
-        expect(playerThree.status).toBe(GameStatus.Lost);
-        expect(blackjackInstance.dealer.getNumericScore()).toStrictEqual([28]);
-        expect(blackjackInstance.dealer.status).toBe(GameStatus.Lost);
-      });
-      //      it('Blackjack Edge Case #2 Player & dealer bust & all others win', async () => {
+      //   const hand = new Hand(handArray);
+      //   playerOne.hand = hand;
+      //   const hand2 = new Hand(handArray2);
+      //   playerTwo.hand = hand2;
+      //   const hand3 = new Hand(handArray3);
+      //   playerThree.hand = hand3;
+      //   blackjackInstance.dealer.hand = new Hand(handArray4);
+      //   expect(playerOne.getNumericScore()).toStrictEqual([2, 12]);
+      //   expect(playerTwo.getNumericScore()).toStrictEqual([27]);
+      //   expect(playerThree.getNumericScore()).toStrictEqual([25]);
+      //   expect(blackjackInstance.dealer.getNumericScore()).toStrictEqual([28]);
+      //   await blackjackInstance.playGame(false);
+      //   expect(playerOne.getNumericScore()).toStrictEqual([2, 12]);
+      //   expect(playerOne.status).toBe(GameStatus.Won);
+      //   expect(playerTwo.getNumericScore()).toStrictEqual([27]);
+      //   expect(playerTwo.status).toBe(GameStatus.Lost);
+      //   expect(playerThree.getNumericScore()).toStrictEqual([25]);
+      //   expect(playerThree.status).toBe(GameStatus.Lost);
+      //   expect(blackjackInstance.dealer.getNumericScore()).toStrictEqual([28]);
+      //   expect(blackjackInstance.dealer.status).toBe(GameStatus.Lost);
+      // });
+      //       it('Blackjack Edge Case #2 Player & dealer bust & all others win', async () => {
       //         playerOne.getBlackjackAction = jest.fn().mockReturnValue(BlackjackAction.Stay);
       //         playerOne.doTurn = jest.fn().mockReturnValue(BlackjackAction.Stay);
 

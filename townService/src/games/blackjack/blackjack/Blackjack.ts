@@ -1,7 +1,6 @@
 import GameStatus from '../players/GameStatus';
 import DealerPlayer from '../players/DealerPlayer';
 import HumanPlayer from '../players/HumanPlayer';
-import Player from '../players/Player';
 
 export default class BlackJack {
   // Going to have this DealerPlayer class handle the responsiblites of the Dealer and the Player.
@@ -15,20 +14,20 @@ export default class BlackJack {
   // i need to abstract this out to a Player[] where
   // a player is a interface that HumanPlayer and SpectatorPlayer implement.
   // I think that will be easier once I finish implementing this though
-  private _players: Player[];
+  private _players: HumanPlayer[];
 
-  public get players(): Player[] {
+  public get players(): HumanPlayer[] {
     return this._players;
   }
 
-  constructor(players: Player[] = []) {
-    this._dealer = new DealerPlayer();
+  constructor(players: HumanPlayer[] = []) {
+    this._dealer = new DealerPlayer(GameStatus.Waiting, '1');
     // We assume that there is at least one human player. I am going to start with the
     // assumption of one Player but will make sure to expand tests to cover 2 players
     this._players = players;
   }
 
-  public addPlayer(player: Player): void {
+  public addPlayer(player: HumanPlayer): void {
     this._players.push(player);
   }
 
