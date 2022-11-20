@@ -67,4 +67,10 @@ describe('Leaderboard Modal', () => {
     fireEvent.click(doneButton);
     await waitFor(() => expect(mockUseDisclosure.onClose).toBeCalled());
   }, 10000);
+  //   it('Leaderboard Modal closes when shift key is pressed', async () => {
+  //     await openLeaderboardModal();
+  //     await waitFor(() => expect(renderData.getByText('Blackjack Leaderboard')).toBeInTheDocument());
+  //     fireEvent.keyPress(window, { key: 'Shift', code: 16, charCode: 16 });
+  //     await waitFor(() => expect(mockUseDisclosure.onClose).toBeCalled());
+  //   }, 10000);
 });
