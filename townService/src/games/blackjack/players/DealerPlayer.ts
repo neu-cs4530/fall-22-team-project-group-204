@@ -1,3 +1,4 @@
+import { nanoid } from 'nanoid';
 import Card from '../../cards/Card';
 import Hand from './Hand';
 import GameStatus from './GameStatus';
@@ -8,9 +9,13 @@ import BlackjackAction from '../blackjack/BlackjackAction';
 export default class DealerPlayer extends HumanPlayer {
   private _masterDeck: Card[];
 
-  constructor(id: string) {
-    super(id);
-    this._masterDeck = DealerPlayer.getDecks(2).flat();
+  constructor(Gamestatus: GameStatus, id: string) {
+    super(GameStatus.Waiting, nanoid());
+    super.status = Gamestatus;
+    super.id = id;
+    super.hand = new Hand();
+    // change this to 6
+    this._masterDeck = DealerPlayer.getDecks(6).flat();
     this.shuffleDecks();
   }
 
@@ -20,14 +25,6 @@ export default class DealerPlayer extends HumanPlayer {
 
   public set hand(value: Hand) {
     super.hand = value;
-  }
-
-  public get id(): string {
-    return super.id;
-  }
-
-  public set id(value: string) {
-    super.id = value;
   }
 
   public get status(): GameStatus {
@@ -40,6 +37,14 @@ export default class DealerPlayer extends HumanPlayer {
 
   public get deck(): Card[] {
     return this._masterDeck;
+  }
+
+  public get id(): string {
+    return super.id;
+  }
+
+  public set id(value: string) {
+    super.id = value;
   }
 
   public static getDecks(amount: number): Card[][] {
@@ -123,6 +128,7 @@ export default class DealerPlayer extends HumanPlayer {
       if (chosenAction === BlackjackAction.Hit) {
         player.addCard(this._popCard());
       }
+      // move these three checks into a helper method
       if (player.has21()) {
         player.status = GameStatus.Won;
         this._setEveryoneElseToLost(players.filter(p => p !== player));
@@ -143,11 +149,16 @@ export default class DealerPlayer extends HumanPlayer {
     super.addCard(newCard, super.hand.cards.length !== 0);
   }
 
-  private static _isGameOver(players: HumanPlayer[]): boolean {
-    return (
-      players.some(player => player.status === GameStatus.Won) ||
-      players.every(player => player.status === GameStatus.Lost)
-    );
+  private _isGameOver(players: HumanPlayer[]): boolean {
+    // make this a method and set said players GameStatus to Won
+    const allButOneBusted =
+      players.filter(player => player.status === GameStatus.Lost).length === players.length - 1 &&
+      this.status === GameStatus.Lost;
+    const allButDealerBusted =
+      players.every(player => player.status === GameStatus.Lost) && this.status !== GameStatus.Lost;
+    const somePlayerWon = players.some(player => player.status === GameStatus.Won);
+    const dealerWon = this.status === GameStatus.Won;
+    return allButOneBusted || allButDealerBusted || somePlayerWon || dealerWon;
   }
 
   public async doTurns(players: HumanPlayer[]): Promise<void> {
@@ -157,7 +168,7 @@ export default class DealerPlayer extends HumanPlayer {
 
     await this.doHumanTurns(players);
 
-    if (DealerPlayer._isGameOver(players)) {
+    if (this._isGameOver(players)) {
       return;
     }
 

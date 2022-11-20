@@ -2,16 +2,20 @@
 /* eslint-disable class-methods-use-this */
 import { setTimeout } from 'timers';
 import { ReadLine, createInterface } from 'readline';
+import { nanoid } from 'nanoid';
 import Hand from './Hand';
 import GameStatus from './GameStatus';
-import Player from './Player';
 import BlackjackAction from '../blackjack/BlackjackAction';
 import Card from '../../cards/Card';
 
-export default class HumanPlayer extends Player {
+export default class HumanPlayer {
   private static _rl: ReadLine = createInterface({ input: process.stdin, output: process.stdout });
 
   private _hand: Hand;
+
+  private _status: GameStatus;
+
+  private _id: string;
 
   public get hand(): Hand {
     return this._hand;
@@ -22,25 +26,25 @@ export default class HumanPlayer extends Player {
   }
 
   public get id(): string {
-    return super.id;
+    return this._id;
   }
 
   public set id(value: string) {
-    super.id = value;
+    this._id = value;
   }
 
   public get status(): GameStatus {
-    return super.status;
+    return this._status;
   }
 
   public set status(value: GameStatus) {
-    super.status = value;
+    this._status = value;
   }
 
-  constructor(id: string) {
-    super(GameStatus.Waiting, id);
+  constructor(status: GameStatus, id: string = nanoid()) {
     this._hand = new Hand();
-    this.id = id;
+    this._status = status;
+    this._id = id;
   }
 
   public addCard(newCard: Card, newCardHiddenStatus = true): void {
