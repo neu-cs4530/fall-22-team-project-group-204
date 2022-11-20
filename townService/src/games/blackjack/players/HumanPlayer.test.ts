@@ -14,16 +14,17 @@ describe('HumanPlayer', () => {
   let player: HumanPlayer;
 
   beforeEach(() => {
-    player = new HumanPlayer();
+    player = new HumanPlayer(GameStatus.Waiting, '0');
   });
 
   describe('constructor', () => {
     it('Constructs a HumanPlayer properly', () => {
       expect(() => {
-        new HumanPlayer();
+        new HumanPlayer(GameStatus.Waiting, '1');
       }).not.toThrowError();
-      const newPlayer = new HumanPlayer();
+      const newPlayer = new HumanPlayer(GameStatus.Waiting, '1');
       expect(newPlayer.status).toBe(GameStatus.Waiting);
+      expect(newPlayer.id).toBe('1');
     });
   });
 
@@ -35,6 +36,10 @@ describe('HumanPlayer', () => {
     it('Hand getter works correctly', () => {
       expect(player.hand).toBeInstanceOf(Hand);
       expect(player.hand.cards).toStrictEqual([]);
+    });
+
+    it('id getter works correctly', () => {
+      expect(player.id).toBe('0');
     });
   });
 
@@ -56,7 +61,18 @@ describe('HumanPlayer', () => {
       player.status = GameStatus.Won;
       expect(player.status).toBe(GameStatus.Won);
     });
+
+    it('id setter works correctly', () => {
+      player.id = '0'
+      expect(player.id).toBe('0');
+      player.id = '8'
+      expect(player.id).toBe('8');
+      player.id = '88'
+      expect(player.id).toBe('88');
+    });
   });
+
+
 
   describe('class methods', () => {
     describe('addCard', () => {
