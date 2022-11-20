@@ -16,6 +16,8 @@ export type GamingAreaEvents = {
 
   dealerHandChange: (dealerHand: PlayingCard[]) => void;
   playerHandsChange: (playerHands: PlayerHand[]) => void;
+  gameStatusChange: (gameStatus: string) => void;
+  activeGameAlert: (isPlaying: boolean) => void;
 };
 
 /**
@@ -79,6 +81,23 @@ export default class GamingAreaController extends (EventEmitter as new () => Typ
   }
 
   /**
+   * Returns the game's status
+   */
+  public get gameStatus() {
+    return this._model.gameStatus;
+  }
+
+  /**
+   * Sets the game's status
+   */
+  public set gameStatus(gameStatus: string) {
+    if (this.gameStatus != gameStatus) {
+      this._model.gameStatus = gameStatus;
+      this.emit('gameStatusChange', this.gameStatus);
+    }
+  }
+
+  /**
    * Indicates how the player wants to advance their turn (hit: true, stay: false)
    *
    * @param playerId the id of the current player
@@ -94,14 +113,31 @@ export default class GamingAreaController extends (EventEmitter as new () => Typ
    *
    * @param playerId id of player trying to join
    */
-  public toggleJoinGame(playerId: string) {
+  public toggleJoinGame(playerId: string): boolean {
     const player = this.playerHands.find(playerHand => playerHand.id === playerId);
     if (!player) {
-      this.playerHands.push({ id: playerId, hand: [] });
-    } else if (player) {
-      this.playerHands = this.playerHands.filter(playerHand => playerHand.id !== playerId);
+      if (this.gameStatus === 'Playing') {
+        this.emit('activeGameAlert', true);
+        console.log('activeGameAlert');
+        return false;
+      } else {
+        this.playerHands.push({ id: playerId, hand: [] });
+        this.emit('playerHandsChange', this.playerHands);
+        console.log('playerHandsChange');
+        return true;
+      }
+    } else {
+      if (this.gameStatus === 'Playing') {
+        this.emit('activeGameAlert', false);
+        console.log('activeGameAlert');
+        return false;
+      } else {
+        this.playerHands = this.playerHands.filter(playerHand => playerHand.id !== playerId);
+        this.emit('playerHandsChange', this.playerHands);
+        console.log('playerHandsChange');
+        return true;
+      }
     }
-    this.emit('playerHandsChange', this.playerHands);
   }
 
   /**
@@ -113,6 +149,7 @@ export default class GamingAreaController extends (EventEmitter as new () => Typ
   public updateFrom(updatedModel: GamingArea): void {
     this.playerHands = updatedModel.playerHands;
     this.dealerHand = updatedModel.dealerHand;
+    this.gameStatus = updatedModel.gameStatus;
   }
 
   /**

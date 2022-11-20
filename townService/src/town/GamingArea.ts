@@ -14,15 +14,16 @@ import HumanPlayer from '../games/blackjack/players/HumanPlayer';
 import Hand from '../games/blackjack/players/Hand';
 import Suit from '../games/cards/Suit';
 import Value from '../games/cards/Value';
+import GameStatus from '../games/blackjack/players/GameStatus';
 
 export default class GamingArea extends InteractableArea {
   private _dealerHand: PlayingCard[];
 
   private _playerHands: PlayerHand[];
 
-  private _game: BlackJack;
+  private _gameStatus: string;
 
-  private _gameIsActive: boolean;
+  private _game: BlackJack;
 
   public get dealerHand() {
     return this._dealerHand;
@@ -32,6 +33,10 @@ export default class GamingArea extends InteractableArea {
     return this._playerHands;
   }
 
+  public get gameStatus() {
+    return this._gameStatus;
+  }
+
   /**
    * Creates a new GamingArea
    * @param gamingArea represents a gamingArea with id, dealer hand, and player hands
@@ -39,7 +44,7 @@ export default class GamingArea extends InteractableArea {
    * @param townEmitter a broadcast emitter that can be used to emit updates to players
    */
   public constructor(
-    { id, dealerHand, playerHands }: GamingAreaModel,
+    { id, dealerHand, playerHands, gameStatus }: GamingAreaModel,
     coordinates: BoundingBox,
     townEmitter: TownEmitter,
   ) {
@@ -47,7 +52,7 @@ export default class GamingArea extends InteractableArea {
     this._dealerHand = dealerHand;
     this._playerHands = playerHands;
     this._game = new BlackJack([], this);
-    this._gameIsActive = false;
+    this._gameStatus = gameStatus;
   }
 
   /**
@@ -55,27 +60,41 @@ export default class GamingArea extends InteractableArea {
    *
    * @param gamingArea updated model
    */
-  public updateModel({ dealerHand, playerHands }: GamingAreaModel) {
+  public updateModel({ dealerHand, playerHands, gameStatus }: GamingAreaModel) {
+    // console.log('updateModelCalled');
     this._dealerHand = dealerHand;
+    let startGame = false;
+    if (this._playerHands.length === 0 && playerHands.length > 0) {
+      startGame = true;
+    }
     this._playerHands = playerHands;
+    this._gameStatus = gameStatus;
     // NOTE: please change to support more players / keeping track of game is active
     this._playerHands.forEach(playerHand => {
-      if (playerHand.hand.length === 0) {
+      if (playerHand.hand.length === 0 && this._game.dealer.status !== GameStatus.Playing) {
         this._game.addPlayer(new HumanPlayer(playerHand.id));
-        this._game.playGame();
+        // console.log(`added ${playerHand.id}`);
+      } else {
+        // console.log('trying to join an existing game');
+        // NOTE: send some alert to the player somehow
       }
     });
+    if (startGame) {
+      this._game.playGame();
+    }
   }
 
   // NOTE: refactor for array order checking later
   /**
    * Obtains a model from the Blackjack backend whenever players or dealer are updated
    *
-   * @param gamingArea
+   * @param dealer the dealer player
+   * @param players the human players
    */
-  public updateFromBlackjack(dealer: DealerPlayer, players: HumanPlayer[]) {
+  public updateFromBlackjack(dealer: DealerPlayer, players: HumanPlayer[], status: string) {
     this._dealerHand = GamingArea.handToListOfPlayingCards(dealer.hand);
     this._playerHands = GamingArea.playersToPlayerHands(players);
+    this._gameStatus = status;
     this._emitAreaChanged();
   }
 
@@ -92,6 +111,7 @@ export default class GamingArea extends InteractableArea {
       playingCards.push({
         suit: GamingArea.suitToString(suit),
         value: GamingArea.valueToString(value),
+        faceUp: card[1],
       });
     });
     return playingCards;
@@ -178,6 +198,7 @@ export default class GamingArea extends InteractableArea {
       id: this.id,
       dealerHand: this._dealerHand,
       playerHands: this._playerHands,
+      gameStatus: this._gameStatus,
     };
   }
 
@@ -195,6 +216,10 @@ export default class GamingArea extends InteractableArea {
     const dealerHand: PlayingCard[] = [];
     const playerHands: PlayerHand[] = [];
     const rect: BoundingBox = { x: mapObject.x, y: mapObject.y, width, height };
-    return new GamingArea({ id: name, playerHands, dealerHand }, rect, townEmitter);
+    return new GamingArea(
+      { id: name, playerHands, dealerHand, gameStatus: 'Waiting' },
+      rect,
+      townEmitter,
+    );
   }
 }

@@ -13,13 +13,14 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
+  useToast,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useInteractable, useGamingAreaController } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
 import GamingAreaController from '../../../classes/GamingAreaController';
 import GamingArea from './GamingArea';
-import { PlayingCard } from '../../../types/CoveyTownSocket';
+import { PlayerHand, PlayingCard } from '../../../types/CoveyTownSocket';
 
 // i need to figure out how the back and front end communicate :C
 
@@ -27,6 +28,9 @@ import { PlayingCard } from '../../../types/CoveyTownSocket';
 // import Suit from '../../../../../townService/src/games/cards/Suit';
 
 function cardToId(card: PlayingCard): number {
+  if (card.faceUp == false) {
+    return 53;
+  }
   const value = card.value;
   const suit = card.suit;
   const valueMap = new Map<string, number>([
@@ -116,7 +120,7 @@ export function PlayingCardImage({ cardId, x, y }: { cardId: number; x: number; 
 }
 
 export function Hand({ cards, x, y }: { cards: PlayingCard[]; x: number; y: number }) {
-  const hand = cards.map((card, index) => {
+  const handComponent = cards.map((card, index) => {
     return (
       <PlayingCardImage key={index} cardId={cardToId(card)} x={x + index * 25} y={y + index * 25} />
     );
@@ -124,9 +128,41 @@ export function Hand({ cards, x, y }: { cards: PlayingCard[]; x: number; y: numb
   return (
     <Container>
       <Image position='absolute' src='assets/blackjack/marker.png' top={y} left={x} width='50px' />
-      {hand}
+      {handComponent}
     </Container>
   );
+}
+
+export function Hands({ hands }: { hands: PlayerHand[] }) {
+  const townController = useTownController();
+  const positions = [
+    [100, 175],
+    [100, 325],
+    [860, 175],
+    [860, 325],
+  ];
+  let offset = 0;
+  const handComponents = hands.map((hand, index) => {
+    if (hand.id == townController.userID) {
+      offset = -1;
+      return <Hand cards={hand.hand} x={450} y={400} />;
+    } else {
+      return (
+        <Hand cards={hand.hand} x={positions[index + offset][0]} y={positions[index + offset][1]} />
+      );
+    }
+  });
+  for (let i = hands.length; i < 5; i++) {
+    if (i == 0) {
+      handComponents.push(<Hand cards={[]} x={450} y={400} />);
+      offset = -1;
+    } else {
+      handComponents.push(
+        <Hand cards={[]} x={positions[i + offset][0]} y={positions[i + offset][1]} />,
+      );
+    }
+  }
+  return <Container>{handComponents}</Container>;
 }
 
 export function Chip({ chipValue, x, y }: { chipValue: number; x: number; y: number }) {
@@ -145,8 +181,14 @@ export function Chip({ chipValue, x, y }: { chipValue: number; x: number; y: num
   );
 }
 
-export function JoinLeaveButton({ joinLeaveFunc }: { joinLeaveFunc: () => void }) {
-  const [joinLeave, setJoinLeave] = useState<boolean>(true);
+export function JoinLeaveButton({
+  joinLeaveFunc,
+  isPlaying,
+}: {
+  joinLeaveFunc: () => boolean;
+  isPlaying: boolean;
+}) {
+  const [joinLeave, setJoinLeave] = useState<boolean>(!isPlaying);
 
   if (joinLeave) {
     return (
@@ -157,8 +199,10 @@ export function JoinLeaveButton({ joinLeaveFunc }: { joinLeaveFunc: () => void }
         colorScheme='gray'
         position='absolute'
         onClick={() => {
-          setJoinLeave(false);
-          joinLeaveFunc();
+          const success = joinLeaveFunc();
+          if (success) {
+            setJoinLeave(false);
+          }
         }}>
         Join
       </Button>
@@ -172,8 +216,10 @@ export function JoinLeaveButton({ joinLeaveFunc }: { joinLeaveFunc: () => void }
         colorScheme='gray'
         position='absolute'
         onClick={() => {
-          setJoinLeave(true);
-          joinLeaveFunc();
+          const success = joinLeaveFunc();
+          if (success) {
+            setJoinLeave(true);
+          }
         }}>
         Leave
       </Button>
@@ -184,6 +230,11 @@ export function JoinLeaveButton({ joinLeaveFunc }: { joinLeaveFunc: () => void }
 export function Blackjack({ controller }: { controller: GamingAreaController }) {
   const townController = useTownController();
   const [dealerHand, setDealerHand] = useState<PlayingCard[]>(controller.dealerHand);
+  const [playerHands, setPlayerHands] = useState<PlayerHand[]>(controller.playerHands);
+  const [gameStatus, setGameStatus] = useState<string>(controller.gameStatus);
+
+  const toast = useToast();
+
   useEffect(() => {
     console.log(controller.id);
   });
@@ -197,6 +248,44 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
       controller.removeListener('dealerHandChange', setNewDealerHand);
     };
   }, [controller, townController]);
+
+  useEffect(() => {
+    const setNewPlayerHands = (hands: PlayerHand[]) => {
+      setPlayerHands(hands);
+    };
+    controller.addListener('playerHandsChange', setNewPlayerHands);
+    return () => {
+      controller.removeListener('playerHandsChange', setNewPlayerHands);
+    };
+  }, [controller, townController]);
+
+  useEffect(() => {
+    const setNewGameStatus = (status: string) => {
+      setGameStatus(status);
+    };
+    controller.addListener('gameStatusChange', setNewGameStatus);
+    return () => {
+      controller.removeListener('gameStatusChange', setNewGameStatus);
+    };
+  }, [controller, townController]);
+
+  useEffect(() => {
+    const alertPlayer = (isPlaying: boolean) => {
+      const alert = isPlaying
+        ? "Can't join an active game!"
+        : "Can't leave a game you have started!";
+      toast({
+        title: alert,
+        status: 'error',
+        duration: 2000,
+        isClosable: false,
+      });
+    };
+    controller.addListener('activeGameAlert', alertPlayer);
+    return () => {
+      controller.removeListener('activeGameAlert', alertPlayer);
+    };
+  });
 
   townController.emitGamingAreaUpdate(controller);
   const hit = () => {
@@ -213,9 +302,11 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
       position='relative'>
       <JoinLeaveButton
         joinLeaveFunc={() => {
-          controller.toggleJoinGame(townController.userID);
+          const success = controller.toggleJoinGame(townController.userID);
           townController.emitGamingAreaUpdate(controller);
+          return success;
         }}
+        isPlaying={playerHands.map(player => player.id).includes(townController.userID)}
       />
       <Button
         size='sm'
@@ -232,19 +323,19 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
       <Button size='sm' left='240px' top='500px' colorScheme='gray' position='relative'>
         Stand
       </Button>
-      <Hand
+      {/*<Hand
         cards={[
           { value: '7', suit: 'Clubs' },
           { value: 'A', suit: 'Spades' },
         ]}
         x={450}
         y={400}
-      />
+      />*/}
+      <Text top={30} left={700} position='absolute' color='white'>
+        Game Status: {gameStatus}
+      </Text>
       <Hand cards={dealerHand} x={450} y={100} />
-      <Hand cards={[]} x={100} y={175} />
-      <Hand cards={[]} x={100} y={325} />
-      <Hand cards={[]} x={860} y={175} />
-      <Hand cards={[]} x={860} y={325} />
+      <Hands hands={playerHands} />
       <Chip chipValue={1} x={600} y={480} />
       <Chip chipValue={5} x={650} y={480} />
       <Chip chipValue={25} x={700} y={480} />
@@ -306,12 +397,7 @@ export function BlackjackModal({ gamingArea }: { gamingArea: GamingArea }): JSX.
         <ModalBody>
           <Blackjack controller={gamingAreaController} />
         </ModalBody>
-        <ModalFooter>
-          <Button colorScheme='blue' mr={3} onClick={closeModal}>
-            Done
-          </Button>
-          <Button onClick={closeModal}>Cancel</Button>
-        </ModalFooter>
+        <ModalFooter> </ModalFooter>
       </ModalContent>
     </Modal>
   );

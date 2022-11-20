@@ -34,7 +34,7 @@ export default class BlackJack {
   constructor(
     players: Player[] = [],
     gamingArea: GamingArea = new GamingArea(
-      { id: 'invalidId', dealerHand: [], playerHands: [] },
+      { id: 'invalidId', dealerHand: [], playerHands: [], gameStatus: 'Waiting' },
       { x: 0, y: 0, width: 0, height: 0 },
       mock<TownEmitter>(), // NOTE: may need to change in the future
     ),
@@ -79,7 +79,7 @@ export default class BlackJack {
 
     this._dealer.dealCards(players);
 
-    this._gamingArea.updateFromBlackjack(this._dealer, players);
+    this._gamingArea.updateFromBlackjack(this._dealer, players, GameStatus[this._dealer.status]);
 
     while (!BlackJack._isGameOver([...players, this._dealer])) {
       await this._dealer.doTurns(players);

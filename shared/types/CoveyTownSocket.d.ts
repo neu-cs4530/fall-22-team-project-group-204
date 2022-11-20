@@ -53,6 +53,7 @@ export type ChatMessage = {
 export interface PlayingCard {
   value: string;
   suit: string;
+  faceUp: boolean;
 };
 
 export interface PlayerHand {
@@ -81,6 +82,7 @@ export interface ViewingArea {
 
 export interface GamingArea {
   id: string;
+  gameStatus: string
   dealerHand: PlayingCard[];
   playerHands: PlayerHand[];
 }
