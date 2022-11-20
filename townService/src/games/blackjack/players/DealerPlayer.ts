@@ -118,27 +118,34 @@ export default class DealerPlayer extends HumanPlayer {
   public async doHumanTurns(players: HumanPlayer[]): Promise<void> {
     const activePlayers = players.filter(player => player.status !== GameStatus.Lost);
     for (const player of activePlayers) {
+      const otherPlayers = players.filter(p => p !== player);
+      if (this._updatePlayerStatusAndReport(player, otherPlayers)) return;
       // If they hit or stay do the correct thing
       const chosenAction: BlackjackAction = await player.doTurn();
       // replace if with switch statement (i forgot the syntax)
       if (chosenAction === BlackjackAction.Hit) {
         player.addCard(this._popCard());
       }
-      // move these three checks into a helper method
-      if (player.has21()) {
-        player.status = GameStatus.Won;
-        this._setEveryoneElseToLost(players.filter(p => p !== player));
-        return;
-      }
-      if (player.hasBusted()) {
-        player.status = GameStatus.Lost;
-      }
-
-      if (players.filter(p => p !== player).every(p => p.status === GameStatus.Lost)) {
-        player.status = GameStatus.Won;
-        return;
-      }
+      if (this._updatePlayerStatusAndReport(player, otherPlayers)) return;
     }
+  }
+
+  // Update's the players status if needed and reports if the game
+  // needs to be exited early
+  private _updatePlayerStatusAndReport(player: HumanPlayer, otherPlayers: HumanPlayer[]): boolean {
+    if (player.has21()) {
+      player.status = GameStatus.Won;
+      this._setEveryoneElseToLost(otherPlayers);
+      return true;
+    }
+    if (otherPlayers.every(p => p.status === GameStatus.Lost) && super.status === GameStatus.Lost) {
+      player.status = GameStatus.Won;
+      return true;
+    }
+    if (player.hasBusted()) {
+      player.status = GameStatus.Lost;
+    }
+    return false;
   }
 
   public addCard(newCard: Card): void {
@@ -147,14 +154,38 @@ export default class DealerPlayer extends HumanPlayer {
 
   private _isGameOver(players: HumanPlayer[]): boolean {
     // make this a method and set said players GameStatus to Won
-    const allButOneBusted =
-      players.filter(player => player.status === GameStatus.Lost).length === players.length - 1 &&
-      this.status === GameStatus.Lost;
-    const allButDealerBusted =
-      players.every(player => player.status === GameStatus.Lost) && this.status !== GameStatus.Lost;
+    const allButOneBusted = this._allButOneBusted(players);
+    const allButDealerBusted = this._allButDealerBusted(players);
     const somePlayerWon = players.some(player => player.status === GameStatus.Won);
     const dealerWon = this.status === GameStatus.Won;
     return allButOneBusted || allButDealerBusted || somePlayerWon || dealerWon;
+  }
+
+  private _allButOneBusted(players: HumanPlayer[]): boolean {
+    let idxToUpdate = -1;
+    let count = 0;
+    for (let i = 0; i < players.length; i++) {
+      if (players[i].status === GameStatus.Lost) {
+        count += 1;
+      } else {
+        idxToUpdate = i;
+      }
+    }
+
+    if (count === players.length - 1 && this.status === GameStatus.Lost) {
+      players[idxToUpdate].status = GameStatus.Won;
+      return true;
+    }
+    return false;
+  }
+
+  private _allButDealerBusted(players: HumanPlayer[]): boolean {
+    const allBusted = players.every(player => player.status === GameStatus.Lost);
+    if (allBusted && this.status !== GameStatus.Lost) {
+      this.status = GameStatus.Won;
+      return true;
+    }
+    return false;
   }
 
   public async doTurns(players: HumanPlayer[]): Promise<void> {
