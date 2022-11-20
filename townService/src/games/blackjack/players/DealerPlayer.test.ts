@@ -1,15 +1,15 @@
 /* eslint-disable no-promise-executor-return */
 /* eslint-disable prettier/prettier */
 
-import GameStatus from "./GameStatus";
-import DealerPlayer from "./DealerPlayer";
-import Hand from "./Hand";
-import CardFactory from "../../cards/CardFactory";
-import Suit from "../../cards/Suit";
-import Value from "../../cards/Value";
-import Card from "../../cards/Card";
-import HumanPlayer from "./HumanPlayer";
-import BlackjackAction from "../blackjack/BlackjackAction";
+import GameStatus from './GameStatus';
+import DealerPlayer from './DealerPlayer';
+import Hand from './Hand';
+import CardFactory from '../../cards/CardFactory';
+import Suit from '../../cards/Suit';
+import Value from '../../cards/Value';
+import Card from '../../cards/Card';
+import HumanPlayer from './HumanPlayer';
+import BlackjackAction from '../blackjack/BlackjackAction';
 
 // We are effectively testing both the DealerPlayer class and the
 // Player class here
@@ -52,11 +52,13 @@ describe('DealerPlayer', () => {
       expect(dealerPlayer.deck.length).toBe(312);
     });
 
-    DealerPlayer.getDecks(2).flat().forEach((card, index) => {
-      it(`Deck getter works correctly for card ${index}`, () => {
-        expect(dealerPlayer.deck).toContain(card);
+    DealerPlayer.getDecks(2)
+      .flat()
+      .forEach((card, index) => {
+        it(`Deck getter works correctly for card ${index}`, () => {
+          expect(dealerPlayer.deck).toContain(card);
+        });
       });
-    });
 
     it('Hand getter works properly', () => {
       expect(dealerPlayer.hand).toBeInstanceOf(Hand);
@@ -68,7 +70,6 @@ describe('DealerPlayer', () => {
     });
   });
 
-
   describe('setters', () => {
     it('Status setter works properly', () => {
       expect(dealerPlayer.status).toBe(GameStatus.Waiting);
@@ -78,7 +79,10 @@ describe('DealerPlayer', () => {
     it('Hand setter works properly', () => {
       expect(dealerPlayer.hand).toBeInstanceOf(Hand);
       expect(dealerPlayer.hand.cards).toStrictEqual([]);
-      const cards: [Card, boolean][] = [[CardFactory.getCard(Value.Ace, Suit.Diamonds), false], [CardFactory.getCard(Value.King, Suit.Diamonds), true]];
+      const cards: [Card, boolean][] = [
+        [CardFactory.getCard(Value.Ace, Suit.Diamonds), false],
+        [CardFactory.getCard(Value.King, Suit.Diamonds), true],
+      ];
       const newHand = new Hand(cards);
       dealerPlayer.hand = newHand;
       expect(dealerPlayer.hand).toBe(newHand);
@@ -99,9 +103,7 @@ describe('DealerPlayer', () => {
         expect(shuffledDeck).not.toStrictEqual(deck);
         expect(deck).toStrictEqual(CardFactory.getDeck());
         expect(shuffledDeck).toStrictEqual(expect.arrayContaining(deck));
-
       });
-
     });
 
     describe('shuffleDecks', () => {
@@ -148,7 +150,6 @@ describe('DealerPlayer', () => {
         const playerFourSecondCardHidden = playerFourCards[1][1];
         expect(playerFourSecondCard).toBeInstanceOf(Card);
         expect(playerFourSecondCardHidden).toBe(true);
-
       });
     });
 
@@ -177,9 +178,15 @@ describe('DealerPlayer', () => {
         const decks = DealerPlayer.getDecks(2);
         expect(decks).toStrictEqual([CardFactory.getDeck(), CardFactory.getDeck()]);
 
-        expect(DealerPlayer.getDecks(5)).toStrictEqual([CardFactory.getDeck(), CardFactory.getDeck(), CardFactory.getDeck(), CardFactory.getDeck(), CardFactory.getDeck()]);
+        expect(DealerPlayer.getDecks(5)).toStrictEqual([
+          CardFactory.getDeck(),
+          CardFactory.getDeck(),
+          CardFactory.getDeck(),
+          CardFactory.getDeck(),
+          CardFactory.getDeck(),
+        ]);
       });
     });
+  });
 
-  })
 });

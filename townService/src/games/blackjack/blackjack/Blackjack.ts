@@ -50,15 +50,20 @@ export default class BlackJack {
   }
 
   private static _isGameOver(players: HumanPlayer[]): boolean {
-    return players.some(player => player.status === GameStatus.Won);
+    return (
+      players.some(player => player.status === GameStatus.Won) ||
+      players.every(player => player.status === GameStatus.Lost)
+    );
   }
 
-  public async playGame(): Promise<void> {
+  public async playGame(doDealing = true): Promise<void> {
     // maybe check that there is more than 1 player before i start the gameplay loop?
     const players: HumanPlayer[] = this._getActiveHumanPlayers();
     this._updateToPlaying();
 
-    this._dealer.dealCards(players);
+    if (doDealing) {
+      this._dealer.dealCards(players);
+    }
 
     while (!BlackJack._isGameOver([...players, this._dealer])) {
       await this._dealer.doTurns(players);
