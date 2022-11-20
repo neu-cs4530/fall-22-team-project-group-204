@@ -75,7 +75,6 @@ describe('DealerPlayer', () => {
         Apologies that this test isn't thorough. I just want to do a sanity test check to know that
         it is handling the basic gameplay and async functions correctly. It is much easier for me to change
         and refactor this code once I have a full set of suits.
-
         I will come back later and test the edge cases of Blackjack. (We have to try to think of weird scenarios and test them)
         */
         await blackjackInstance.playGame();

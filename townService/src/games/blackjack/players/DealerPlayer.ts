@@ -9,12 +9,8 @@ import BlackjackAction from '../blackjack/BlackjackAction';
 export default class DealerPlayer extends HumanPlayer {
   private _masterDeck: Card[];
 
-  constructor(Gamestatus: GameStatus, id: string) {
-    super(GameStatus.Waiting, nanoid());
-    super.status = Gamestatus;
-    super.id = id;
-    super.hand = new Hand();
-    // change this to 6
+  constructor(status: GameStatus = GameStatus.Waiting, id: string = nanoid()) {
+    super(status, id);
     this._masterDeck = DealerPlayer.getDecks(6).flat();
     this.shuffleDecks();
   }

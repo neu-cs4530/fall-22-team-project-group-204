@@ -25,14 +25,6 @@ export default class HumanPlayer {
     this._hand = value;
   }
 
-  public get status(): GameStatus {
-    return this._status;
-  }
-
-  public set status(value: GameStatus) {
-    this._status = value;
-  }
-
   public get id(): string {
     return this._id;
   }
@@ -41,10 +33,18 @@ export default class HumanPlayer {
     this._id = value;
   }
 
+  public get status(): GameStatus {
+    return this._status;
+  }
+
+  public set status(value: GameStatus) {
+    this._status = value;
+  }
+
   constructor(status: GameStatus, id: string = nanoid()) {
+    this._hand = new Hand();
     this._status = status;
     this._id = id;
-    this._hand = new Hand();
   }
 
   public addCard(newCard: Card, newCardHiddenStatus = true): void {

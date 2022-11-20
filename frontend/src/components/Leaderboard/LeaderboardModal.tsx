@@ -110,9 +110,6 @@ export default function LeaderboardModal(): JSX.Element {
     columnHelper.accessor('ranking', {
       cell: info => info.getValue(),
       header: 'Ranking',
-      meta: {
-        isNumeric: true,
-      },
     }),
     columnHelper.accessor('name', {
       cell: info => info.getValue(),
@@ -121,16 +118,10 @@ export default function LeaderboardModal(): JSX.Element {
     columnHelper.accessor('wins', {
       cell: info => info.getValue(),
       header: 'Wins',
-      meta: {
-        isNumeric: true,
-      },
     }),
     columnHelper.accessor('reward', {
       cell: info => info.getValue(),
       header: 'Reward',
-      meta: {
-        isNumeric: true,
-      },
     }),
   ];
 

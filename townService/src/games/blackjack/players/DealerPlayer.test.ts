@@ -1,15 +1,15 @@
 /* eslint-disable no-promise-executor-return */
 /* eslint-disable prettier/prettier */
 
-import GameStatus from "./GameStatus";
-import DealerPlayer from "./DealerPlayer";
-import Hand from "./Hand";
-import CardFactory from "../../cards/CardFactory";
-import Suit from "../../cards/Suit";
-import Value from "../../cards/Value";
-import Card from "../../cards/Card";
-import HumanPlayer from "./HumanPlayer";
-import BlackjackAction from "../blackjack/BlackjackAction";
+import GameStatus from './GameStatus';
+import DealerPlayer from './DealerPlayer';
+import Hand from './Hand';
+import CardFactory from '../../cards/CardFactory';
+import Suit from '../../cards/Suit';
+import Value from '../../cards/Value';
+import Card from '../../cards/Card';
+import HumanPlayer from './HumanPlayer';
+import BlackjackAction from '../blackjack/BlackjackAction';
 
 // We are effectively testing both the DealerPlayer class and the
 // Player class here
@@ -20,7 +20,7 @@ describe('DealerPlayer', () => {
   let players: HumanPlayer[];
 
   beforeEach(() => {
-    dealerPlayer = new DealerPlayer(GameStatus.Waiting, '1');
+    dealerPlayer = new DealerPlayer(GameStatus.Waiting, '0');
     playerOne = new HumanPlayer(GameStatus.Waiting, '1');
     playerTwo = new HumanPlayer(GameStatus.Waiting, '2');
     players = [playerOne, playerTwo];
@@ -36,9 +36,9 @@ describe('DealerPlayer', () => {
 
   describe('constructor', () => {
     it('Constructs a DealerPlayer properly', () => {
-      const newDealerPlayer = new DealerPlayer(GameStatus.Waiting, '1');
+      const newDealerPlayer = new DealerPlayer(GameStatus.Waiting, '0');
       expect(newDealerPlayer.status).toBe(GameStatus.Waiting);
-      expect(newDealerPlayer.id).toBe('1');
+      expect(newDealerPlayer.id).toBe('0');
     });
   });
 
@@ -52,11 +52,13 @@ describe('DealerPlayer', () => {
       expect(dealerPlayer.deck.length).toBe(312);
     });
 
-    DealerPlayer.getDecks(2).flat().forEach((card, index) => {
-      it(`Deck getter works correctly for card ${index}`, () => {
-        expect(dealerPlayer.deck).toContain(card);
+    DealerPlayer.getDecks(2)
+      .flat()
+      .forEach((card, index) => {
+        it(`Deck getter works correctly for card ${index}`, () => {
+          expect(dealerPlayer.deck).toContain(card);
+        });
       });
-    });
 
     it('Hand getter works properly', () => {
       expect(dealerPlayer.hand).toBeInstanceOf(Hand);
@@ -64,10 +66,9 @@ describe('DealerPlayer', () => {
     });
 
     it('id getter works properly', () => {
-      expect(dealerPlayer.id).toBe('1');
+      expect(dealerPlayer.id).toBe('0');
     });
   });
-
 
   describe('setters', () => {
     it('Status setter works properly', () => {
@@ -78,16 +79,19 @@ describe('DealerPlayer', () => {
     it('Hand setter works properly', () => {
       expect(dealerPlayer.hand).toBeInstanceOf(Hand);
       expect(dealerPlayer.hand.cards).toStrictEqual([]);
-      const cards: [Card, boolean][] = [[CardFactory.getCard(Value.Ace, Suit.Diamonds), false], [CardFactory.getCard(Value.King, Suit.Diamonds), true]];
+      const cards: [Card, boolean][] = [
+        [CardFactory.getCard(Value.Ace, Suit.Diamonds), false],
+        [CardFactory.getCard(Value.King, Suit.Diamonds), true],
+      ];
       const newHand = new Hand(cards);
       dealerPlayer.hand = newHand;
       expect(dealerPlayer.hand).toBe(newHand);
       expect(dealerPlayer.hand.cards).toStrictEqual(cards);
     });
     it('id setter works properly', () => {
-      expect(dealerPlayer.id).toBe('1');
-      dealerPlayer.id = '0';
       expect(dealerPlayer.id).toBe('0');
+      dealerPlayer.id = 'dealer';
+      expect(dealerPlayer.id).toBe('dealer');
     });
   });
 
@@ -99,9 +103,7 @@ describe('DealerPlayer', () => {
         expect(shuffledDeck).not.toStrictEqual(deck);
         expect(deck).toStrictEqual(CardFactory.getDeck());
         expect(shuffledDeck).toStrictEqual(expect.arrayContaining(deck));
-
       });
-
     });
 
     describe('shuffleDecks', () => {
@@ -148,7 +150,6 @@ describe('DealerPlayer', () => {
         const playerFourSecondCardHidden = playerFourCards[1][1];
         expect(playerFourSecondCard).toBeInstanceOf(Card);
         expect(playerFourSecondCardHidden).toBe(true);
-
       });
     });
 
@@ -177,12 +178,15 @@ describe('DealerPlayer', () => {
         const decks = DealerPlayer.getDecks(2);
         expect(decks).toStrictEqual([CardFactory.getDeck(), CardFactory.getDeck()]);
 
-        expect(DealerPlayer.getDecks(5)).toStrictEqual([CardFactory.getDeck(), CardFactory.getDeck(), CardFactory.getDeck(), CardFactory.getDeck(), CardFactory.getDeck()]);
+        expect(DealerPlayer.getDecks(5)).toStrictEqual([
+          CardFactory.getDeck(),
+          CardFactory.getDeck(),
+          CardFactory.getDeck(),
+          CardFactory.getDeck(),
+          CardFactory.getDeck(),
+        ]);
       });
     });
-
-  })
-
-
+  });
+  
 });
-
