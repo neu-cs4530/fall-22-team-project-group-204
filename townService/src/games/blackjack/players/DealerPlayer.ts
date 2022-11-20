@@ -6,6 +6,12 @@ import HumanPlayer from './HumanPlayer';
 import CardFactory from '../../cards/CardFactory';
 import BlackjackAction from '../blackjack/BlackjackAction';
 
+enum PlayerStatusUpdateType {
+  UpdatedToWon,
+  UpdatedToLost,
+  Nothing,
+}
+
 export default class DealerPlayer extends HumanPlayer {
   private _masterDeck: Card[];
 
@@ -119,33 +125,46 @@ export default class DealerPlayer extends HumanPlayer {
     const activePlayers = players.filter(player => player.status !== GameStatus.Lost);
     for (const player of activePlayers) {
       const otherPlayers = players.filter(p => p !== player);
-      if (this._updatePlayerStatusAndReport(player, otherPlayers)) return;
+      let playerUpdateStatus = this._updatePlayerStatusAndReport(player, otherPlayers);
+      if (playerUpdateStatus === PlayerStatusUpdateType.UpdatedToLost) {
+        // eslint-disable-next-line no-continue
+        continue;
+      } else if (playerUpdateStatus === PlayerStatusUpdateType.UpdatedToWon) {
+        return;
+      }
       // If they hit or stay do the correct thing
       const chosenAction: BlackjackAction = await player.doTurn();
       // replace if with switch statement (i forgot the syntax)
       if (chosenAction === BlackjackAction.Hit) {
         player.addCard(this._popCard());
       }
-      if (this._updatePlayerStatusAndReport(player, otherPlayers)) return;
+      playerUpdateStatus = this._updatePlayerStatusAndReport(player, otherPlayers);
+      if (playerUpdateStatus === PlayerStatusUpdateType.UpdatedToWon) {
+        return;
+      }
     }
   }
 
   // Update's the players status if needed and reports if the game
   // needs to be exited early
-  private _updatePlayerStatusAndReport(player: HumanPlayer, otherPlayers: HumanPlayer[]): boolean {
+  private _updatePlayerStatusAndReport(
+    player: HumanPlayer,
+    otherPlayers: HumanPlayer[],
+  ): PlayerStatusUpdateType {
     if (player.has21()) {
       player.status = GameStatus.Won;
       this._setEveryoneElseToLost(otherPlayers);
-      return true;
+      return PlayerStatusUpdateType.UpdatedToWon;
     }
     if (otherPlayers.every(p => p.status === GameStatus.Lost) && super.status === GameStatus.Lost) {
       player.status = GameStatus.Won;
-      return true;
+      return PlayerStatusUpdateType.UpdatedToWon;
     }
     if (player.hasBusted()) {
       player.status = GameStatus.Lost;
+      return PlayerStatusUpdateType.UpdatedToLost;
     }
-    return false;
+    return PlayerStatusUpdateType.Nothing;
   }
 
   public addCard(newCard: Card): void {
@@ -156,9 +175,16 @@ export default class DealerPlayer extends HumanPlayer {
     // make this a method and set said players GameStatus to Won
     const allButOneBusted = this._allButOneBusted(players);
     const allButDealerBusted = this._allButDealerBusted(players);
+    const allBusted = this._allBusted(players);
     const somePlayerWon = players.some(player => player.status === GameStatus.Won);
     const dealerWon = this.status === GameStatus.Won;
-    return allButOneBusted || allButDealerBusted || somePlayerWon || dealerWon;
+    return allButOneBusted || allButDealerBusted || allBusted || somePlayerWon || dealerWon;
+  }
+
+  private _allBusted(players: HumanPlayer[]): boolean {
+    return (
+      players.every(player => player.status === GameStatus.Lost) && this.status === GameStatus.Lost
+    );
   }
 
   private _allButOneBusted(players: HumanPlayer[]): boolean {
@@ -172,8 +198,9 @@ export default class DealerPlayer extends HumanPlayer {
       }
     }
 
-    if (count === players.length - 1 && this.status === GameStatus.Lost) {
+    if (count === players.length - 1 && this.status === GameStatus.Lost && idxToUpdate !== -1) {
       players[idxToUpdate].status = GameStatus.Won;
+      this._setEveryoneElseToLost(players.filter(p => p !== players[idxToUpdate]));
       return true;
     }
     return false;
@@ -195,7 +222,16 @@ export default class DealerPlayer extends HumanPlayer {
 
     await this.doHumanTurns(players);
 
+    if (super.hasBusted()) {
+      this.status = GameStatus.Lost;
+    }
+
     if (this._isGameOver(players)) {
+      // again - will remove this and refactor once we come to a better conclusion
+      // for what to do in the case of multiple winners at the same time
+      if (super.status !== GameStatus.Won) {
+        this.status = GameStatus.Lost;
+      }
       return;
     }
 
@@ -204,10 +240,10 @@ export default class DealerPlayer extends HumanPlayer {
     }
 
     if (super.has21()) {
-      super.status = GameStatus.Won;
+      this.status = GameStatus.Won;
       this._setEveryoneElseToLost(players);
     } else if (super.hasBusted()) {
-      super.status = GameStatus.Lost;
+      this.status = GameStatus.Lost;
     }
   }
 }

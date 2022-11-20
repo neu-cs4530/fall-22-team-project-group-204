@@ -50,7 +50,10 @@ export default class BlackJack {
   }
 
   private static _isGameOver(players: HumanPlayer[]): boolean {
-    return players.some(player => player.status === GameStatus.Won);
+    return (
+      players.some(player => player.status === GameStatus.Won) ||
+      players.every(player => player.status === GameStatus.Lost)
+    );
   }
 
   public async playGame(doDealing = true): Promise<void> {
