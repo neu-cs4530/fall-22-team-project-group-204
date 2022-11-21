@@ -4,6 +4,7 @@
     "description": "Development setup",
     "main": "index.js",
     "scripts": {
+        "test-blackjack-file": "cd townService/src/games/blackjack/blackjack && jest Blackjack.test.ts --forceExit",
         "install": "cd townService && CI= NODE_ENV=development npm install && CI= NODE_ENV=development npm run prestart && cd ../frontend && CI= NODE_ENV=development npm install && CI= NODE_ENV=development npm run prestart && cd ../shared && CI= NODE_ENV=development npm install",
         "heroku-postbuild": "cd townService && CI= NODE_ENV=development npm install && npm run build",
         "run-townservice": "heroku local -p 3001 web",

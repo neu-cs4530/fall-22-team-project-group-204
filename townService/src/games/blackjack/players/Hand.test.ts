@@ -97,5 +97,18 @@ describe('Hand', () => {
         [CardFactory.getCard(Value.Ace, Suit.Hearts), false],
       ]).getNumericScores(),
     ).toStrictEqual([11, 21]);
+    expect(
+      new Hand([
+        [CardFactory.getCard(Value.Ace, Suit.Diamonds), true],
+        [CardFactory.getCard(Value.Ace, Suit.Hearts), false],
+      ]).getNumericScores(),
+    ).toStrictEqual([2, 12, 22]);
+    expect(
+      new Hand([
+        [CardFactory.getCard(Value.Ace, Suit.Diamonds), true],
+        [CardFactory.getCard(Value.Two, Suit.Hearts), false],
+      ]).getNumericScores(),
+    ).toStrictEqual([3, 13]);
   });
 });
+// jest <file-name.ts?> --forceExit

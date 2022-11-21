@@ -4,7 +4,6 @@ import { TownEmitter } from 'src/types/CoveyTownSocket';
 import GameStatus from '../players/GameStatus';
 import DealerPlayer from '../players/DealerPlayer';
 import HumanPlayer from '../players/HumanPlayer';
-import Player from '../players/Player';
 // eslint-disable-next-line import/no-cycle
 import GamingArea from '../../../town/GamingArea';
 
@@ -20,9 +19,9 @@ export default class BlackJack {
   // i need to abstract this out to a Player[] where
   // a player is a interface that HumanPlayer and SpectatorPlayer implement.
   // I think that will be easier once I finish implementing this though
-  private _players: Player[];
+  private _players: HumanPlayer[];
 
-  public get players(): Player[] {
+  public get players(): HumanPlayer[] {
     return this._players;
   }
 
@@ -32,21 +31,21 @@ export default class BlackJack {
   // default GamingArea should never be used, but is good for testing purpose where gamingArea
   // is irrelevant
   constructor(
-    players: Player[] = [],
+    players: HumanPlayer[] = [],
     gamingArea: GamingArea = new GamingArea(
       { id: 'invalidId', dealerHand: [], playerHands: [], gameStatus: 'Waiting' },
       { x: 0, y: 0, width: 0, height: 0 },
       mock<TownEmitter>(), // NOTE: may need to change in the future
     ),
   ) {
-    this._dealer = new DealerPlayer();
+    this._dealer = new DealerPlayer(GameStatus.Waiting, '0');
     // We assume that there is at least one human player. I am going to start with the
     // assumption of one Player but will make sure to expand tests to cover 2 players
     this._players = players;
     this._gamingArea = gamingArea;
   }
 
-  public addPlayer(player: Player): void {
+  public addPlayer(player: HumanPlayer): void {
     this._players.push(player);
   }
 
@@ -69,15 +68,20 @@ export default class BlackJack {
   }
 
   private static _isGameOver(players: HumanPlayer[]): boolean {
-    return players.some(player => player.status === GameStatus.Won);
+    return (
+      players.some(player => player.status === GameStatus.Won) ||
+      players.every(player => player.status === GameStatus.Lost)
+    );
   }
 
-  public async playGame(): Promise<void> {
+  public async playGame(doDealing = true): Promise<void> {
     // maybe check that there is more than 1 player before i start the gameplay loop?
     const players: HumanPlayer[] = this._getActiveHumanPlayers();
     this._updateToPlaying();
 
-    this._dealer.dealCards(players);
+    if (doDealing) {
+      this._dealer.dealCards(players);
+    }
 
     this._gamingArea.updateFromBlackjack(this._dealer, players, GameStatus[this._dealer.status]);
 
