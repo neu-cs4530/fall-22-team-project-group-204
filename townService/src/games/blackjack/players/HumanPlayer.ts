@@ -13,10 +13,6 @@ export default class HumanPlayer {
 
   private _hand: Hand;
 
-  private _status: GameStatus;
-
-  private _id: string;
-
   public get hand(): Hand {
     return this._hand;
   }
@@ -25,13 +21,13 @@ export default class HumanPlayer {
     this._hand = value;
   }
 
+  private _id: string;
+
   public get id(): string {
     return this._id;
   }
 
-  public set id(value: string) {
-    this._id = value;
-  }
+  private _status: GameStatus;
 
   public get status(): GameStatus {
     return this._status;
@@ -41,7 +37,7 @@ export default class HumanPlayer {
     this._status = value;
   }
 
-  constructor(status: GameStatus, id: string = nanoid()) {
+  constructor(status: GameStatus = GameStatus.Waiting, id: string = nanoid()) {
     this._hand = new Hand();
     this._status = status;
     this._id = id;

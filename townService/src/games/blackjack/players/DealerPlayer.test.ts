@@ -88,11 +88,6 @@ describe('DealerPlayer', () => {
       expect(dealerPlayer.hand).toBe(newHand);
       expect(dealerPlayer.hand.cards).toStrictEqual(cards);
     });
-    it('id setter works properly', () => {
-      expect(dealerPlayer.id).toBe('0');
-      dealerPlayer.id = 'dealer';
-      expect(dealerPlayer.id).toBe('dealer');
-    });
   });
 
   describe('class methods', () => {
@@ -188,5 +183,4 @@ describe('DealerPlayer', () => {
       });
     });
   });
-
 });

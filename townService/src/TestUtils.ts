@@ -17,6 +17,7 @@ import {
   ConversationArea,
   CoveyTownSocket,
   Direction,
+  GamingArea,
   Interactable,
   PlayerLocation,
   ServerToClientEvents,
@@ -201,4 +202,8 @@ export function isViewingArea(interactable: Interactable): interactable is Viewi
 
 export function isConversationArea(interactable: Interactable): interactable is ConversationArea {
   return 'topic' in interactable;
+}
+
+export function isGamingArea(interactable: Interactable): interactable is GamingArea {
+  return 'dealerHand' in interactable;
 }

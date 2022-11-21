@@ -6,6 +6,7 @@ import { io } from 'socket.io-client';
 import TypedEmitter from 'typed-emitter';
 import Interactable from '../components/Town/Interactable';
 import ViewingArea from '../components/Town/interactables/ViewingArea';
+import GamingArea from '../components/Town/interactables/GamingArea';
 import { LoginController } from '../contexts/LoginControllerContext';
 import { TownsService, TownsServiceClient } from '../generated/client';
 import useTownController from '../hooks/useTownController';
@@ -15,11 +16,15 @@ import {
   PlayerLocation,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
+  GamingArea as GamingAreaModel,
+  PlayingCard,
+  PlayerHand,
 } from '../types/CoveyTownSocket';
-import { isConversationArea, isViewingArea } from '../types/TypeUtils';
+import { isConversationArea, isViewingArea, isGamingArea } from '../types/TypeUtils';
 import ConversationAreaController from './ConversationAreaController';
 import PlayerController from './PlayerController';
 import ViewingAreaController from './ViewingAreaController';
+import GamingAreaController from './GamingAreaController';
 
 const CALCULATE_NEARBY_PLAYERS_DELAY = 300;
 
@@ -69,6 +74,11 @@ export type TownEvents = {
    * the town controller's record of viewing areas.
    */
   viewingAreasChanged: (newViewingAreas: ViewingAreaController[]) => void;
+  /**
+   * An event that indicates that the set of gaming areas has changed. This event is emitted after updating
+   * the town controller's record of gaming areas.
+   */
+  gamingAreasChanged: (newGamingAreas: GamingAreaController[]) => void;
   /**
    * An event that indicates that a new chat message has been received, which is the parameter passed to the listener
    */
@@ -190,6 +200,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
   private _viewingAreas: ViewingAreaController[] = [];
 
+  private _gamingAreas: GamingAreaController[] = [];
+
   public constructor({ userName, townID, loginController }: ConnectionProperties) {
     super();
     this._townID = townID;
@@ -307,6 +319,15 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   public set viewingAreas(newViewingAreas: ViewingAreaController[]) {
     this._viewingAreas = newViewingAreas;
     this.emit('viewingAreasChanged', newViewingAreas);
+  }
+
+  public get gamingAreas() {
+    return this._gamingAreas;
+  }
+
+  public set gamingAreas(newGamingAreas: GamingAreaController[]) {
+    this._gamingAreas = newGamingAreas;
+    this.emit('gamingAreasChanged', newGamingAreas);
   }
 
   /**
@@ -427,6 +448,9 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
           eachArea => eachArea.id === interactable.id,
         );
         updatedViewingArea?.updateFrom(interactable);
+      } else if (isGamingArea(interactable)) {
+        const updatedGamingArea = this.gamingAreas.find(eachArea => eachArea.id == interactable.id);
+        updatedGamingArea?.updateFrom(interactable);
       }
     });
   }
@@ -509,6 +533,17 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
+   * Create a new gaming area, sending the request to the townService. Throws an error if the request
+   * is not successful. Does not immediately update local state about the new viewing area - it will be
+   * updated once the townService creates the area and emits an interactableUpdate
+   *
+   * @param newArea
+   */
+  async createGamingArea(newArea: GamingAreaModel) {
+    await this._townsService.createGamingArea(this.townID, this.sessionToken, newArea);
+  }
+
+  /**
    * Disconnect from the town, notifying the townService that we are leaving and returning
    * to the login page
    */
@@ -588,12 +623,47 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
+   * Retrieve the gaming area controller that corresponds to a gamingAreaModel, creating one if necessary
+   *
+   * @param gamingArea
+   * @returns
+   */
+  public getGamingAreaController(gamingArea: GamingArea): GamingAreaController {
+    const existingController = this._gamingAreas.find(
+      eachExistingArea => eachExistingArea.id === gamingArea.name,
+    );
+    if (existingController) {
+      return existingController;
+    } else {
+      const dealerHand: PlayingCard[] = [];
+      const playerHands: PlayerHand[] = [];
+      const newController = new GamingAreaController({
+        id: gamingArea.name,
+        dealerHand: dealerHand,
+        playerHands: playerHands,
+        gameStatus: 'Waiting',
+      });
+      this._gamingAreas.push(newController);
+      return newController;
+    }
+  }
+
+  /**
    * Emit a viewing area update to the townService
    * @param viewingArea The Viewing Area Controller that is updated and should be emitted
    *    with the event
    */
   public emitViewingAreaUpdate(viewingArea: ViewingAreaController) {
     this._socket.emit('interactableUpdate', viewingArea.viewingAreaModel());
+  }
+
+  /**
+   * Emit a gaming area update to the townService
+   * @param gamingArea The Gaming Area Controller that is updated and should be emitted
+   *    with the event
+   */
+  public emitGamingAreaUpdate(gamingArea: GamingAreaController) {
+    this._socket.emit('interactableUpdate', gamingArea.gamingAreaModel());
   }
 
   /**
@@ -673,6 +743,16 @@ export function useViewingAreaController(viewingAreaID: string): ViewingAreaCont
     throw new Error(`Requested viewing area ${viewingAreaID} does not exist`);
   }
   return viewingArea;
+}
+
+export function useGamingAreaController(gamingAreaID: string): GamingAreaController {
+  const townController = useTownController();
+
+  const gamingArea = townController.gamingAreas.find(eachArea => eachArea.id == gamingAreaID);
+  if (!gamingArea) {
+    throw new Error(`Requested viewing area ${gamingAreaID} does not exist`);
+  }
+  return gamingArea;
 }
 
 /**

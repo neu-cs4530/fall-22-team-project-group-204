@@ -15,14 +15,14 @@ export type TownJoinResponse = {
   isPubliclyListed: boolean;
   /** Current state of interactables in this town */
   interactables: Interactable[];
-}
+};
 
-export type Interactable = ViewingArea | ConversationArea;
+export type Interactable = ViewingArea | ConversationArea | GamingArea;
 
 export type TownSettingsUpdate = {
   friendlyName?: string;
   isPubliclyListed?: boolean;
-}
+};
 
 export type Direction = 'front' | 'back' | 'left' | 'right';
 export interface Player {
@@ -50,6 +50,17 @@ export type ChatMessage = {
   dateCreated: Date;
 };
 
+export interface PlayingCard {
+  value: string;
+  suit: string;
+  faceUp: boolean;
+};
+
+export interface PlayerHand {
+  id: string;
+  hand: PlayingCard[];
+};
+
 export interface ConversationArea {
   id: string;
   topic?: string;
@@ -69,6 +80,13 @@ export interface ViewingArea {
   elapsedTimeSec: number;
 }
 
+export interface GamingArea {
+  id: string;
+  gameStatus: string
+  dealerHand: PlayingCard[];
+  playerHands: PlayerHand[];
+}
+
 export interface ServerToClientEvents {
   playerMoved: (movedPlayer: Player) => void;
   playerDisconnect: (disconnectedPlayer: Player) => void;
@@ -85,3 +103,7 @@ export interface ClientToServerEvents {
   playerMovement: (movementData: PlayerLocation) => void;
   interactableUpdate: (update: Interactable) => void;
 }
+
+
+
+
