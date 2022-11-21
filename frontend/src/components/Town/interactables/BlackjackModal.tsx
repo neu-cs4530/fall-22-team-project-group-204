@@ -15,12 +15,12 @@ import {
   Text,
   useToast,
 } from '@chakra-ui/react';
-import React, { useCallback, useEffect, useState } from 'react';
-import { useInteractable, useGamingAreaController } from '../../../classes/TownController';
-import useTownController from '../../../hooks/useTownController';
+import React, { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
 import GamingAreaController from '../../../classes/GamingAreaController';
-import GamingArea from './GamingArea';
+import { useGamingAreaController, useInteractable } from '../../../classes/TownController';
+import useTownController from '../../../hooks/useTownController';
 import { PlayerHand, PlayingCard } from '../../../types/CoveyTownSocket';
+import GamingArea from './GamingArea';
 
 // i need to figure out how the back and front end communicate :C
 
@@ -165,10 +165,33 @@ export function Hands({ hands }: { hands: PlayerHand[] }) {
   return <Container>{handComponents}</Container>;
 }
 
-export function Chip({ chipValue, x, y }: { chipValue: number; x: number; y: number }) {
+export function Chip({
+  chipValue,
+  x,
+  y,
+  controller,
+  currBettingAmount,
+  setBettingAmount,
+}: {
+  chipValue: number;
+  x: number;
+  y: number;
+  controller: GamingAreaController;
+  currBettingAmount: number;
+  setBettingAmount: Dispatch<SetStateAction<number>>;
+}) {
+  const townController = useTownController();
+
+  const updateBetting = () => {
+    const newBetValue: number = chipValue + currBettingAmount;
+    setBettingAmount(newBetValue);
+    townController.emitGamingAreaUpdate(controller);
+  };
+
   const chip = `assets/blackjack/chips/chip_${chipValue}.png`;
   return (
     <IconButton
+      onClick={updateBetting}
       variant='ghost'
       position='absolute'
       colorScheme='ghost'
@@ -232,6 +255,7 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
   const [dealerHand, setDealerHand] = useState<PlayingCard[]>(controller.dealerHand);
   const [playerHands, setPlayerHands] = useState<PlayerHand[]>(controller.playerHands);
   const [gameStatus, setGameStatus] = useState<string>(controller.gameStatus);
+  const [bettingAmount, setBettingAmount] = useState<number>(controller.bettingAmount);
 
   const toast = useToast();
 
@@ -336,11 +360,46 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
       </Text>
       <Hand cards={dealerHand} x={450} y={100} />
       <Hands hands={playerHands} />
-      <Chip chipValue={1} x={600} y={480} />
-      <Chip chipValue={5} x={650} y={480} />
-      <Chip chipValue={25} x={700} y={480} />
-      <Chip chipValue={100} x={750} y={480} />
-      <Chip chipValue={500} x={800} y={480} />
+      <Chip
+        chipValue={1}
+        x={600}
+        y={480}
+        controller={controller}
+        currBettingAmount={bettingAmount}
+        setBettingAmount={setBettingAmount}
+      />
+      <Chip
+        chipValue={5}
+        x={650}
+        y={480}
+        controller={controller}
+        currBettingAmount={bettingAmount}
+        setBettingAmount={setBettingAmount}
+      />
+      <Chip
+        chipValue={25}
+        x={700}
+        y={480}
+        controller={controller}
+        currBettingAmount={bettingAmount}
+        setBettingAmount={setBettingAmount}
+      />
+      <Chip
+        chipValue={100}
+        x={750}
+        y={480}
+        controller={controller}
+        currBettingAmount={bettingAmount}
+        setBettingAmount={setBettingAmount}
+      />
+      <Chip
+        chipValue={500}
+        x={800}
+        y={480}
+        controller={controller}
+        currBettingAmount={bettingAmount}
+        setBettingAmount={setBettingAmount}
+      />
       <Text as='b' fontSize='md' left='615px' top='450px' position='absolute'>
         1
       </Text>
@@ -356,8 +415,23 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
       <Text as='b' fontSize='md' left='805px' top='450px' position='absolute'>
         500
       </Text>
-      <Button size='sm' left='697px' top='535px' colorScheme='gray' position='absolute'>
+      <Text as='b' fontSize='md' left='600px' top='400px' position='absolute'>
+        Betting Amount: {bettingAmount}
+      </Text>
+      <Button size='sm' left='660px' top='535px' colorScheme='gray' position='absolute'>
         Bet
+      </Button>
+      <Button
+        size='sm'
+        left='730px'
+        top='535px'
+        colorScheme='gray'
+        position='absolute'
+        onClick={() => {
+          setBettingAmount(0);
+          townController.emitGamingAreaUpdate(controller);
+        }}>
+        Clear
       </Button>
     </Box>
   );

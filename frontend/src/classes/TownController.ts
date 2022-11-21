@@ -642,6 +642,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         dealerHand: dealerHand,
         playerHands: playerHands,
         gameStatus: 'Waiting',
+        bettingAmount: 0,
       });
       this._gamingAreas.push(newController);
       return newController;

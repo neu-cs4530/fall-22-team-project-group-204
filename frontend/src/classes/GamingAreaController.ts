@@ -1,7 +1,6 @@
 import { EventEmitter } from 'events';
 import TypedEventEmitter from 'typed-emitter';
-import { GamingArea } from '../types/CoveyTownSocket';
-import { PlayingCard, PlayerHand } from '../types/CoveyTownSocket';
+import { GamingArea, PlayerHand, PlayingCard } from '../types/CoveyTownSocket';
 
 /**
  * The events that a GamingAreaController can emit
@@ -17,6 +16,7 @@ export type GamingAreaEvents = {
   dealerHandChange: (dealerHand: PlayingCard[]) => void;
   playerHandsChange: (playerHands: PlayerHand[]) => void;
   gameStatusChange: (gameStatus: string) => void;
+  bettingAmountChange: (bettingAmount: number) => void;
   activeGameAlert: (isPlaying: boolean) => void;
 };
 
@@ -94,6 +94,23 @@ export default class GamingAreaController extends (EventEmitter as new () => Typ
     if (this.gameStatus != gameStatus) {
       this._model.gameStatus = gameStatus;
       this.emit('gameStatusChange', this.gameStatus);
+    }
+  }
+
+  /**
+   * Returns the players' betting amount
+   */
+  public get bettingAmount() {
+    return this._model.bettingAmount;
+  }
+
+  /**
+   * Sets the players' betting amount
+   */
+  public set bettingAmount(bettingAmount: number) {
+    if (this.bettingAmount != bettingAmount) {
+      this._model.bettingAmount = bettingAmount;
+      this.emit('bettingAmountChange', this.bettingAmount);
     }
   }
 

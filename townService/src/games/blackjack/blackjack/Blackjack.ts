@@ -33,7 +33,7 @@ export default class BlackJack {
   constructor(
     players: HumanPlayer[] = [],
     gamingArea: GamingArea = new GamingArea(
-      { id: 'invalidId', dealerHand: [], playerHands: [], gameStatus: 'Waiting' },
+      { id: 'invalidId', dealerHand: [], playerHands: [], gameStatus: 'Waiting', bettingAmount: 0 },
       { x: 0, y: 0, width: 0, height: 0 },
       mock<TownEmitter>(), // NOTE: may need to change in the future
     ),

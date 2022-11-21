@@ -25,6 +25,8 @@ export default class GamingArea extends InteractableArea {
 
   private _game: BlackJack;
 
+  private _bettingAmount: number;
+
   public get dealerHand() {
     return this._dealerHand;
   }
@@ -37,6 +39,10 @@ export default class GamingArea extends InteractableArea {
     return this._gameStatus;
   }
 
+  public get gameBettingAmount() {
+    return this._bettingAmount;
+  }
+
   /**
    * Creates a new GamingArea
    * @param gamingArea represents a gamingArea with id, dealer hand, and player hands
@@ -44,7 +50,7 @@ export default class GamingArea extends InteractableArea {
    * @param townEmitter a broadcast emitter that can be used to emit updates to players
    */
   public constructor(
-    { id, dealerHand, playerHands, gameStatus }: GamingAreaModel,
+    { id, dealerHand, playerHands, gameStatus, bettingAmount }: GamingAreaModel,
     coordinates: BoundingBox,
     townEmitter: TownEmitter,
   ) {
@@ -53,6 +59,7 @@ export default class GamingArea extends InteractableArea {
     this._playerHands = playerHands;
     this._game = new BlackJack([], this);
     this._gameStatus = gameStatus;
+    this._bettingAmount = bettingAmount;
   }
 
   /**
@@ -200,6 +207,7 @@ export default class GamingArea extends InteractableArea {
       dealerHand: this._dealerHand,
       playerHands: this._playerHands,
       gameStatus: this._gameStatus,
+      bettingAmount: this._bettingAmount,
     };
   }
 
@@ -218,7 +226,7 @@ export default class GamingArea extends InteractableArea {
     const playerHands: PlayerHand[] = [];
     const rect: BoundingBox = { x: mapObject.x, y: mapObject.y, width, height };
     return new GamingArea(
-      { id: name, playerHands, dealerHand, gameStatus: 'Waiting' },
+      { id: name, playerHands, dealerHand, gameStatus: 'Waiting', bettingAmount: 0 },
       rect,
       townEmitter,
     );

@@ -82,9 +82,10 @@ export interface ViewingArea {
 
 export interface GamingArea {
   id: string;
-  gameStatus: string
+  gameStatus: string;
   dealerHand: PlayingCard[];
   playerHands: PlayerHand[];
+  bettingAmount: number;
 }
 
 export interface ServerToClientEvents {
