@@ -61,18 +61,7 @@ describe('HumanPlayer', () => {
       player.status = GameStatus.Won;
       expect(player.status).toBe(GameStatus.Won);
     });
-
-    it('id setter works correctly', () => {
-      player.id = '0'
-      expect(player.id).toBe('0');
-      player.id = '8'
-      expect(player.id).toBe('8');
-      player.id = '88'
-      expect(player.id).toBe('88');
-    });
   });
-
-
 
   describe('class methods', () => {
     describe('addCard', () => {
@@ -196,4 +185,3 @@ describe('HumanPlayer', () => {
     });
   });
 });
-

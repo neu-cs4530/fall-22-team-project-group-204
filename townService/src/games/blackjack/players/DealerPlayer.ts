@@ -45,10 +45,6 @@ export default class DealerPlayer extends HumanPlayer {
     return super.id;
   }
 
-  public set id(value: string) {
-    super.id = value;
-  }
-
   public static getDecks(amount: number): Card[][] {
     const decks: Card[][] = [];
     Array(amount)

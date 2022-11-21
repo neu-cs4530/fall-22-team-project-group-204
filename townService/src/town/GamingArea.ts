@@ -72,7 +72,8 @@ export default class GamingArea extends InteractableArea {
     // NOTE: please change to support more players / keeping track of game is active
     this._playerHands.forEach(playerHand => {
       if (playerHand.hand.length === 0 && this._game.dealer.status !== GameStatus.Playing) {
-        this._game.addPlayer(new HumanPlayer(playerHand.id));
+        // TODO: Figure out correct status here
+        this._game.addPlayer(new HumanPlayer(GameStatus.Waiting, playerHand.id));
         // console.log(`added ${playerHand.id}`);
       } else {
         // console.log('trying to join an existing game');
