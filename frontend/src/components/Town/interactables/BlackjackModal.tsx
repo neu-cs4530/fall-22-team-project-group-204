@@ -172,6 +172,7 @@ export function Chip({
   controller,
   currBettingAmount,
   setBettingAmount,
+  isPlaying,
 }: {
   chipValue: number;
   x: number;
@@ -179,13 +180,25 @@ export function Chip({
   controller: GamingAreaController;
   currBettingAmount: number;
   setBettingAmount: Dispatch<SetStateAction<number>>;
+  isPlaying: boolean;
 }) {
   const townController = useTownController();
+  const toast = useToast();
 
   const updateBetting = () => {
-    const newBetValue: number = chipValue + currBettingAmount;
-    setBettingAmount(newBetValue);
-    townController.emitGamingAreaUpdate(controller);
+    if (isPlaying) {
+      const newBetValue: number = chipValue + currBettingAmount;
+      setBettingAmount(newBetValue);
+      townController.emitGamingAreaUpdate(controller);
+    } else {
+      const alert = 'Cannot place a bet before joining game!';
+      toast({
+        title: alert,
+        status: 'error',
+        duration: 2000,
+        isClosable: false,
+      });
+    }
   };
 
   const chip = `assets/blackjack/chips/chip_${chipValue}.png`;
@@ -367,6 +380,7 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
         controller={controller}
         currBettingAmount={bettingAmount}
         setBettingAmount={setBettingAmount}
+        isPlaying={playerHands.map(player => player.id).includes(townController.userID)}
       />
       <Chip
         chipValue={5}
@@ -375,6 +389,7 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
         controller={controller}
         currBettingAmount={bettingAmount}
         setBettingAmount={setBettingAmount}
+        isPlaying={playerHands.map(player => player.id).includes(townController.userID)}
       />
       <Chip
         chipValue={25}
@@ -383,6 +398,7 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
         controller={controller}
         currBettingAmount={bettingAmount}
         setBettingAmount={setBettingAmount}
+        isPlaying={playerHands.map(player => player.id).includes(townController.userID)}
       />
       <Chip
         chipValue={100}
@@ -391,6 +407,7 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
         controller={controller}
         currBettingAmount={bettingAmount}
         setBettingAmount={setBettingAmount}
+        isPlaying={playerHands.map(player => player.id).includes(townController.userID)}
       />
       <Chip
         chipValue={500}
@@ -399,6 +416,7 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
         controller={controller}
         currBettingAmount={bettingAmount}
         setBettingAmount={setBettingAmount}
+        isPlaying={playerHands.map(player => player.id).includes(townController.userID)}
       />
       <Text as='b' fontSize='md' left='615px' top='450px' position='absolute'>
         1
