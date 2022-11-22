@@ -53,6 +53,7 @@ export type ChatMessage = {
 export interface PlayingCard {
   value: string;
   suit: string;
+<<<<<<< Updated upstream
   faceUp: boolean;
 };
 
@@ -60,6 +61,20 @@ export interface PlayerHand {
   id: string;
   hand: PlayingCard[];
 };
+=======
+};
+// not sure if you need to know if certain cards are hidden or not
+export interface BlackjackPlayer {
+  id: string;
+  hand: PlayingCard[];
+};
+export interface GamingArea {
+  id: string;
+  dealer: BlackjackPlayer;
+  players: BlackjackPlayer[];
+};
+
+>>>>>>> Stashed changes
 
 export interface ConversationArea {
   id: string;
@@ -79,6 +94,7 @@ export interface ViewingArea {
   isPlaying: boolean;
   elapsedTimeSec: number;
 }
+<<<<<<< Updated upstream
 
 export interface GamingArea {
   id: string;
@@ -87,6 +103,8 @@ export interface GamingArea {
   playerHands: PlayerHand[];
 }
 
+=======
+>>>>>>> Stashed changes
 export interface ServerToClientEvents {
   playerMoved: (movedPlayer: Player) => void;
   playerDisconnect: (disconnectedPlayer: Player) => void;

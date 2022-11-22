@@ -39,7 +39,7 @@ export default class GamingArea extends InteractableArea {
 
   /**
    * Creates a new GamingArea
-   * @param gamingArea represents a gamingArea with id, dealer hand, and player hands
+   * @param gamingArea represents a gamingArea with id, dealer, and players
    * @param coordinates the bounding box that defines this viewing area
    * @param townEmitter a broadcast emitter that can be used to emit updates to players
    */
@@ -53,6 +53,9 @@ export default class GamingArea extends InteractableArea {
     this._playerHands = playerHands;
     this._game = new BlackJack([], this);
     this._gameStatus = gameStatus;
+    const dealerProper = new DealerPlayer(dealer.id);
+    const playersProper = players.map(player => new HumanPlayer(player.id));
+    this._game = new BlackJack(dealerProper, playersProper);
   }
 
   /**
