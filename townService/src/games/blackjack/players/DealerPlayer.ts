@@ -45,6 +45,12 @@ export default class DealerPlayer extends HumanPlayer {
     return this._masterDeck;
   }
 
+  public updateDealer(newDealer: DealerPlayer): void {
+    this._masterDeck = newDealer.deck;
+    this.hand = newDealer.hand;
+    this.status = newDealer.status;
+  }
+
   public static getDecks(amount: number): Card[][] {
     const decks: Card[][] = [];
     Array(amount)

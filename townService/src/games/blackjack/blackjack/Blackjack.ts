@@ -32,19 +32,24 @@ export default class BlackJack {
   // default GamingArea should never be used, but is good for testing purpose where gamingArea
   // is irrelevant
   constructor(
-    dealer: DealerPlayer = new DealerPlayer(GameStatus.Waiting, '0'),
     players: HumanPlayer[] = [],
+    dealer: DealerPlayer = new DealerPlayer(GameStatus.Waiting, '0'),
     gamingArea: GamingArea = new GamingArea(
       { id: 'invalidId', dealerHand: [], playerHands: [], gameStatus: 'Waiting' },
       { x: 0, y: 0, width: 0, height: 0 },
       mock<TownEmitter>(), // NOTE: may need to change in the future
     ),
-    ) {
-      this._dealer = dealer;
-      this._players = players;
-      this._gamingArea = gamingArea;
-    }
+  ) {
+    this._dealer = dealer;
+    this._players = players;
+    this._gamingArea = gamingArea;
+  }
 
+  public updatePlayerCards(allCards: Card[][]): void {
+    this._players.forEach((player, index) => {
+      player.updateCards(allCards[index]);
+    });
+  }
 
   public addPlayer(player: HumanPlayer): void {
     this._players.push(player);

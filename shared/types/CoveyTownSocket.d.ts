@@ -1,3 +1,4 @@
+
 export type TownJoinResponse = {
   /** Unique ID that represents this player * */
   userID: string;
@@ -53,28 +54,18 @@ export type ChatMessage = {
 export interface PlayingCard {
   value: string;
   suit: string;
-<<<<<<< Updated upstream
   faceUp: boolean;
 };
-
-export interface PlayerHand {
-  id: string;
-  hand: PlayingCard[];
-};
-=======
-};
-// not sure if you need to know if certain cards are hidden or not
 export interface BlackjackPlayer {
   id: string;
   hand: PlayingCard[];
 };
-export interface GamingArea {
+export interface BlackjackArea {
   id: string;
   dealer: BlackjackPlayer;
   players: BlackjackPlayer[];
+  gameStatus: string;
 };
-
->>>>>>> Stashed changes
 
 export interface ConversationArea {
   id: string;
@@ -94,17 +85,7 @@ export interface ViewingArea {
   isPlaying: boolean;
   elapsedTimeSec: number;
 }
-<<<<<<< Updated upstream
 
-export interface GamingArea {
-  id: string;
-  gameStatus: string
-  dealerHand: PlayingCard[];
-  playerHands: PlayerHand[];
-}
-
-=======
->>>>>>> Stashed changes
 export interface ServerToClientEvents {
   playerMoved: (movedPlayer: Player) => void;
   playerDisconnect: (disconnectedPlayer: Player) => void;
