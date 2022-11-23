@@ -85,6 +85,11 @@ export default function LeaderboardModal(): JSX.Element {
   const coveyTownController = useTownController();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  const openLeaderboardModal = useCallback(() => {
+    onOpen();
+    coveyTownController.pause();
+  }, [onOpen, coveyTownController]);
+
   const closeLeaderboardModal = useCallback(() => {
     onClose();
     coveyTownController.unPause();
@@ -94,11 +99,9 @@ export default function LeaderboardModal(): JSX.Element {
     const downHandler = ({ key }: { key: unknown }) => {
       if (key === 'Shift') {
         if (coveyTownController.paused) {
-          onClose();
-          coveyTownController.unPause();
+          closeLeaderboardModal();
         } else {
-          onOpen();
-          coveyTownController.pause();
+          openLeaderboardModal();
         }
       }
     };
