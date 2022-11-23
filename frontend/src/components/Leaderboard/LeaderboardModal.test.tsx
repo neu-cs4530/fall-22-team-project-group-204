@@ -65,18 +65,21 @@ describe('Leaderboard Modal', () => {
   it('Leaderboard Modal closes when Done button is clicked', async () => {
     await openLeaderboardModal();
     fireEvent.click(doneButton);
+    await waitFor(() => expect(mockedTownController.unPause).toBeCalled());
     await waitFor(() => expect(mockUseDisclosure.onClose).toBeCalled());
   }, 10000);
   it('Leaderboard Modal closes when Shift key is pressed', async () => {
     await openLeaderboardModal();
     await waitFor(() => expect(renderData.getByText('Blackjack Leaderboard')).toBeInTheDocument());
     fireEvent.keyDown(global.window, { key: 'Shift', code: 16, charCode: 16 });
+    await waitFor(() => expect(mockedTownController.unPause).toBeCalled());
     await waitFor(() => expect(mockUseDisclosure.onClose).toBeCalled());
   }, 10000);
   it('Leaderboard Modal should not close when any other key is pressed', async () => {
     await openLeaderboardModal();
     await waitFor(() => expect(renderData.getByText('Blackjack Leaderboard')).toBeInTheDocument());
     fireEvent.keyDown(global.window, { key: 'a', code: 65, charCode: 65 });
+    await waitFor(() => expect(mockedTownController.unPause).not.toBeCalled());
     await waitFor(() => expect(mockUseDisclosure.onClose).not.toBeCalled());
   }, 10000);
 });

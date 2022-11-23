@@ -98,7 +98,7 @@ export default function LeaderboardModal(): JSX.Element {
   useEffect(() => {
     const downHandler = ({ key }: { key: unknown }) => {
       if (key === 'Shift') {
-        if (coveyTownController.paused) {
+        if (isOpen) {
           closeLeaderboardModal();
         } else {
           openLeaderboardModal();
