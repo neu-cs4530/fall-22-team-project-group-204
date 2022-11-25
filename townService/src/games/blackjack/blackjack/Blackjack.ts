@@ -5,7 +5,7 @@ import GameStatus from '../players/GameStatus';
 import DealerPlayer from '../players/DealerPlayer';
 import HumanPlayer from '../players/HumanPlayer';
 // eslint-disable-next-line import/no-cycle
-import GamingArea from '../../../town/GamingArea';
+import BlackjackArea from '../../../town/BlackjackArea';
 import Card from '../../cards/Card';
 
 export default class BlackJack {
@@ -26,16 +26,16 @@ export default class BlackJack {
     return this._players;
   }
 
-  // contains a reference to the GamingArea for sending notifications of changes
-  private _gamingArea: GamingArea;
+  // contains a reference to the BlackjackArea for sending notifications of changes
+  private _gamingArea: BlackjackArea;
 
-  // default GamingArea should never be used, but is good for testing purpose where gamingArea
+  // default BlackjackArea should never be used, but is good for testing purpose where gamingArea
   // is irrelevant
   constructor(
     players: HumanPlayer[] = [],
     dealer: DealerPlayer = new DealerPlayer(GameStatus.Waiting, '0'),
-    gamingArea: GamingArea = new GamingArea(
-      { id: 'invalidId', dealerHand: [], playerHands: [], gameStatus: 'Waiting' },
+    gamingArea: BlackjackArea = new BlackjackArea(
+      { id: 'invalidId', dealer: { id: 'dealer', hand: [] }, players: [], gameStatus: 'Waiting' },
       { x: 0, y: 0, width: 0, height: 0 },
       mock<TownEmitter>(), // NOTE: may need to change in the future
     ),

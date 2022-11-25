@@ -19,8 +19,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useInteractable, useGamingAreaController } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
 import GamingAreaController from '../../../classes/GamingAreaController';
-import GamingArea from './GamingArea';
-import { PlayerHand, PlayingCard } from '../../../types/CoveyTownSocket';
+import BlackjackArea from './GamingArea';
+import { BlackjackPlayer, PlayingCard } from '../../../types/CoveyTownSocket';
 
 // i need to figure out how the back and front end communicate :C
 
@@ -133,7 +133,7 @@ export function Hand({ cards, x, y }: { cards: PlayingCard[]; x: number; y: numb
   );
 }
 
-export function Hands({ hands }: { hands: PlayerHand[] }) {
+export function Hands({ hands }: { hands: BlackjackPlayer[] }) {
   const townController = useTownController();
   const positions = [
     [100, 175],
@@ -229,8 +229,8 @@ export function JoinLeaveButton({
 
 export function Blackjack({ controller }: { controller: GamingAreaController }) {
   const townController = useTownController();
-  const [dealerHand, setDealerHand] = useState<PlayingCard[]>(controller.dealerHand);
-  const [playerHands, setPlayerHands] = useState<PlayerHand[]>(controller.playerHands);
+  const [dealer, setDealerHand] = useState<BlackjackPlayer>(controller.dealer);
+  const [players, setBlackjackPlayers] = useState<BlackjackPlayer[]>(controller.players);
   const [gameStatus, setGameStatus] = useState<string>(controller.gameStatus);
 
   const toast = useToast();
@@ -240,22 +240,22 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
   });
 
   useEffect(() => {
-    const setNewDealerHand = (hand: PlayingCard[]) => {
+    const setNewDealerHand = (hand: BlackjackPlayer) => {
       setDealerHand(hand);
     };
-    controller.addListener('dealerHandChange', setNewDealerHand);
+    controller.addListener('dealerChange', setNewDealerHand);
     return () => {
-      controller.removeListener('dealerHandChange', setNewDealerHand);
+      controller.removeListener('dealerChange', setNewDealerHand);
     };
   }, [controller, townController]);
 
   useEffect(() => {
-    const setNewPlayerHands = (hands: PlayerHand[]) => {
-      setPlayerHands(hands);
+    const setNewBlackjackPlayers = (hands: BlackjackPlayer[]) => {
+      setBlackjackPlayers(hands);
     };
-    controller.addListener('playerHandsChange', setNewPlayerHands);
+    controller.addListener('playersChange', setNewBlackjackPlayers);
     return () => {
-      controller.removeListener('playerHandsChange', setNewPlayerHands);
+      controller.removeListener('playersChange', setNewBlackjackPlayers);
     };
   }, [controller, townController]);
 
@@ -288,9 +288,6 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
   });
 
   townController.emitGamingAreaUpdate(controller);
-  const hit = () => {
-    controller.advanceTurn(townController.userID, true);
-  };
 
   return (
     <Box
@@ -306,7 +303,7 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
           townController.emitGamingAreaUpdate(controller);
           return success;
         }}
-        isPlaying={playerHands.map(player => player.id).includes(townController.userID)}
+        isPlaying={players.map(player => player.id).includes(townController.userID)}
       />
       <Button
         size='sm'
@@ -315,7 +312,6 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
         colorScheme='gray'
         position='relative'
         onClick={() => {
-          hit();
           townController.emitGamingAreaUpdate(controller);
         }}>
         Hit
@@ -334,8 +330,8 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
       <Text top={30} left={700} position='absolute' color='white'>
         Game Status: {gameStatus}
       </Text>
-      <Hand cards={dealerHand} x={450} y={100} />
-      <Hands hands={playerHands} />
+      <Hand cards={dealer.hand} x={450} y={100} />
+      <Hands hands={players} />
       <Chip chipValue={1} x={600} y={480} />
       <Chip chipValue={5} x={650} y={480} />
       <Chip chipValue={25} x={700} y={480} />
@@ -363,7 +359,7 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
   );
 }
 
-export function BlackjackModal({ gamingArea }: { gamingArea: GamingArea }): JSX.Element {
+export function BlackjackModal({ gamingArea }: { gamingArea: BlackjackArea }): JSX.Element {
   const coveyTownController = useTownController();
   const gamingAreaController = useGamingAreaController(gamingArea.name);
 
@@ -404,7 +400,7 @@ export function BlackjackModal({ gamingArea }: { gamingArea: GamingArea }): JSX.
 }
 
 export default function BlackjackWrapper(): JSX.Element {
-  const gamingArea = useInteractable<GamingArea>('gamingArea');
+  const gamingArea = useInteractable<BlackjackArea>('gamingArea');
   if (gamingArea) {
     return <BlackjackModal gamingArea={gamingArea} />;
   }

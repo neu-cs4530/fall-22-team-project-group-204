@@ -22,7 +22,7 @@ import {
   CoveyTownSocket,
   TownSettingsUpdate,
   ViewingArea,
-  GamingArea,
+  BlackjackArea,
 } from '../types/CoveyTownSocket';
 
 /**
@@ -175,10 +175,10 @@ export class TownsController extends Controller {
    */
   @Post('{townID}/gamingArea')
   @Response<InvalidParametersError>(400, 'Invalid values specified')
-  public async createGamingArea(
+  public async createBlackjackArea(
     @Path() townID: string,
     @Header('X-Session-Token') sessionToken: string,
-    @Body() requestBody: GamingArea,
+    @Body() requestBody: BlackjackArea,
   ): Promise<void> {
     const town = this._townsStore.getTownByID(townID);
     if (!town) {
@@ -187,7 +187,7 @@ export class TownsController extends Controller {
     if (!town?.getPlayerBySessionToken(sessionToken)) {
       throw new InvalidParametersError('Invalid values specified');
     }
-    const success = town.addGamingArea(requestBody);
+    const success = town.addBlackjackArea(requestBody);
     if (!success) {
       throw new InvalidParametersError('Invalid values specified');
     }

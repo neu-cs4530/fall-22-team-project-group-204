@@ -5,7 +5,7 @@ import { PlayerLocation } from '../../types/CoveyTownSocket';
 import { Callback } from '../VideoCall/VideoFrontend/types';
 import Interactable from './Interactable';
 import ConversationArea from './interactables/ConversationArea';
-import GamingArea from './interactables/GamingArea';
+import BlackjackArea from './interactables/GamingArea';
 import Transporter from './interactables/Transporter';
 import ViewingArea from './interactables/ViewingArea';
 
@@ -19,7 +19,7 @@ function interactableTypeForObjectType(type: string): any {
   } else if (type == 'ViewingArea') {
     return ViewingArea;
   } else if (type == 'GamingArea') {
-    return GamingArea;
+    return BlackjackArea;
   } else {
     throw new Error(`Unknown object type: ${type}`);
   }

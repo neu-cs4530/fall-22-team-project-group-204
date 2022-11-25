@@ -6,7 +6,7 @@ import { io } from 'socket.io-client';
 import TypedEmitter from 'typed-emitter';
 import Interactable from '../components/Town/Interactable';
 import ViewingArea from '../components/Town/interactables/ViewingArea';
-import GamingArea from '../components/Town/interactables/GamingArea';
+import BlackjackArea from '../components/Town/interactables/GamingArea';
 import { LoginController } from '../contexts/LoginControllerContext';
 import { TownsService, TownsServiceClient } from '../generated/client';
 import useTownController from '../hooks/useTownController';
@@ -16,11 +16,11 @@ import {
   PlayerLocation,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
-  GamingArea as GamingAreaModel,
+  BlackjackArea as GamingAreaModel,
   PlayingCard,
-  PlayerHand,
+  BlackjackPlayer,
 } from '../types/CoveyTownSocket';
-import { isConversationArea, isViewingArea, isGamingArea } from '../types/TypeUtils';
+import { isConversationArea, isViewingArea, isBlackjackArea } from '../types/TypeUtils';
 import ConversationAreaController from './ConversationAreaController';
 import PlayerController from './PlayerController';
 import ViewingAreaController from './ViewingAreaController';
@@ -448,9 +448,11 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
           eachArea => eachArea.id === interactable.id,
         );
         updatedViewingArea?.updateFrom(interactable);
-      } else if (isGamingArea(interactable)) {
-        const updatedGamingArea = this.gamingAreas.find(eachArea => eachArea.id == interactable.id);
-        updatedGamingArea?.updateFrom(interactable);
+      } else if (isBlackjackArea(interactable)) {
+        const updatedBlackjackArea = this.gamingAreas.find(
+          eachArea => eachArea.id == interactable.id,
+        );
+        updatedBlackjackArea?.updateFrom(interactable);
       }
     });
   }
@@ -539,8 +541,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    *
    * @param newArea
    */
-  async createGamingArea(newArea: GamingAreaModel) {
-    await this._townsService.createGamingArea(this.townID, this.sessionToken, newArea);
+  async createBlackjackArea(newArea: GamingAreaModel) {
+    await this._townsService.createBlackjackArea(this.townID, this.sessionToken, newArea);
   }
 
   /**
@@ -628,19 +630,19 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    * @param gamingArea
    * @returns
    */
-  public getGamingAreaController(gamingArea: GamingArea): GamingAreaController {
+  public getGamingAreaController(gamingArea: BlackjackArea): GamingAreaController {
     const existingController = this._gamingAreas.find(
       eachExistingArea => eachExistingArea.id === gamingArea.name,
     );
     if (existingController) {
       return existingController;
     } else {
-      const dealerHand: PlayingCard[] = [];
-      const playerHands: PlayerHand[] = [];
+      const dealer: BlackjackPlayer = { id: '0', hand: [] };
+      const players: BlackjackPlayer[] = [];
       const newController = new GamingAreaController({
         id: gamingArea.name,
-        dealerHand: dealerHand,
-        playerHands: playerHands,
+        dealer: dealer,
+        players: players,
         gameStatus: 'Waiting',
       });
       this._gamingAreas.push(newController);
