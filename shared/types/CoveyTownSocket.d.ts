@@ -1,3 +1,4 @@
+
 export type TownJoinResponse = {
   /** Unique ID that represents this player * */
   userID: string;
@@ -55,10 +56,15 @@ export interface PlayingCard {
   suit: string;
   faceUp: boolean;
 };
-
-export interface PlayerHand {
+export interface BlackjackPlayer {
   id: string;
   hand: PlayingCard[];
+};
+export interface BlackjackArea {
+  id: string;
+  dealer: BlackjackPlayer;
+  players: BlackjackPlayer[];
+  gameStatus: string;
 };
 
 export interface ConversationArea {
@@ -78,13 +84,6 @@ export interface ViewingArea {
   video?: string;
   isPlaying: boolean;
   elapsedTimeSec: number;
-}
-
-export interface GamingArea {
-  id: string;
-  gameStatus: string
-  dealerHand: PlayingCard[];
-  playerHands: PlayerHand[];
 }
 
 export interface ServerToClientEvents {

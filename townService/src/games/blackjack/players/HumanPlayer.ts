@@ -47,6 +47,10 @@ export default class HumanPlayer {
     this._hand.cards.push([newCard, newCardHiddenStatus]);
   }
 
+  public updateCards(cards: Card[]): void {
+    this._hand.cards = cards.map(card => [card, false]);
+  }
+
   public getNumericScore(): Array<number> {
     let scores = this._hand.getNumericScores();
     if (scores.length > 1) {

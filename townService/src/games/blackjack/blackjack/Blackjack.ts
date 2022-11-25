@@ -6,6 +6,7 @@ import DealerPlayer from '../players/DealerPlayer';
 import HumanPlayer from '../players/HumanPlayer';
 // eslint-disable-next-line import/no-cycle
 import GamingArea from '../../../town/GamingArea';
+import Card from '../../cards/Card';
 
 export default class BlackJack {
   // Going to have this DealerPlayer class handle the responsiblites of the Dealer and the Player.
@@ -32,17 +33,22 @@ export default class BlackJack {
   // is irrelevant
   constructor(
     players: HumanPlayer[] = [],
+    dealer: DealerPlayer = new DealerPlayer(GameStatus.Waiting, '0'),
     gamingArea: GamingArea = new GamingArea(
       { id: 'invalidId', dealerHand: [], playerHands: [], gameStatus: 'Waiting' },
       { x: 0, y: 0, width: 0, height: 0 },
       mock<TownEmitter>(), // NOTE: may need to change in the future
     ),
   ) {
-    this._dealer = new DealerPlayer(GameStatus.Waiting, '0');
-    // We assume that there is at least one human player. I am going to start with the
-    // assumption of one Player but will make sure to expand tests to cover 2 players
+    this._dealer = dealer;
     this._players = players;
     this._gamingArea = gamingArea;
+  }
+
+  public updatePlayerCards(allCards: Card[][]): void {
+    this._players.forEach((player, index) => {
+      player.updateCards(allCards[index]);
+    });
   }
 
   public addPlayer(player: HumanPlayer): void {

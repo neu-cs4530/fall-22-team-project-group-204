@@ -21,6 +21,10 @@ export default class DealerPlayer extends HumanPlayer {
     this.shuffleDecks();
   }
 
+  public get id(): string {
+    return super.id;
+  }
+
   public get hand(): Hand {
     return super.hand;
   }
@@ -41,8 +45,10 @@ export default class DealerPlayer extends HumanPlayer {
     return this._masterDeck;
   }
 
-  public get id(): string {
-    return super.id;
+  public updateDealer(newDealer: DealerPlayer): void {
+    this._masterDeck = newDealer.deck;
+    this.hand = newDealer.hand;
+    this.status = newDealer.status;
   }
 
   public static getDecks(amount: number): Card[][] {
@@ -61,6 +67,10 @@ export default class DealerPlayer extends HumanPlayer {
       .map(card => ({ card, sort: Math.random() }))
       .sort((a, b) => a.sort - b.sort)
       .map(({ card }) => card);
+  }
+
+  public updateCards(cards: Card[]): void {
+    this.hand.updateCards(cards);
   }
 
   public shuffleDecks(): void {

@@ -2,9 +2,9 @@ import { ITiledMapObject } from '@jonbell/tiled-map-type-guard';
 import {
   BoundingBox,
   TownEmitter,
-  GamingArea as GamingAreaModel,
+  BlackjackArea as BlackjackAreaModel,
   PlayingCard,
-  PlayerHand,
+  BlackjackPlayer,
 } from '../types/CoveyTownSocket';
 import InteractableArea from './InteractableArea';
 // eslint-disable-next-line import/no-cycle
@@ -16,22 +16,11 @@ import Suit from '../games/cards/Suit';
 import Value from '../games/cards/Value';
 import GameStatus from '../games/blackjack/players/GameStatus';
 
-export default class GamingArea extends InteractableArea {
-  private _dealerHand: PlayingCard[];
-
-  private _playerHands: PlayerHand[];
-
+export default class BlackjackArea extends InteractableArea {
+  // need to add a proper representation of this to the backend - on my todo list
   private _gameStatus: string;
 
   private _game: BlackJack;
-
-  public get dealerHand() {
-    return this._dealerHand;
-  }
-
-  public get playerHands() {
-    return this._playerHands;
-  }
 
   public get gameStatus() {
     return this._gameStatus;
@@ -44,18 +33,19 @@ export default class GamingArea extends InteractableArea {
    * @param townEmitter a broadcast emitter that can be used to emit updates to players
    */
   public constructor(
-    { id, dealerHand, playerHands, gameStatus }: GamingAreaModel,
+    { id, dealer, players, gameStatus }: BlackjackAreaModel,
     coordinates: BoundingBox,
     townEmitter: TownEmitter,
   ) {
     super(id, coordinates, townEmitter);
-    this._dealerHand = dealerHand;
-    this._playerHands = playerHands;
-    this._game = new BlackJack([], this);
+    const dealerProper = new DealerPlayer(GameStatus.Waiting, dealer.id);
+    const playersProper = players.map(player => new HumanPlayer(GameStatus.Waiting, player.id));
+    this._game = new BlackJack(playersProper, dealerProper);
+    // I feel a bit weird about this line - we really should be pulling gameStatus from the backend
+    // representation of the game. I can't think of a case where the back end would need to know
+    // whats going on in the front end (in that sense), but its very possible that said case exists.
+    // I'm going to leave this here for now, but I just want to note this for future reference
     this._gameStatus = gameStatus;
-    const dealerProper = new DealerPlayer(dealer.id);
-    const playersProper = players.map(player => new HumanPlayer(player.id));
-    this._game = new BlackJack(dealerProper, playersProper);
   }
 
   /**
@@ -63,29 +53,8 @@ export default class GamingArea extends InteractableArea {
    *
    * @param gamingArea updated model
    */
-  public updateModel({ dealerHand, playerHands, gameStatus }: GamingAreaModel) {
-    // console.log('updateModelCalled');
-    this._dealerHand = dealerHand;
-    let startGame = false;
-    if (this._playerHands.length === 0 && playerHands.length > 0) {
-      startGame = true;
-    }
-    this._playerHands = playerHands;
-    this._gameStatus = gameStatus;
-    // NOTE: please change to support more players / keeping track of game is active
-    this._playerHands.forEach(playerHand => {
-      if (playerHand.hand.length === 0 && this._game.dealer.status !== GameStatus.Playing) {
-        // TODO: Figure out correct status here
-        this._game.addPlayer(new HumanPlayer(GameStatus.Waiting, playerHand.id));
-        // console.log(`added ${playerHand.id}`);
-      } else {
-        // console.log('trying to join an existing game');
-        // NOTE: send some alert to the player somehow
-      }
-    });
-    if (startGame) {
-      this._game.playGame();
-    }
+  public updateModel({ id, dealer, players, gameStatus }: BlackjackAreaModel) {
+    this._game.dealer = dealer;
   }
 
   // NOTE: refactor for array order checking later
@@ -96,8 +65,8 @@ export default class GamingArea extends InteractableArea {
    * @param players the human players
    */
   public updateFromBlackjack(dealer: DealerPlayer, players: HumanPlayer[], status: string) {
-    this._dealerHand = GamingArea.handToListOfPlayingCards(dealer.hand);
-    this._playerHands = GamingArea.playersToPlayerHands(players);
+    this._dealerHand = BlackjackArea.handToListOfPlayingCards(dealer.hand);
+    this._playerHands = BlackjackArea.playersToPlayerHands(players);
     this._gameStatus = status;
     this._emitAreaChanged();
   }
@@ -113,71 +82,12 @@ export default class GamingArea extends InteractableArea {
     hand.cards.forEach(card => {
       const { suit, value } = card[0];
       playingCards.push({
-        suit: GamingArea.suitToString(suit),
-        value: GamingArea.valueToString(value),
+        suit: BlackjackArea.suitToString(suit),
+        value: BlackjackArea.valueToString(value),
         faceUp: card[1],
       });
     });
     return playingCards;
-  }
-
-  /**
-   * Converts a Suit to a string
-   * @param suit Suit of the card
-   * @returns a string representative
-   */
-  public static suitToString(suit: Suit): string {
-    switch (suit) {
-      case Suit.Clubs:
-        return 'Clubs';
-      case Suit.Diamonds:
-        return 'Diamonds';
-      case Suit.Hearts:
-        return 'Hearts';
-      case Suit.Spades:
-        return 'Spades';
-      default:
-        return 'unknown';
-    }
-  }
-
-  /**
-   * Converts a value to a string
-   *
-   * @param value Value of the card
-   * @returns a string representative
-   */
-  public static valueToString(value: Value): string {
-    switch (value) {
-      case Value.Ace:
-        return 'A';
-      case Value.King:
-        return 'K';
-      case Value.Queen:
-        return 'Q';
-      case Value.Jack:
-        return 'J';
-      case Value.Ten:
-        return '10';
-      case Value.Nine:
-        return '9';
-      case Value.Eight:
-        return '8';
-      case Value.Seven:
-        return '7';
-      case Value.Six:
-        return '6';
-      case Value.Five:
-        return '5';
-      case Value.Four:
-        return '4';
-      case Value.Three:
-        return '3';
-      case Value.Two:
-        return '2';
-      default:
-        return 'unknown';
-    }
   }
 
   /**
@@ -188,7 +98,10 @@ export default class GamingArea extends InteractableArea {
   public static playersToPlayerHands(players: HumanPlayer[]): PlayerHand[] {
     const playerHands: PlayerHand[] = [];
     players.forEach(player => {
-      playerHands.push({ hand: GamingArea.handToListOfPlayingCards(player.hand), id: player.id });
+      playerHands.push({
+        hand: BlackjackArea.handToListOfPlayingCards(player.hand),
+        id: player.id,
+      });
     });
     return playerHands;
   }
