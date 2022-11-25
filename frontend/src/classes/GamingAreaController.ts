@@ -2,18 +2,12 @@ import { EventEmitter } from 'events';
 import TypedEventEmitter from 'typed-emitter';
 import { GamingArea } from '../types/CoveyTownSocket';
 import { PlayingCard, PlayerHand } from '../types/CoveyTownSocket';
+import _ from 'lodash';
 
 /**
  * The events that a GamingAreaController can emit
  */
 export type GamingAreaEvents = {
-  /**
-   * A cardUpdateChange indicates whether a player chooses to hit or stay. The back end should
-   * confirm whether the player provided is currently playing, and update the game's status
-   * dependant on whether the player hit (true) or stayed (false)
-   */
-  cardUpdateChange: (playerId: string, hit: boolean) => void;
-
   dealerHandChange: (dealerHand: PlayingCard[]) => void;
   playerHandsChange: (playerHands: PlayerHand[]) => void;
   gameStatusChange: (gameStatus: string) => void;
@@ -57,7 +51,10 @@ export default class GamingAreaController extends (EventEmitter as new () => Typ
    * Sets the dealer's hand
    */
   public set dealerHand(dealerHand: PlayingCard[]) {
-    if (this.dealerHand != dealerHand) {
+    if (
+      dealerHand.length !== this.dealerHand.length ||
+      _.xor(dealerHand, this.dealerHand).length > 0
+    ) {
       this._model.dealerHand = dealerHand;
       this.emit('dealerHandChange', this.dealerHand);
     }
@@ -74,7 +71,10 @@ export default class GamingAreaController extends (EventEmitter as new () => Typ
    * Sets the players' hands
    */
   public set playerHands(playerHands: PlayerHand[]) {
-    if (this.playerHands != playerHands) {
+    if (
+      playerHands.length !== this.playerHands.length ||
+      _.xor(playerHands, this.playerHands).length > 0
+    ) {
       this._model.playerHands = playerHands;
       this.emit('playerHandsChange', this.playerHands);
     }
@@ -95,16 +95,6 @@ export default class GamingAreaController extends (EventEmitter as new () => Typ
       this._model.gameStatus = gameStatus;
       this.emit('gameStatusChange', this.gameStatus);
     }
-  }
-
-  /**
-   * Indicates how the player wants to advance their turn (hit: true, stay: false)
-   *
-   * @param playerId the id of the current player
-   * @param hit how the player advances their turn (hit or stay)
-   */
-  public advanceTurn(playerId: string, hit: boolean): void {
-    this.emit('cardUpdateChange', playerId, hit);
   }
 
   /**

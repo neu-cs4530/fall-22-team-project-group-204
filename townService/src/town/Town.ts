@@ -142,9 +142,12 @@ export default class Town {
     });
 
     // Set up a listener to process updates to interactables.
-    // Currently only knows how to process updates for ViewingArea's, and
+    // Currently only knows how to process updates for ViewingAreas and GamingAreas, and
     // ignores any other updates for any other kind of interactable.
-    // For ViewingArea's: dispatches an updateModel call to the viewingArea that
+    // For ViewingAreas: dispatches an updateModel call to the viewingArea that
+    // corresponds to the interactable being updated. Does not throw an error if
+    // the specified viewing area does not exist.
+    // For GamingAreas: dispatches an updateModel call to the GamingArea that
     // corresponds to the interactable being updated. Does not throw an error if
     // the specified viewing area does not exist.
     socket.on('interactableUpdate', (update: Interactable) => {
