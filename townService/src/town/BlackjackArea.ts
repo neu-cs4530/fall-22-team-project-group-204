@@ -84,9 +84,10 @@ export default class BlackjackArea extends InteractableArea {
         this._game.addPlayer(new HumanPlayer(GameStatus.Waiting, playerHand.id));
       }
       if (newUpdate && update !== undefined && playerHand.id === update.id) {
-        const player = this._game.players.find(x => x.id === playerHand.id);
-        if (player !== undefined && update.action) player.updateMove(update.action);
-        newUpdate = false;
+        this._game.advanceGame(playerHand.id, HumanPlayer.parseNextMove(update.action));
+        // const player = this._game.players.find(x => x.id === playerHand.id);
+        // if (player !== undefined && update.action) player.updateMove(update.action);
+        // newUpdate = false;
       }
     });
     if (startGame) {

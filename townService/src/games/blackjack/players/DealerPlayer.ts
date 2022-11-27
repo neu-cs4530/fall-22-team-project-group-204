@@ -159,7 +159,7 @@ export default class DealerPlayer extends HumanPlayer {
   ): PlayerStatusUpdateType {
     if (player.has21()) {
       player.status = GameStatus.Won;
-      this._setEveryoneElseToLost(otherPlayers);
+      // this._setEveryoneElseToLost(otherPlayers);
       return PlayerStatusUpdateType.UpdatedToWon;
     }
     if (otherPlayers.every(p => p.status === GameStatus.Lost) && super.status === GameStatus.Lost) {
@@ -219,6 +219,29 @@ export default class DealerPlayer extends HumanPlayer {
       return true;
     }
     return false;
+  }
+
+  public advanceGame(players: HumanPlayer[], playerId: string, action: BlackjackAction): void {
+    if (!players || players.length === 0) {
+      throw new Error("Can't play Blackjack with 0 people!");
+    }
+
+    const player = players.find(p => p.id === playerId);
+    const otherPlayers = players.filter(p => p !== player);
+    if (!player) {
+      throw new Error("This is not a valid player's id!");
+    }
+
+    let playerUpdateStatus = this._updatePlayerStatusAndReport(player, otherPlayers);
+    const wonLost = [PlayerStatusUpdateType.UpdatedToLost, PlayerStatusUpdateType.UpdatedToWon];
+    if (wonLost.includes(playerUpdateStatus)) {
+      return;
+    }
+
+    if (action === BlackjackAction.Hit) {
+      player.addCard(this._popCard());
+    }
+    playerUpdateStatus = this._updatePlayerStatusAndReport(player, otherPlayers);
   }
 
   public async doTurns(players: HumanPlayer[]): Promise<void> {

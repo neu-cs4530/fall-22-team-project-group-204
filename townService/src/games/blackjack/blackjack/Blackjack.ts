@@ -7,6 +7,7 @@ import HumanPlayer from '../players/HumanPlayer';
 // eslint-disable-next-line import/no-cycle
 import BlackjackArea from '../../../town/BlackjackArea';
 import Card from '../../cards/Card';
+import BlackjackAction from './BlackjackAction';
 
 export default class BlackJack {
   // Going to have this DealerPlayer class handle the responsiblites of the Dealer and the Player.
@@ -84,6 +85,22 @@ export default class BlackJack {
       players.some(player => player.status === GameStatus.Won) ||
       players.every(player => player.status === GameStatus.Lost)
     );
+  }
+
+  public startGame(doDealing = true): void {
+    const players: HumanPlayer[] = this._getActiveHumanPlayers();
+    this._updateToPlaying();
+
+    if (doDealing) {
+      this._dealer.dealCards(players);
+    }
+  }
+
+  public advanceGame(playerId: string, playerAction: BlackjackAction): void {
+    // you may need to replace this call of this._getActiveHumanPlayers with just a call to this._players
+    this._dealer.advanceGame(this._getActiveHumanPlayers(), playerId, playerAction);
+
+    // Also not sure when to call updateFromBlackjack
   }
 
   public async playGame(doDealing = true): Promise<void> {
