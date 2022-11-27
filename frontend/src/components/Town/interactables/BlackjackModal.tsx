@@ -15,7 +15,7 @@ import {
   Text,
   useToast,
 } from '@chakra-ui/react';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useInteractable, useGamingAreaController } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
 import GamingAreaController from '../../../classes/GamingAreaController';
@@ -193,9 +193,7 @@ export function JoinLeaveButton({
   joinLeaveFunc: () => boolean;
   isPlaying: boolean;
 }) {
-  const [joinLeave, setJoinLeave] = useState<boolean>(!isPlaying);
-
-  if (joinLeave) {
+  if (!isPlaying) {
     return (
       <Button
         size='sm'
@@ -204,10 +202,7 @@ export function JoinLeaveButton({
         colorScheme='gray'
         position='absolute'
         onClick={() => {
-          const success = joinLeaveFunc();
-          if (success) {
-            setJoinLeave(false);
-          }
+          joinLeaveFunc();
         }}>
         Join
       </Button>
@@ -221,10 +216,7 @@ export function JoinLeaveButton({
         colorScheme='gray'
         position='absolute'
         onClick={() => {
-          const success = joinLeaveFunc();
-          if (success) {
-            setJoinLeave(true);
-          }
+          joinLeaveFunc();
         }}>
         Leave
       </Button>
@@ -236,7 +228,8 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
   const townController = useTownController();
   const [dealer, setDealerHand] = useState<BlackjackPlayer>(controller.dealer);
   const [players, setBlackjackPlayers] = useState<BlackjackPlayer[]>(controller.players);
-  const [gameStatus, setGameStatus] = useState<string>(controller.gameStatus);
+  const [timestamp, setTimestamp] = useState<number>(0);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
   const toast = useToast();
 
@@ -257,6 +250,7 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
   useEffect(() => {
     const setNewBlackjackPlayers = (hands: BlackjackPlayer[]) => {
       setBlackjackPlayers(hands);
+      setIsPlaying(hands.map(hand => hand.id).includes(townController.userID));
     };
     controller.addListener('playersChange', setNewBlackjackPlayers);
     return () => {
@@ -265,20 +259,8 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
   }, [controller, townController]);
 
   useEffect(() => {
-    const setNewGameStatus = (status: string) => {
-      setGameStatus(status);
-    };
-    controller.addListener('gameStatusChange', setNewGameStatus);
-    return () => {
-      controller.removeListener('gameStatusChange', setNewGameStatus);
-    };
-  }, [controller, townController]);
-
-  useEffect(() => {
-    const alertPlayer = (isPlaying: boolean) => {
-      const alert = isPlaying
-        ? "Can't join an active game!"
-        : "Can't leave a game you have started!";
+    const alertPlayer = (playing: boolean) => {
+      const alert = playing ? "Can't join an active game!" : "Can't leave a game you have started!";
       toast({
         title: alert,
         status: 'error',
@@ -308,7 +290,7 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
           townController.emitGamingAreaUpdate(controller);
           return success;
         }}
-        isPlaying={players.map(player => player.id).includes(townController.userID)}
+        isPlaying={isPlaying}
       />
       <Button
         size='sm'
@@ -317,24 +299,55 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
         colorScheme='gray'
         position='relative'
         onClick={() => {
-          controller.update = { id: townController.userID, action: 'Hit', timestamp: 'N/A' };
+          controller.update = {
+            id: townController.userID,
+            action: 'Hit',
+            timestamp: timestamp + '',
+          };
+          setTimestamp(prevState => prevState + 1);
           townController.emitGamingAreaUpdate(controller);
         }}>
         Hit
       </Button>
-      <Button size='sm' left='240px' top='500px' colorScheme='gray' position='relative'>
+      <Button
+        size='sm'
+        left='240px'
+        top='500px'
+        colorScheme='gray'
+        position='relative'
+        onClick={() => {
+          controller.update = {
+            id: townController.userID,
+            action: 'Stay',
+            timestamp: timestamp + '',
+          };
+          setTimestamp(prevState => prevState + 1);
+          townController.emitGamingAreaUpdate(controller);
+        }}>
         Stand
       </Button>
-      {/*<Hand
-        cards={[
-          { value: '7', suit: 'Clubs' },
-          { value: 'A', suit: 'Spades' },
-        ]}
-        x={450}
-        y={400}
-      />*/}
+      <Button
+        size='sm'
+        left='120px'
+        top='50px'
+        colorScheme='gray'
+        position='absolute'
+        onClick={() => {
+          controller.update = {
+            id: townController.userID,
+            action: 'Start',
+            timestamp: timestamp + '',
+          };
+          setTimestamp(prevState => prevState + 1);
+          townController.emitGamingAreaUpdate(controller);
+        }}>
+        Start Game
+      </Button>
       <Text top={30} left={700} position='absolute' color='white'>
-        Game Status: {gameStatus}
+        Dealer Game Status: {dealer.gameStatus}
+      </Text>
+      <Text top={550} left={375} position='absolute' color='white'>
+        Game Status: {players.find(x => x.id == townController.userID)?.gameStatus}
       </Text>
       <Hand cards={dealer.hand} x={450} y={100} />
       <Hands hands={players} />

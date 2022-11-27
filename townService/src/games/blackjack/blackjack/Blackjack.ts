@@ -38,9 +38,8 @@ export default class BlackJack {
     gamingArea: BlackjackArea = new BlackjackArea(
       {
         id: 'invalidId',
-        dealer: { id: '0', hand: [] },
+        dealer: { id: '0', hand: [], gameStatus: 'Waiting' },
         players: [],
-        gameStatus: 'Waiting',
         update: undefined,
       },
       { x: 0, y: 0, width: 0, height: 0 },
@@ -94,6 +93,8 @@ export default class BlackJack {
     if (doDealing) {
       this._dealer.dealCards(players);
     }
+
+    this._gamingArea.updateFromBlackjack(this.dealer, this.players);
   }
 
   public advanceGame(playerId: string, playerAction: BlackjackAction): void {
@@ -101,6 +102,7 @@ export default class BlackJack {
     this._dealer.advanceGame(this._getActiveHumanPlayers(), playerId, playerAction);
 
     // Also not sure when to call updateFromBlackjack
+    this._gamingArea.updateFromBlackjack(this.dealer, this.players);
   }
 
   public async playGame(doDealing = true): Promise<void> {
@@ -112,7 +114,7 @@ export default class BlackJack {
       this._dealer.dealCards(players);
     }
 
-    this._gamingArea.updateFromBlackjack(this._dealer, players, GameStatus[this._dealer.status]);
+    this._gamingArea.updateFromBlackjack(this._dealer, players);
 
     while (!BlackJack._isGameOver([...players, this._dealer])) {
       await this._dealer.doTurns(players);

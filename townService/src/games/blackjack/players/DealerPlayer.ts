@@ -227,7 +227,6 @@ export default class DealerPlayer extends HumanPlayer {
     }
 
     const player = players.find(p => p.id === playerId);
-    const playerIndex = players.indexOf(player);
     const otherPlayers = players.filter(p => p !== player);
     if (!player) {
       throw new Error("This is not a valid player's id!");
@@ -238,37 +237,56 @@ export default class DealerPlayer extends HumanPlayer {
     if (wonLost.includes(playerUpdateStatus)) {
       return;
     }
+    if (player.status === GameStatus.Staying) {
+      return;
+    }
 
     if (action === BlackjackAction.Hit) {
       player.addCard(this._popCard());
+    } else if (action === BlackjackAction.Stay) {
+      player.status = GameStatus.Staying;
     }
     playerUpdateStatus = this._updatePlayerStatusAndReport(player, otherPlayers);
-
-    if (players.indexOf(player) === players.length - 1) {
+    const allRemainingDone = players.reduce(
+      (a, b) =>
+        (b.status === GameStatus.Staying ||
+          b.status === GameStatus.Lost ||
+          b.status === GameStatus.Won) &&
+        a,
+      true,
+    );
+    if (allRemainingDone) {
       if (super.hasBusted()) {
         this.status = GameStatus.Lost;
       }
-  
+
       if (this._isGameOver(players)) {
         // again - will remove this and refactor once we come to a better conclusion
         // for what to do in the case of multiple winners at the same time
         if (super.status !== GameStatus.Won) {
           this.status = GameStatus.Lost;
         }
-        return;
       }
-  
-      if (this._willHit()) {
+
+      this.hand.cards[0][1] = true;
+      while (this._willHit()) {
         super.addCard(this._popCard());
       }
-  
-      if (super.has21()) {
+
+      const dealerScore = super.getMaxScore();
+      const maxPlayerScore = Math.max(...players.map(p => p.getMaxScore()));
+      if (super.has21() || dealerScore > maxPlayerScore) {
         this.status = GameStatus.Won;
         this._setEveryoneElseToLost(players);
-      } else if (super.hasBusted()) {
+      } else {
         this.status = GameStatus.Lost;
+        players.forEach(p => {
+          if (p.getMaxScore() > dealerScore) {
+            p.status = GameStatus.Won;
+          }
+        });
       }
-    };
+    }
   }
 
   public async doTurns(players: HumanPlayer[]): Promise<void> {

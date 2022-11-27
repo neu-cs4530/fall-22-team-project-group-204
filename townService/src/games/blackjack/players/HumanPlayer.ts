@@ -67,6 +67,14 @@ export default class HumanPlayer {
     return scores;
   }
 
+  public getMaxScore(): number {
+    const scores = this.getNumericScore().filter(score => score < 22);
+    if (scores.length < 1) {
+      return -1;
+    }
+    return Math.max(...scores);
+  }
+
   public has21(): boolean {
     const scores = this.getNumericScore();
     return scores.includes(21);

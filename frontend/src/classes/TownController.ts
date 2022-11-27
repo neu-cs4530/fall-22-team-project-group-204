@@ -636,13 +636,12 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     if (existingController) {
       return existingController;
     } else {
-      const dealer: BlackjackPlayer = { id: '0', hand: [] };
+      const dealer: BlackjackPlayer = { id: '0', hand: [], gameStatus: 'Waiting' };
       const players: BlackjackPlayer[] = [];
       const newController = new GamingAreaController({
         id: gamingArea.name,
         dealer: dealer,
         players: players,
-        gameStatus: 'Waiting',
         update: undefined,
       });
       this._gamingAreas.push(newController);
