@@ -254,6 +254,28 @@ describe('Blackjack Modal', () => {
           expect(getSingleListenerRemoved('activeGameAlert')).toBe(listenerAdded);
         });
       });
+      describe('When re-rendered with a different gaming area controller', () => {
+        it('Removes the listeners on the old gaming area controller and adds listeners to the new controller', () => {
+          const origGameStatus = getSingleListenerAdded('gameStatusChange');
+          const origActiveGameAlert = getSingleListenerAdded('activeGameAlert');
+          const dealer: BlackjackPlayer = { id: '0', hand: [] };
+          const players: BlackjackPlayer[] = [];
+          const newGamingArea = new GamingAreaController({
+            id: 'test',
+            dealer: dealer,
+            players: players,
+            gameStatus: 'Waiting',
+          });
+          const newAddListenerSpy = jest.spyOn(newGamingArea, 'addListener');
+          renderData.rerender(renderBlackjack(newGamingArea, townController));
+
+          expect(getSingleListenerRemoved('gameStatusChange')).toBe(origGameStatus);
+          expect(getSingleListenerRemoved('activeGameAlert')).toBe(origActiveGameAlert);
+
+          getSingleListenerAdded('gameStatusChange', newAddListenerSpy);
+          getSingleListenerAdded('activeGameAlert', newAddListenerSpy);
+        });
+      });
     });
   });
 });

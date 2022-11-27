@@ -315,7 +315,9 @@ export default class Town {
    * with the specified ID or if there is no video URL specified
    */
   public addBlackjackArea(gamingArea: GamingAreaModel): boolean {
-    const area = this._interactables.find(eachArea => eachArea.id === gamingArea.id) as BlackjackArea;
+    const area = this._interactables.find(
+      eachArea => eachArea.id === gamingArea.id,
+    ) as BlackjackArea;
     if (!area || area.players || area.dealer) {
       return false;
     }
