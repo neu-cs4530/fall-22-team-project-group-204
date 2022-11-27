@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import TypedEventEmitter from 'typed-emitter';
-import { BlackjackArea } from '../types/CoveyTownSocket';
+import { BlackjackArea, BlackjackUpdate } from '../types/CoveyTownSocket';
 import { BlackjackPlayer } from '../types/CoveyTownSocket';
 import _ from 'lodash';
 
@@ -11,6 +11,7 @@ export type GamingAreaEvents = {
   dealerChange: (dealer: BlackjackPlayer) => void;
   playersChange: (players: BlackjackPlayer[]) => void;
   gameStatusChange: (gameStatus: string) => void;
+  updateChange: (update: BlackjackUpdate | undefined) => void;
   activeGameAlert: (isPlaying: boolean) => void;
 };
 
@@ -95,6 +96,23 @@ export default class GamingAreaController extends (EventEmitter as new () => Typ
   }
 
   /**
+   * Returns the last update
+   */
+  public get update() {
+    return this._model.update;
+  }
+
+  /**
+   * Sets a new update for the Blackjack class
+   */
+  public set update(update: BlackjackUpdate | undefined) {
+    if (this.update != update) {
+      this._model.update = update;
+      this.emit('updateChange', this.update);
+    }
+  }
+
+  /**
    * Joins the game of blackjack if the player isn't already in the game
    * Leaves the game of blackjack if the player is already in the game
    *
@@ -105,23 +123,19 @@ export default class GamingAreaController extends (EventEmitter as new () => Typ
     if (!player) {
       if (this.gameStatus === 'Playing') {
         this.emit('activeGameAlert', true);
-        console.log('activeGameAlert');
         return false;
       } else {
         this.players.push({ id: playerId, hand: [] });
         this.emit('playersChange', this.players);
-        console.log('playersChange');
         return true;
       }
     } else {
       if (this.gameStatus === 'Playing') {
         this.emit('activeGameAlert', false);
-        console.log('activeGameAlert');
         return false;
       } else {
         this.players = this.players.filter(playerHand => playerHand.id !== playerId);
         this.emit('playersChange', this.players);
-        console.log('playersChange');
         return true;
       }
     }
@@ -137,6 +151,7 @@ export default class GamingAreaController extends (EventEmitter as new () => Typ
     this.players = updatedModel.players;
     this.dealer = updatedModel.dealer;
     this.gameStatus = updatedModel.gameStatus;
+    this.update = updatedModel.update;
   }
 
   /**

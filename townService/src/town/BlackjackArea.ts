@@ -5,6 +5,7 @@ import {
   BlackjackArea as GamingAreaModel,
   PlayingCard,
   BlackjackPlayer,
+  BlackjackUpdate,
 } from '../types/CoveyTownSocket';
 import InteractableArea from './InteractableArea';
 // eslint-disable-next-line import/no-cycle
@@ -22,6 +23,8 @@ export default class BlackjackArea extends InteractableArea {
   private _players: BlackjackPlayer[];
 
   private _gameStatus: string;
+
+  private _update: BlackjackUpdate | undefined;
 
   private _game: BlackJack;
 
@@ -44,7 +47,7 @@ export default class BlackjackArea extends InteractableArea {
    * @param townEmitter a broadcast emitter that can be used to emit updates to players
    */
   public constructor(
-    { id, dealer, players, gameStatus }: GamingAreaModel,
+    { id, dealer, players, gameStatus, update }: GamingAreaModel,
     coordinates: BoundingBox,
     townEmitter: TownEmitter,
   ) {
@@ -52,6 +55,7 @@ export default class BlackjackArea extends InteractableArea {
     this._dealer = dealer;
     this._players = players;
     this._gameStatus = gameStatus;
+    this._update = update;
     const dealerProper = new DealerPlayer(GameStatus.Waiting, dealer.id);
     const playersProper = players.map(player => new HumanPlayer(GameStatus.Waiting, player.id));
     this._game = new BlackJack(playersProper, dealerProper, this);
@@ -62,8 +66,8 @@ export default class BlackjackArea extends InteractableArea {
    *
    * @param gamingArea updated model
    */
-  public updateModel({ dealer, players, gameStatus }: GamingAreaModel) {
-    // console.log('updateModelCalled');
+  public updateModel({ dealer, players, gameStatus, update }: GamingAreaModel) {
+    console.log('updateModelCalled');
     this._dealer = dealer;
     let startGame = false;
     if (this._players.length === 0 && players.length > 0) {
@@ -71,15 +75,14 @@ export default class BlackjackArea extends InteractableArea {
     }
     this._players = players;
     this._gameStatus = gameStatus;
-    // NOTE: please change to support more players / keeping track of game is active
+    this._update = update;
     this._players.forEach(playerHand => {
       if (playerHand.hand.length === 0 && this._game.dealer.status !== GameStatus.Playing) {
-        // TODO: Figure out correct status here
         this._game.addPlayer(new HumanPlayer(GameStatus.Waiting, playerHand.id));
-        // console.log(`added ${playerHand.id}`);
-      } else {
-        // console.log('trying to join an existing game');
-        // NOTE: send some alert to the player somehow
+      }
+      if (update !== undefined && playerHand.id === update.id) {
+        const player = this._game.players.find(x => x.id === playerHand.id);
+        if (player !== undefined && update.action) player.updateMove(update.action);
       }
     });
     if (startGame) {
@@ -205,6 +208,7 @@ export default class BlackjackArea extends InteractableArea {
       dealer: this._dealer,
       players: this._players,
       gameStatus: this._gameStatus,
+      update: this._update,
     };
   }
 
@@ -223,7 +227,7 @@ export default class BlackjackArea extends InteractableArea {
     const players: BlackjackPlayer[] = [];
     const rect: BoundingBox = { x: mapObject.x, y: mapObject.y, width, height };
     return new BlackjackArea(
-      { id: name, players, dealer, gameStatus: 'Waiting' },
+      { id: name, players, dealer, gameStatus: 'Waiting', update: undefined },
       rect,
       townEmitter,
     );

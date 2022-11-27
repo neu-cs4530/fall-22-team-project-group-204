@@ -60,11 +60,17 @@ export interface BlackjackPlayer {
   id: string;
   hand: PlayingCard[];
 };
+export interface BlackjackUpdate {
+  id: string;
+  action: string;
+  timestamp: string;
+}
 export interface BlackjackArea {
   id: string;
   dealer: BlackjackPlayer;
   players: BlackjackPlayer[];
   gameStatus: string;
+  update?: BlackjackUpdate;
 };
 
 export interface ConversationArea {

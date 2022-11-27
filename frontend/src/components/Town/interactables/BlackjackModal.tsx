@@ -145,20 +145,25 @@ export function Hands({ hands }: { hands: BlackjackPlayer[] }) {
   const handComponents = hands.map((hand, index) => {
     if (hand.id == townController.userID) {
       offset = -1;
-      return <Hand cards={hand.hand} x={450} y={400} />;
+      return <Hand key={index} cards={hand.hand} x={450} y={400} />;
     } else {
       return (
-        <Hand cards={hand.hand} x={positions[index + offset][0]} y={positions[index + offset][1]} />
+        <Hand
+          key={index}
+          cards={hand.hand}
+          x={positions[index + offset][0]}
+          y={positions[index + offset][1]}
+        />
       );
     }
   });
   for (let i = hands.length; i < 5; i++) {
     if (i == 0) {
-      handComponents.push(<Hand cards={[]} x={450} y={400} />);
+      handComponents.push(<Hand key={i} cards={[]} x={450} y={400} />);
       offset = -1;
     } else {
       handComponents.push(
-        <Hand cards={[]} x={positions[i + offset][0]} y={positions[i + offset][1]} />,
+        <Hand key={i} cards={[]} x={positions[i + offset][0]} y={positions[i + offset][1]} />,
       );
     }
   }
@@ -312,6 +317,7 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
         colorScheme='gray'
         position='relative'
         onClick={() => {
+          controller.update = { id: townController.userID, action: 'Hit', timestamp: 'N/A' };
           townController.emitGamingAreaUpdate(controller);
         }}>
         Hit

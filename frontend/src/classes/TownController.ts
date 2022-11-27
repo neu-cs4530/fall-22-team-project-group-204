@@ -17,7 +17,6 @@ import {
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
   BlackjackArea as GamingAreaModel,
-  PlayingCard,
   BlackjackPlayer,
 } from '../types/CoveyTownSocket';
 import { isConversationArea, isViewingArea, isBlackjackArea } from '../types/TypeUtils';
@@ -644,6 +643,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         dealer: dealer,
         players: players,
         gameStatus: 'Waiting',
+        update: undefined,
       });
       this._gamingAreas.push(newController);
       return newController;

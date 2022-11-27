@@ -35,7 +35,13 @@ export default class BlackJack {
     players: HumanPlayer[] = [],
     dealer: DealerPlayer = new DealerPlayer(GameStatus.Waiting, '0'),
     gamingArea: BlackjackArea = new BlackjackArea(
-      { id: 'invalidId', dealer: { id: 'dealer', hand: [] }, players: [], gameStatus: 'Waiting' },
+      {
+        id: 'invalidId',
+        dealer: { id: '0', hand: [] },
+        players: [],
+        gameStatus: 'Waiting',
+        update: undefined,
+      },
       { x: 0, y: 0, width: 0, height: 0 },
       mock<TownEmitter>(), // NOTE: may need to change in the future
     ),

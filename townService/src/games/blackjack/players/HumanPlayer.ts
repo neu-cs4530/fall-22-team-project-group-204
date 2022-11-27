@@ -37,10 +37,13 @@ export default class HumanPlayer {
     this._status = value;
   }
 
+  private _lastAction: string | undefined;
+
   constructor(status: GameStatus = GameStatus.Waiting, id: string = nanoid()) {
     this._hand = new Hand();
     this._status = status;
     this._id = id;
+    this._lastAction = undefined;
   }
 
   public addCard(newCard: Card, newCardHiddenStatus = true): void {
@@ -88,6 +91,16 @@ export default class HumanPlayer {
     }
   }
 
+  public updateMove(action: string) {
+    this._lastAction = action;
+  }
+
+  // TODO: take input in the form of the variable _lastAction
+  // Somehow, when the last action inputted by the player != undefined (which is updated by the BlackjackArea class),
+  // this function should return the _lastAction ('Hit' or 'Stay')
+  // It should also reset the value of _lastAction to be undefined
+  // This might be achieved somehow through keeping this method, replacing stdin with some other form of Readable, and
+  // passing the input in that way
   public async getNextMove(): Promise<string> {
     const questionText = 'What would you like to do?\n1. [h]it\n2. [s]tay))';
     // eslint-disable-next-line no-promise-executor-return
@@ -98,6 +111,15 @@ export default class HumanPlayer {
     const name = await question();
     return name;
   }
+
+  // public async getNextMove(): Promise<string> {
+  //   // const questionText = 'What would you like to do?\n1. [h]it\n2. [s]tay))';
+  //   // eslint-disable-next-line no-promise-executor-return
+  //   const question = () => new Promise<string | undefined>(resolve => resolve(this._lastAction));
+  //   let name: string | undefined;
+  //   this._lastAction = undefined;
+  //   return name;
+  // }
 
   // I will have to mock this function to test
   public async getBlackjackAction(): Promise<BlackjackAction> {
