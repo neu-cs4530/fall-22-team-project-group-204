@@ -1,6 +1,6 @@
 import { ChakraProvider } from '@chakra-ui/react';
 import { EventNames } from '@socket.io/component-emitter';
-import { act, cleanup, render, RenderResult } from '@testing-library/react';
+import { act, cleanup, render, RenderResult, waitFor } from '@testing-library/react';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
 import React from 'react';
@@ -100,6 +100,23 @@ describe('Blackjack Modal', () => {
   describe('[T4] Bridging events from the GamingAreaController to the ReactPlayer', () => {
     describe('Registering GamingAreaController listeners', () => {
       describe('When rendered', () => {
+        it('Has Blackjack button components', async () => {
+          await waitFor(() => expect(renderData.getByText('Bet')).toBeInTheDocument());
+          const numButtons = await renderData.getAllByRole('button');
+          expect(numButtons).toHaveLength(9);
+          const numChips = await renderData.getAllByRole('button', { name: 'chip' });
+          expect(numChips).toHaveLength(5);
+
+          // const rankingText = await renderData.findAllByText('Ranking');
+          // expect(rankingText).toHaveLength(2);
+          // const nameText = await renderData.findAllByText('Name');
+          // expect(nameText).toHaveLength(2);
+          // const winsText = await renderData.findAllByText('Wins');
+          // expect(winsText).toHaveLength(2);
+          // const rewardText = await renderData.findAllByText('Reward');
+          // expect(rewardText).toHaveLength(2);
+          renderData.unmount();
+        }, 10000);
         it('Registers exactly one dealerChange listener', () => {
           act(() => {
             gamingArea.emit('dealerChange', {

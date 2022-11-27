@@ -176,7 +176,7 @@ export function Chip({ chipValue, x, y }: { chipValue: number; x: number; y: num
       top={y + 'px'}
       left={x + 'px'}
       icon={<Image width='40px' src={chip} />}
-      aria-label={''}
+      aria-label={'chip'}
     />
   );
 }
