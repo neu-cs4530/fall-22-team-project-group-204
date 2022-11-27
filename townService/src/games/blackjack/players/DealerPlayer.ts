@@ -227,6 +227,7 @@ export default class DealerPlayer extends HumanPlayer {
     }
 
     const player = players.find(p => p.id === playerId);
+    const playerIndex = players.indexOf(player);
     const otherPlayers = players.filter(p => p !== player);
     if (!player) {
       throw new Error("This is not a valid player's id!");
@@ -242,6 +243,32 @@ export default class DealerPlayer extends HumanPlayer {
       player.addCard(this._popCard());
     }
     playerUpdateStatus = this._updatePlayerStatusAndReport(player, otherPlayers);
+
+    if (players.indexOf(player) === players.length - 1) {
+      if (super.hasBusted()) {
+        this.status = GameStatus.Lost;
+      }
+  
+      if (this._isGameOver(players)) {
+        // again - will remove this and refactor once we come to a better conclusion
+        // for what to do in the case of multiple winners at the same time
+        if (super.status !== GameStatus.Won) {
+          this.status = GameStatus.Lost;
+        }
+        return;
+      }
+  
+      if (this._willHit()) {
+        super.addCard(this._popCard());
+      }
+  
+      if (super.has21()) {
+        this.status = GameStatus.Won;
+        this._setEveryoneElseToLost(players);
+      } else if (super.hasBusted()) {
+        this.status = GameStatus.Lost;
+      }
+    };
   }
 
   public async doTurns(players: HumanPlayer[]): Promise<void> {
