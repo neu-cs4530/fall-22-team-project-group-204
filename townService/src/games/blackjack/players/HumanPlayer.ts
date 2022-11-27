@@ -77,7 +77,7 @@ export default class HumanPlayer {
   }
 
   public static parseNextMove(answerText: string): BlackjackAction {
-    const answerTextCleaned = answerText.toLowerCase();
+    const answerTextCleaned = answerText.toLowerCase().trim();
     switch (answerTextCleaned) {
       case 'h':
       case 'hit':
@@ -101,38 +101,20 @@ export default class HumanPlayer {
   // It should also reset the value of _lastAction to be undefined
   // This might be achieved somehow through keeping this method, replacing stdin with some other form of Readable, and
   // passing the input in that way
-  public async getNextMove(): Promise<string> {
-    const questionText = 'What would you like to do?\n1. [h]it\n2. [s]tay))';
-    // eslint-disable-next-line no-promise-executor-return
-    const question = () =>
-      new Promise<string>(resolve => HumanPlayer._rl.question(questionText, resolve)).finally(() =>
-        HumanPlayer._rl.close(),
-      );
-    const name = await question();
-    return name;
+  public getNextMove(): string {
+    if (!this._lastAction) {
+      throw new Error("Player's last action is undefined");
+    }
+    return this._lastAction;
   }
 
-  // public async getNextMove(): Promise<string> {
-  //   // const questionText = 'What would you like to do?\n1. [h]it\n2. [s]tay))';
-  //   // eslint-disable-next-line no-promise-executor-return
-  //   const question = () => new Promise<string | undefined>(resolve => resolve(this._lastAction));
-  //   let name: string | undefined;
-  //   this._lastAction = undefined;
-  //   return name;
-  // }
-
   // I will have to mock this function to test
-  public async getBlackjackAction(): Promise<BlackjackAction> {
-    return new Promise(resolve => {
-      setTimeout(async () => {
-        resolve(HumanPlayer.parseNextMove(await this.getNextMove()));
-      }, 150);
-      // I tried to use setTimeout here to simulate async code, but it didnt work
-    });
+  public getBlackjackAction(): BlackjackAction {
+    return HumanPlayer.parseNextMove(this.getNextMove());
   }
 
   // This function will be more complicated as we advance
-  public async doTurn(): Promise<BlackjackAction> {
+  public doTurn(): BlackjackAction {
     return this.getBlackjackAction();
   }
 }
