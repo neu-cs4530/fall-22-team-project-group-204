@@ -100,21 +100,20 @@ describe('Blackjack Modal', () => {
   describe('[T4] Bridging events from the GamingAreaController to the ReactPlayer', () => {
     describe('Registering GamingAreaController listeners', () => {
       describe('When rendered', () => {
-        it('Has Blackjack button components', async () => {
+        it('Has Blackjack button and text components', async () => {
           await waitFor(() => expect(renderData.getByText('Bet')).toBeInTheDocument());
-          const numButtons = await renderData.getAllByRole('button');
+          await waitFor(() => expect(renderData.getByText('Join')).toBeInTheDocument());
+          await waitFor(() => expect(renderData.getByText('Hit')).toBeInTheDocument());
+          await waitFor(() => expect(renderData.getByText('Stand')).toBeInTheDocument());
+          await waitFor(() => expect(renderData.getByText('1')).toBeInTheDocument());
+          await waitFor(() => expect(renderData.getByText('5')).toBeInTheDocument());
+          await waitFor(() => expect(renderData.getByText('25')).toBeInTheDocument());
+          await waitFor(() => expect(renderData.getByText('100')).toBeInTheDocument());
+          await waitFor(() => expect(renderData.getByText('500')).toBeInTheDocument());
+          const numButtons = renderData.getAllByRole('button');
           expect(numButtons).toHaveLength(9);
-          const numChips = await renderData.getAllByRole('button', { name: 'chip' });
+          const numChips = renderData.getAllByRole('button', { name: 'chip' });
           expect(numChips).toHaveLength(5);
-
-          // const rankingText = await renderData.findAllByText('Ranking');
-          // expect(rankingText).toHaveLength(2);
-          // const nameText = await renderData.findAllByText('Name');
-          // expect(nameText).toHaveLength(2);
-          // const winsText = await renderData.findAllByText('Wins');
-          // expect(winsText).toHaveLength(2);
-          // const rewardText = await renderData.findAllByText('Reward');
-          // expect(rewardText).toHaveLength(2);
           renderData.unmount();
         }, 10000);
         it('Registers exactly one dealerChange listener', () => {
