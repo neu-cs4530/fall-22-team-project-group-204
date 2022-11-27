@@ -67,22 +67,26 @@ export default class BlackjackArea extends InteractableArea {
    * @param gamingArea updated model
    */
   public updateModel({ dealer, players, gameStatus, update }: GamingAreaModel) {
-    console.log('updateModelCalled');
     this._dealer = dealer;
     let startGame = false;
+    let newUpdate = false;
     if (this._players.length === 0 && players.length > 0) {
       startGame = true;
     }
     this._players = players;
     this._gameStatus = gameStatus;
+    if (this._update !== update) {
+      newUpdate = true;
+    }
     this._update = update;
     this._players.forEach(playerHand => {
       if (playerHand.hand.length === 0 && this._game.dealer.status !== GameStatus.Playing) {
         this._game.addPlayer(new HumanPlayer(GameStatus.Waiting, playerHand.id));
       }
-      if (update !== undefined && playerHand.id === update.id) {
+      if (newUpdate && update !== undefined && playerHand.id === update.id) {
         const player = this._game.players.find(x => x.id === playerHand.id);
         if (player !== undefined && update.action) player.updateMove(update.action);
+        newUpdate = false;
       }
     });
     if (startGame) {
