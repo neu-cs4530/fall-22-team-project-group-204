@@ -158,6 +158,7 @@ describe('DealerPlayer', () => {
 
         const playerOneCards = playerOne.hand.cards;
         expect(playerOneCards).not.toStrictEqual([]);
+        expect(playerOneCards.length === 2 || playerOneCards.length === 3).toBe(true);
         expect(playerOneCards.length).toBe(3);
 
         const playerTwoCards = playerTwo.hand.cards;
