@@ -103,6 +103,7 @@ describe('GamingAreaController', () => {
           },
         ],
         update: { id: '1', action: 'Hit', timestamp: 'N/A' },
+        bettingAmount: 0,
       };
       testArea.updateFrom(newModel);
       expect(testArea.dealer).toEqual(newModel.dealer);
@@ -128,6 +129,7 @@ describe('GamingAreaController', () => {
             gameStatus: 'Waiting',
           },
         ],
+        bettingAmount: 0,
       };
       testArea.updateFrom(newModel);
       expect(testArea.id).toEqual(existingID);
