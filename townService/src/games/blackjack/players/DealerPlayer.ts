@@ -103,6 +103,7 @@ export default class DealerPlayer extends HumanPlayer {
         throw new Error('');
       }
       player.hand = new Hand(this._getStarterHand());
+      if (player.getMaxScore() === 21) player.status = GameStatus.Won;
     });
 
     this.hand.cards = this._getStarterHand(false);
@@ -260,14 +261,6 @@ export default class DealerPlayer extends HumanPlayer {
         this.status = GameStatus.Lost;
       }
 
-      if (this._isGameOver(players)) {
-        // again - will remove this and refactor once we come to a better conclusion
-        // for what to do in the case of multiple winners at the same time
-        if (super.status !== GameStatus.Won) {
-          this.status = GameStatus.Lost;
-        }
-      }
-
       this.hand.cards[0][1] = true;
       while (this._willHit()) {
         super.addCard(this._popCard());
@@ -277,12 +270,14 @@ export default class DealerPlayer extends HumanPlayer {
       const maxPlayerScore = Math.max(...players.map(p => p.getMaxScore()));
       if (super.has21() || dealerScore > maxPlayerScore) {
         this.status = GameStatus.Won;
-        this._setEveryoneElseToLost(players);
+        this._setEveryoneElseToLost(players, true);
       } else {
         this.status = GameStatus.Lost;
         players.forEach(p => {
           if (p.getMaxScore() > dealerScore) {
             p.status = GameStatus.Won;
+          } else {
+            p.status = GameStatus.Lost;
           }
         });
       }

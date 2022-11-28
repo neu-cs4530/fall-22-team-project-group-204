@@ -72,7 +72,11 @@ export default class BlackJack {
   private _getActiveHumanPlayers(): HumanPlayer[] {
     const humanPlayers: HumanPlayer[] = [];
     this._players.forEach(player => {
-      if (player.status === GameStatus.Waiting || player.status === GameStatus.Playing) {
+      if (
+        player.status === GameStatus.Waiting ||
+        player.status === GameStatus.Playing ||
+        player.status === GameStatus.Staying
+      ) {
         humanPlayers.push(player as HumanPlayer);
       }
     });

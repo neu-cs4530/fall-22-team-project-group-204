@@ -157,15 +157,14 @@ export function Hands({ hands }: { hands: BlackjackPlayer[] }) {
       );
     }
   });
-  for (let i = hands.length; i < 5; i++) {
-    if (i == 0) {
-      handComponents.push(<Hand key={i} cards={[]} x={450} y={400} />);
-      offset = -1;
-    } else {
-      handComponents.push(
-        <Hand key={i} cards={[]} x={positions[i + offset][0]} y={positions[i + offset][1]} />,
-      );
-    }
+  if (!hands.map(hand => hand.id).includes(townController.userID)) {
+    handComponents.push(<Hand key={handComponents.length} cards={[]} x={450} y={400} />);
+    offset = -1;
+  }
+  for (let i = handComponents.length; i < 5; i++) {
+    handComponents.push(
+      <Hand key={i} cards={[]} x={positions[i + offset][0]} y={positions[i + offset][1]} />,
+    );
   }
   return <Container>{handComponents}</Container>;
 }
@@ -230,16 +229,14 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
   const [players, setBlackjackPlayers] = useState<BlackjackPlayer[]>(controller.players);
   const [timestamp, setTimestamp] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [startGameText, setStartGameText] = useState<string>('Start Game');
 
   const toast = useToast();
 
   useEffect(() => {
-    console.log(controller.id);
-  });
-
-  useEffect(() => {
     const setNewDealerHand = (hand: BlackjackPlayer) => {
       setDealerHand(hand);
+      setStartGameText(hand.gameStatus == 'Waiting' ? 'Start Game' : 'Game In Progress');
     };
     controller.addListener('dealerChange', setNewDealerHand);
     return () => {
@@ -273,8 +270,6 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
       controller.removeListener('activeGameAlert', alertPlayer);
     };
   });
-
-  townController.emitGamingAreaUpdate(controller);
 
   return (
     <Box
@@ -341,13 +336,23 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
           setTimestamp(prevState => prevState + 1);
           townController.emitGamingAreaUpdate(controller);
         }}>
-        Start Game
+        {startGameText}
       </Button>
-      <Text top={30} left={700} position='absolute' color='white'>
-        Dealer Game Status: {dealer.gameStatus}
-      </Text>
       <Text top={550} left={375} position='absolute' color='white'>
-        Game Status: {players.find(x => x.id == townController.userID)?.gameStatus}
+        {(() => {
+          switch (players.find(x => x.id == townController.userID)?.gameStatus) {
+            case 'Won':
+              return 'You Win!';
+            case 'Lost':
+              return 'You Lost :C';
+            case 'Staying':
+              return 'Standing...';
+            case 'Waiting':
+              return 'Waiting to Start Game...';
+            default:
+              return '';
+          }
+        })()}
       </Text>
       <Hand cards={dealer.hand} x={450} y={100} />
       <Hands hands={players} />
@@ -407,7 +412,7 @@ export function BlackjackModal({ gamingArea }: { gamingArea: BlackjackArea }): J
       size='5xl'>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Blackjack!</ModalHeader>
+        <ModalHeader></ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Blackjack controller={gamingAreaController} />
