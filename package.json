@@ -4,6 +4,7 @@
     "description": "Development setup",
     "main": "index.js",
     "scripts": {
+        "test-blackjack": "cd townService && npm run test-blackjack",
         "test-blackjack-file": "cd townService/src/games/blackjack/blackjack && jest Blackjack.test.ts --forceExit",
         "install": "cd townService && CI= NODE_ENV=development npm install && CI= NODE_ENV=development npm run prestart && cd ../frontend && CI= NODE_ENV=development npm install && CI= NODE_ENV=development npm run prestart && cd ../shared && CI= NODE_ENV=development npm install",
         "heroku-postbuild": "cd townService && CI= NODE_ENV=development npm install && npm run build",
@@ -51,6 +52,7 @@
     },
     "dependencies": {
         "@types/ramda": "^0.27.34",
+        "firebase": "^9.14.0",
         "ramda": "^0.27.1",
         "typescript-is": "^0.17.0"
     },
