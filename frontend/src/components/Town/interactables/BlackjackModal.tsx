@@ -193,6 +193,7 @@ export function JoinLeaveButton({
   if (joinLeave) {
     return (
       <Button
+        data-testid='joinButton'
         size='sm'
         left='50px'
         top='50px'
@@ -210,6 +211,7 @@ export function JoinLeaveButton({
   } else {
     return (
       <Button
+        data-testid='leaveButton'
         size='sm'
         left='50px'
         top='50px'
