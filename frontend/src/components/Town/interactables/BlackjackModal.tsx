@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Box,
@@ -15,7 +16,7 @@ import {
   Text,
   useToast,
 } from '@chakra-ui/react';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
 import { useInteractable, useGamingAreaController } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
 import GamingAreaController from '../../../classes/GamingAreaController';
@@ -145,30 +146,70 @@ export function Hands({ hands }: { hands: BlackjackPlayer[] }) {
   const handComponents = hands.map((hand, index) => {
     if (hand.id == townController.userID) {
       offset = -1;
-      return <Hand cards={hand.hand} x={450} y={400} />;
+      return <Hand key={index} cards={hand.hand} x={450} y={400} />;
     } else {
       return (
-        <Hand cards={hand.hand} x={positions[index + offset][0]} y={positions[index + offset][1]} />
+        <Hand
+          key={index}
+          cards={hand.hand}
+          x={positions[index + offset][0]}
+          y={positions[index + offset][1]}
+        />
       );
     }
   });
-  for (let i = hands.length; i < 5; i++) {
-    if (i == 0) {
-      handComponents.push(<Hand cards={[]} x={450} y={400} />);
-      offset = -1;
-    } else {
-      handComponents.push(
-        <Hand cards={[]} x={positions[i + offset][0]} y={positions[i + offset][1]} />,
-      );
-    }
+  if (!hands.map(hand => hand.id).includes(townController.userID)) {
+    handComponents.push(<Hand key={handComponents.length} cards={[]} x={450} y={400} />);
+    offset = -1;
+  }
+  for (let i = handComponents.length; i < 5; i++) {
+    handComponents.push(
+      <Hand key={i} cards={[]} x={positions[i + offset][0]} y={positions[i + offset][1]} />,
+    );
   }
   return <Container>{handComponents}</Container>;
 }
 
-export function Chip({ chipValue, x, y }: { chipValue: number; x: number; y: number }) {
+export function Chip({
+  chipValue,
+  x,
+  y,
+  controller,
+  currBettingAmount,
+  setBettingAmount,
+  isPlaying,
+}: {
+  chipValue: number;
+  x: number;
+  y: number;
+  controller: GamingAreaController;
+  currBettingAmount: number;
+  setBettingAmount: Dispatch<SetStateAction<number>>;
+  isPlaying: boolean;
+}) {
+  const townController = useTownController();
+  const toast = useToast();
+
+  const updateBetting = () => {
+    if (isPlaying) {
+      const newBetValue: number = chipValue + currBettingAmount;
+      setBettingAmount(newBetValue);
+      townController.emitGamingAreaUpdate(controller);
+    } else {
+      const alert = 'Cannot place a bet before joining game!';
+      toast({
+        title: alert,
+        status: 'error',
+        duration: 2000,
+        isClosable: false,
+      });
+    }
+  };
+
   const chip = `assets/blackjack/chips/chip_${chipValue}.png`;
   return (
     <IconButton
+      onClick={updateBetting}
       variant='ghost'
       position='absolute'
       colorScheme='ghost'
@@ -188,9 +229,7 @@ export function JoinLeaveButton({
   joinLeaveFunc: () => boolean;
   isPlaying: boolean;
 }) {
-  const [joinLeave, setJoinLeave] = useState<boolean>(!isPlaying);
-
-  if (joinLeave) {
+  if (!isPlaying) {
     return (
       <Button
         data-testid='joinButton'
@@ -200,10 +239,7 @@ export function JoinLeaveButton({
         colorScheme='gray'
         position='absolute'
         onClick={() => {
-          const success = joinLeaveFunc();
-          if (success) {
-            setJoinLeave(false);
-          }
+          joinLeaveFunc();
         }}>
         Join
       </Button>
@@ -218,10 +254,7 @@ export function JoinLeaveButton({
         colorScheme='gray'
         position='absolute'
         onClick={() => {
-          const success = joinLeaveFunc();
-          if (success) {
-            setJoinLeave(true);
-          }
+          joinLeaveFunc();
         }}>
         Leave
       </Button>
@@ -233,17 +266,17 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
   const townController = useTownController();
   const [dealer, setDealerHand] = useState<BlackjackPlayer>(controller.dealer);
   const [players, setBlackjackPlayers] = useState<BlackjackPlayer[]>(controller.players);
-  const [gameStatus, setGameStatus] = useState<string>(controller.gameStatus);
+  const [timestamp, setTimestamp] = useState<number>(0);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [startGameText, setStartGameText] = useState<string>('Start Game');
+  const [bettingAmount, setBettingAmount] = useState<number>(controller.bettingAmount);
 
   const toast = useToast();
 
   useEffect(() => {
-    console.log(controller.id);
-  });
-
-  useEffect(() => {
     const setNewDealerHand = (hand: BlackjackPlayer) => {
       setDealerHand(hand);
+      setStartGameText(hand.gameStatus == 'Waiting' ? 'Start Game' : 'Game In Progress');
     };
     controller.addListener('dealerChange', setNewDealerHand);
     return () => {
@@ -254,6 +287,7 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
   useEffect(() => {
     const setNewBlackjackPlayers = (hands: BlackjackPlayer[]) => {
       setBlackjackPlayers(hands);
+      setIsPlaying(hands.map(hand => hand.id).includes(townController.userID));
     };
     controller.addListener('playersChange', setNewBlackjackPlayers);
     return () => {
@@ -262,20 +296,8 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
   }, [controller, townController]);
 
   useEffect(() => {
-    const setNewGameStatus = (status: string) => {
-      setGameStatus(status);
-    };
-    controller.addListener('gameStatusChange', setNewGameStatus);
-    return () => {
-      controller.removeListener('gameStatusChange', setNewGameStatus);
-    };
-  }, [controller, townController]);
-
-  useEffect(() => {
-    const alertPlayer = (isPlaying: boolean) => {
-      const alert = isPlaying
-        ? "Can't join an active game!"
-        : "Can't leave a game you have started!";
+    const alertPlayer = (playing: boolean) => {
+      const alert = playing ? "Can't join an active game!" : "Can't leave a game you have started!";
       toast({
         title: alert,
         status: 'error',
@@ -288,8 +310,6 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
       controller.removeListener('activeGameAlert', alertPlayer);
     };
   });
-
-  townController.emitGamingAreaUpdate(controller);
 
   return (
     <Box
@@ -305,7 +325,7 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
           townController.emitGamingAreaUpdate(controller);
           return success;
         }}
-        isPlaying={players.map(player => player.id).includes(townController.userID)}
+        isPlaying={isPlaying}
       />
       <Button
         size='sm'
@@ -314,31 +334,113 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
         colorScheme='gray'
         position='relative'
         onClick={() => {
+          controller.update = {
+            id: townController.userID,
+            action: 'Hit',
+            timestamp: timestamp + '',
+          };
+          setTimestamp(prevState => prevState + 1);
           townController.emitGamingAreaUpdate(controller);
         }}>
         Hit
       </Button>
-      <Button size='sm' left='240px' top='500px' colorScheme='gray' position='relative'>
+      <Button
+        size='sm'
+        left='240px'
+        top='500px'
+        colorScheme='gray'
+        position='relative'
+        onClick={() => {
+          controller.update = {
+            id: townController.userID,
+            action: 'Stay',
+            timestamp: timestamp + '',
+          };
+          setTimestamp(prevState => prevState + 1);
+          townController.emitGamingAreaUpdate(controller);
+        }}>
         Stand
       </Button>
-      {/*<Hand
-        cards={[
-          { value: '7', suit: 'Clubs' },
-          { value: 'A', suit: 'Spades' },
-        ]}
-        x={450}
-        y={400}
-      />*/}
-      <Text top={30} left={700} position='absolute' color='white'>
-        Game Status: {gameStatus}
+      <Button
+        size='sm'
+        left='120px'
+        top='50px'
+        colorScheme='gray'
+        position='absolute'
+        onClick={() => {
+          controller.update = {
+            id: townController.userID,
+            action: 'Start',
+            timestamp: timestamp + '',
+          };
+          setTimestamp(prevState => prevState + 1);
+          townController.emitGamingAreaUpdate(controller);
+        }}>
+        {startGameText}
+      </Button>
+      <Text top={550} left={375} position='absolute' color='white'>
+        {(() => {
+          switch (players.find(x => x.id == townController.userID)?.gameStatus) {
+            case 'Won':
+              return 'You Win!';
+            case 'Lost':
+              return 'You Lost :C';
+            case 'Staying':
+              return 'Standing...';
+            case 'Waiting':
+              return 'Waiting to Start Game...';
+            default:
+              return '';
+          }
+        })()}
       </Text>
       <Hand cards={dealer.hand} x={450} y={100} />
       <Hands hands={players} />
-      <Chip chipValue={1} x={600} y={480} />
-      <Chip chipValue={5} x={650} y={480} />
-      <Chip chipValue={25} x={700} y={480} />
-      <Chip chipValue={100} x={750} y={480} />
-      <Chip chipValue={500} x={800} y={480} />
+      <Chip
+        chipValue={1}
+        x={600}
+        y={480}
+        controller={controller}
+        currBettingAmount={bettingAmount}
+        setBettingAmount={setBettingAmount}
+        isPlaying={players.map(player => player.id).includes(townController.userID)}
+      />
+      <Chip
+        chipValue={5}
+        x={650}
+        y={480}
+        controller={controller}
+        currBettingAmount={bettingAmount}
+        setBettingAmount={setBettingAmount}
+        isPlaying={players.map(player => player.id).includes(townController.userID)}
+      />
+      <Chip
+        chipValue={25}
+        x={700}
+        y={480}
+        controller={controller}
+        currBettingAmount={bettingAmount}
+        setBettingAmount={setBettingAmount}
+        isPlaying={players.map(player => player.id).includes(townController.userID)}
+      />
+      <Chip
+        chipValue={100}
+        x={750}
+        y={480}
+        controller={controller}
+        currBettingAmount={bettingAmount}
+        setBettingAmount={setBettingAmount}
+        isPlaying={players.map(player => player.id).includes(townController.userID)}
+      />
+      <Chip
+        chipValue={500}
+        x={800}
+        y={480}
+        controller={controller}
+        currBettingAmount={bettingAmount}
+        setBettingAmount={setBettingAmount}
+        isPlaying={players.map(player => player.id).includes(townController.userID)}
+      />
       <Text as='b' fontSize='md' left='615px' top='450px' position='absolute'>
         1
       </Text>
@@ -354,8 +456,23 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
       <Text as='b' fontSize='md' left='805px' top='450px' position='absolute'>
         500
       </Text>
-      <Button size='sm' left='697px' top='535px' colorScheme='gray' position='absolute'>
+      <Text as='b' fontSize='md' left='600px' top='400px' position='absolute'>
+        Betting Amount: {bettingAmount}
+      </Text>
+      <Button size='sm' left='660px' top='535px' colorScheme='gray' position='absolute'>
         Bet
+      </Button>
+      <Button
+        size='sm'
+        left='730px'
+        top='535px'
+        colorScheme='gray'
+        position='absolute'
+        onClick={() => {
+          setBettingAmount(0);
+          townController.emitGamingAreaUpdate(controller);
+        }}>
+        Clear
       </Button>
     </Box>
   );
@@ -390,7 +507,7 @@ export function BlackjackModal({ gamingArea }: { gamingArea: BlackjackArea }): J
       size='5xl'>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Blackjack!</ModalHeader>
+        <ModalHeader></ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Blackjack controller={gamingAreaController} />

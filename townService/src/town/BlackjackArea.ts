@@ -5,6 +5,7 @@ import {
   BlackjackArea as GamingAreaModel,
   PlayingCard,
   BlackjackPlayer,
+  BlackjackUpdate,
 } from '../types/CoveyTownSocket';
 import InteractableArea from './InteractableArea';
 // eslint-disable-next-line import/no-cycle
@@ -21,9 +22,19 @@ export default class BlackjackArea extends InteractableArea {
 
   private _players: BlackjackPlayer[];
 
-  private _gameStatus: string;
+  private _lastUpdate: BlackjackUpdate | undefined;
 
+  // an instance of the current blackjack game
   private _game: BlackJack;
+
+  // time each player has in seconds
+  private _timer = 20;
+
+  // id of each player's timeout
+  private _timeoutIds: Map<string, NodeJS.Timeout>;
+
+  // tells whether a player timed out recently
+  private _timedOut: Map<string, boolean>;
 
   public get dealer() {
     return this._dealer;
@@ -33,10 +44,6 @@ export default class BlackjackArea extends InteractableArea {
     return this._players;
   }
 
-  public get gameStatus() {
-    return this._gameStatus;
-  }
-
   /**
    * Creates a new GamingArea
    * @param gamingArea represents a gamingArea with id, dealer, and players
@@ -44,17 +51,19 @@ export default class BlackjackArea extends InteractableArea {
    * @param townEmitter a broadcast emitter that can be used to emit updates to players
    */
   public constructor(
-    { id, dealer, players, gameStatus }: GamingAreaModel,
+    { id, dealer, players, update }: GamingAreaModel,
     coordinates: BoundingBox,
     townEmitter: TownEmitter,
   ) {
     super(id, coordinates, townEmitter);
     this._dealer = dealer;
     this._players = players;
-    this._gameStatus = gameStatus;
+    this._lastUpdate = update;
     const dealerProper = new DealerPlayer(GameStatus.Waiting, dealer.id);
     const playersProper = players.map(player => new HumanPlayer(GameStatus.Waiting, player.id));
     this._game = new BlackJack(playersProper, dealerProper, this);
+    this._timeoutIds = new Map<string, NodeJS.Timeout>();
+    this._timedOut = new Map<string, boolean>();
   }
 
   /**
@@ -62,28 +71,54 @@ export default class BlackjackArea extends InteractableArea {
    *
    * @param gamingArea updated model
    */
-  public updateModel({ dealer, players, gameStatus }: GamingAreaModel) {
-    // console.log('updateModelCalled');
+  public updateModel({ dealer, players, update }: GamingAreaModel) {
     this._dealer = dealer;
-    let startGame = false;
-    if (this._players.length === 0 && players.length > 0) {
-      startGame = true;
-    }
+    let newUpdate = false;
     this._players = players;
-    this._gameStatus = gameStatus;
-    // NOTE: please change to support more players / keeping track of game is active
+    if (
+      this._lastUpdate?.action !== update?.action ||
+      this._lastUpdate?.id !== update?.id ||
+      this._lastUpdate?.timestamp !== update?.timestamp
+    ) {
+      newUpdate = true;
+    }
+    this._lastUpdate = update;
     this._players.forEach(playerHand => {
-      if (playerHand.hand.length === 0 && this._game.dealer.status !== GameStatus.Playing) {
-        // TODO: Figure out correct status here
-        this._game.addPlayer(new HumanPlayer(GameStatus.Waiting, playerHand.id));
-        // console.log(`added ${playerHand.id}`);
-      } else {
-        // console.log('trying to join an existing game');
-        // NOTE: send some alert to the player somehow
+      if (
+        newUpdate &&
+        update !== undefined &&
+        update.action !== 'Start' &&
+        playerHand.id === update.id &&
+        playerHand.gameStatus === 'Playing'
+      ) {
+        this._game.advanceGame(playerHand.id, HumanPlayer.parseNextMove(update.action));
+        if (update.action === 'Stay') {
+          this._timedOut.set(playerHand.id, false);
+          clearTimeout(this._timeoutIds.get(playerHand.id));
+        }
       }
     });
-    if (startGame) {
-      this._game.playGame();
+
+    if (
+      newUpdate &&
+      update?.action === 'Start' &&
+      this.dealer.gameStatus === 'Waiting' &&
+      this._players.length > 0 &&
+      this._players.map(p => p.id).includes(update.id)
+    ) {
+      this._players.forEach(playerHand => {
+        if (!this._game.players.map(p => p.id).includes(playerHand.id)) {
+          this._game.addPlayer(new HumanPlayer(GameStatus.Waiting, playerHand.id));
+        }
+        this._timeoutIds.set(
+          playerHand.id,
+          setTimeout(() => {
+            this._timedOut.set(playerHand.id, true);
+            this._game.advanceGame(playerHand.id, HumanPlayer.parseNextMove('Stay'));
+          }, this._timer * 1000),
+        );
+      });
+      this._game.startGame();
     }
   }
 
@@ -94,10 +129,34 @@ export default class BlackjackArea extends InteractableArea {
    * @param dealer the dealer player
    * @param players the human players
    */
-  public updateFromBlackjack(dealer: DealerPlayer, players: HumanPlayer[], status: string) {
-    this._dealer = { id: dealer.id, hand: BlackjackArea.handToListOfPlayingCards(dealer.hand) };
+  public updateFromBlackjack(dealer: DealerPlayer, players: HumanPlayer[]) {
+    this._dealer = {
+      id: dealer.id,
+      hand: BlackjackArea.handToListOfPlayingCards(dealer.hand),
+      gameStatus: GameStatus[dealer.status],
+    };
     this._players = BlackjackArea.playersToBlackjackPlayers(players);
-    this._gameStatus = status;
+    if (dealer.status !== GameStatus.Waiting && dealer.status !== GameStatus.Playing) {
+      setTimeout(() => {
+        this.endGame();
+      }, 5000);
+    }
+    this._emitAreaChanged();
+  }
+
+  public endGame() {
+    this._players.forEach(p => {
+      p.gameStatus = 'Waiting';
+      p.hand = [];
+    });
+    this._players = this._players.filter(p => !this._timedOut.get(p.id));
+    this._dealer = { id: '0', hand: [], gameStatus: 'Waiting' };
+    const dealerProper = new DealerPlayer(GameStatus.Waiting, this._dealer.id);
+    const playersProper = this._players.map(
+      player => new HumanPlayer(GameStatus.Waiting, player.id),
+    );
+    this._game = new BlackJack(playersProper, dealerProper, this);
+    this._timedOut = new Map<string, boolean>();
     this._emitAreaChanged();
   }
 
@@ -190,6 +249,7 @@ export default class BlackjackArea extends InteractableArea {
       players.push({
         hand: BlackjackArea.handToListOfPlayingCards(newPlayer.hand),
         id: newPlayer.id,
+        gameStatus: GameStatus[newPlayer.status],
       });
     });
     return players;
@@ -204,7 +264,8 @@ export default class BlackjackArea extends InteractableArea {
       id: this.id,
       dealer: this._dealer,
       players: this._players,
-      gameStatus: this._gameStatus,
+      update: this._lastUpdate,
+      bettingAmount: 0,
     };
   }
 
@@ -219,11 +280,11 @@ export default class BlackjackArea extends InteractableArea {
     if (!width || !height) {
       throw new Error(`Malformed viewing area ${name}`);
     }
-    const dealer: BlackjackPlayer = { id: '0', hand: [] };
+    const dealer: BlackjackPlayer = { id: '0', hand: [], gameStatus: 'Waiting' };
     const players: BlackjackPlayer[] = [];
     const rect: BoundingBox = { x: mapObject.x, y: mapObject.y, width, height };
     return new BlackjackArea(
-      { id: name, players, dealer, gameStatus: 'Waiting' },
+      { id: name, players, dealer, update: undefined, bettingAmount: 0 },
       rect,
       townEmitter,
     );

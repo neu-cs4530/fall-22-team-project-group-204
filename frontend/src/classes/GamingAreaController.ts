@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import TypedEventEmitter from 'typed-emitter';
-import { BlackjackArea } from '../types/CoveyTownSocket';
+import { BlackjackArea, BlackjackUpdate } from '../types/CoveyTownSocket';
 import { BlackjackPlayer } from '../types/CoveyTownSocket';
 import _ from 'lodash';
 
@@ -11,6 +11,8 @@ export type GamingAreaEvents = {
   dealerChange: (dealer: BlackjackPlayer) => void;
   playersChange: (players: BlackjackPlayer[]) => void;
   gameStatusChange: (gameStatus: string) => void;
+  bettingAmountChange: (bettingAmount: number) => void;
+  updateChange: (update: BlackjackUpdate | undefined) => void;
   activeGameAlert: (isPlaying: boolean) => void;
 };
 
@@ -53,7 +55,8 @@ export default class GamingAreaController extends (EventEmitter as new () => Typ
   public set dealer(dealer: BlackjackPlayer) {
     if (
       dealer.hand.length !== this.dealer.hand.length ||
-      _.xor(dealer.hand, this.dealer.hand).length > 0
+      _.xor(dealer.hand, this.dealer.hand).length > 0 ||
+      dealer.gameStatus != this.dealer.gameStatus
     ) {
       this._model.dealer = dealer;
       this.emit('dealerChange', this.dealer);
@@ -78,19 +81,36 @@ export default class GamingAreaController extends (EventEmitter as new () => Typ
   }
 
   /**
-   * Returns the game's status
+   * Returns the last update
    */
-  public get gameStatus() {
-    return this._model.gameStatus;
+  public get update() {
+    return this._model.update;
   }
 
   /**
-   * Sets the game's status
+   * Sets a new update for the Blackjack class
    */
-  public set gameStatus(gameStatus: string) {
-    if (this.gameStatus != gameStatus) {
-      this._model.gameStatus = gameStatus;
-      this.emit('gameStatusChange', this.gameStatus);
+  public set update(update: BlackjackUpdate | undefined) {
+    if (this.update != update) {
+      this._model.update = update;
+      this.emit('updateChange', this.update);
+    }
+  }
+
+  /**
+   * Returns the players' betting amount
+   */
+  public get bettingAmount() {
+    return this._model.bettingAmount;
+  }
+
+  /**
+   * Sets the players' betting amount
+   */
+  public set bettingAmount(bettingAmount: number) {
+    if (this.bettingAmount != bettingAmount) {
+      this._model.bettingAmount = bettingAmount;
+      this.emit('bettingAmountChange', this.bettingAmount);
     }
   }
 
@@ -103,25 +123,21 @@ export default class GamingAreaController extends (EventEmitter as new () => Typ
   public toggleJoinGame(playerId: string): boolean {
     const player = this.players.find(playerHand => playerHand.id === playerId);
     if (!player) {
-      if (this.gameStatus === 'Playing') {
+      if (this.dealer.gameStatus === 'Playing') {
         this.emit('activeGameAlert', true);
-        console.log('activeGameAlert');
         return false;
       } else {
-        this.players.push({ id: playerId, hand: [] });
+        this.players.push({ id: playerId, hand: [], gameStatus: 'Waiting' });
         this.emit('playersChange', this.players);
-        console.log('playersChange');
         return true;
       }
     } else {
-      if (this.gameStatus === 'Playing') {
+      if (this.dealer.gameStatus === 'Playing') {
         this.emit('activeGameAlert', false);
-        console.log('activeGameAlert');
         return false;
       } else {
         this.players = this.players.filter(playerHand => playerHand.id !== playerId);
         this.emit('playersChange', this.players);
-        console.log('playersChange');
         return true;
       }
     }
@@ -136,7 +152,7 @@ export default class GamingAreaController extends (EventEmitter as new () => Typ
   public updateFrom(updatedModel: BlackjackArea): void {
     this.players = updatedModel.players;
     this.dealer = updatedModel.dealer;
-    this.gameStatus = updatedModel.gameStatus;
+    this.update = updatedModel.update;
   }
 
   /**

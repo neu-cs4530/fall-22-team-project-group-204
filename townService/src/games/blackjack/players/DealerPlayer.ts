@@ -103,6 +103,7 @@ export default class DealerPlayer extends HumanPlayer {
         throw new Error('');
       }
       player.hand = new Hand(this._getStarterHand());
+      if (player.getMaxScore() === 21) player.status = GameStatus.Won;
     });
 
     this.hand.cards = this._getStarterHand(false);
@@ -159,7 +160,7 @@ export default class DealerPlayer extends HumanPlayer {
   ): PlayerStatusUpdateType {
     if (player.has21()) {
       player.status = GameStatus.Won;
-      this._setEveryoneElseToLost(otherPlayers);
+      // this._setEveryoneElseToLost(otherPlayers);
       return PlayerStatusUpdateType.UpdatedToWon;
     }
     if (otherPlayers.every(p => p.status === GameStatus.Lost) && super.status === GameStatus.Lost) {
@@ -219,6 +220,68 @@ export default class DealerPlayer extends HumanPlayer {
       return true;
     }
     return false;
+  }
+
+  public advanceGame(players: HumanPlayer[], playerId: string, action: BlackjackAction): void {
+    if (!players || players.length === 0) {
+      throw new Error("Can't play Blackjack with 0 people!");
+    }
+
+    const player = players.find(p => p.id === playerId);
+    const otherPlayers = players.filter(p => p !== player);
+    if (!player) {
+      throw new Error("This is not a valid player's id!");
+    }
+
+    let playerUpdateStatus = this._updatePlayerStatusAndReport(player, otherPlayers);
+    const wonLost = [PlayerStatusUpdateType.UpdatedToLost, PlayerStatusUpdateType.UpdatedToWon];
+    if (wonLost.includes(playerUpdateStatus)) {
+      return;
+    }
+    if (player.status === GameStatus.Staying) {
+      return;
+    }
+
+    if (action === BlackjackAction.Hit) {
+      player.addCard(this._popCard());
+    } else if (action === BlackjackAction.Stay) {
+      player.status = GameStatus.Staying;
+    }
+    playerUpdateStatus = this._updatePlayerStatusAndReport(player, otherPlayers);
+    const allRemainingDone = players.reduce(
+      (a, b) =>
+        (b.status === GameStatus.Staying ||
+          b.status === GameStatus.Lost ||
+          b.status === GameStatus.Won) &&
+        a,
+      true,
+    );
+    if (allRemainingDone) {
+      if (super.hasBusted()) {
+        this.status = GameStatus.Lost;
+      }
+
+      this.hand.cards[0][1] = true;
+      while (this._willHit()) {
+        super.addCard(this._popCard());
+      }
+
+      const dealerScore = super.getMaxScore();
+      const maxPlayerScore = Math.max(...players.map(p => p.getMaxScore()));
+      if (super.has21() || dealerScore > maxPlayerScore) {
+        this.status = GameStatus.Won;
+        this._setEveryoneElseToLost(players, true);
+      } else {
+        this.status = GameStatus.Lost;
+        players.forEach(p => {
+          if (p.getMaxScore() > dealerScore) {
+            p.status = GameStatus.Won;
+          } else {
+            p.status = GameStatus.Lost;
+          }
+        });
+      }
+    }
   }
 
   public async doTurns(players: HumanPlayer[]): Promise<void> {

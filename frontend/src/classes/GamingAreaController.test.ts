@@ -1,6 +1,6 @@
 import { mock, mockClear, MockProxy } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
-import { BlackjackArea, BlackjackPlayer, PlayingCard } from '../generated/client';
+import { BlackjackArea, BlackjackPlayer } from '../generated/client';
 import TownController from './TownController';
 import GamingAreaController, { GamingAreaEvents } from './GamingAreaController';
 
@@ -13,9 +13,10 @@ describe('GamingAreaController', () => {
   beforeEach(() => {
     testAreaModel = {
       id: nanoid(),
-      dealer: { id: '0', hand: [] },
+      dealer: { id: '0', hand: [], gameStatus: 'Waiting' },
       players: [],
-      gameStatus: 'Waiting',
+      update: undefined,
+      bettingAmount: 0,
     };
     testArea = new GamingAreaController(testAreaModel);
     mockClear(townController);
@@ -23,20 +24,26 @@ describe('GamingAreaController', () => {
     mockClear(mockListeners.playersChange);
     mockClear(mockListeners.gameStatusChange);
     mockClear(mockListeners.activeGameAlert);
+    mockClear(mockListeners.updateChange);
     testArea.addListener('dealerChange', mockListeners.dealerChange);
     testArea.addListener('playersChange', mockListeners.playersChange);
     testArea.addListener('gameStatusChange', mockListeners.gameStatusChange);
     testArea.addListener('activeGameAlert', mockListeners.activeGameAlert);
+    testArea.addListener('updateChange', mockListeners.updateChange);
   });
   describe('Setting dealer property', () => {
     it('updates the property and emits a dealerChange event if the property changes', () => {
-      const newDealerHand = { id: '0', hand: [{ value: 'Ace', suit: 'Spades', faceUp: true }] };
+      const newDealerHand = {
+        id: '0',
+        hand: [{ value: 'Ace', suit: 'Spades', faceUp: true }],
+        gameStatus: 'Waiting',
+      };
       testArea.dealer = newDealerHand;
       expect(mockListeners.dealerChange).toBeCalledWith(newDealerHand);
       expect(testArea.dealer).toEqual(newDealerHand);
     });
     it('does not emit a dealerChange event if the dealer property does not change', () => {
-      const newDealerHand: BlackjackPlayer = { id: '0', hand: [] };
+      const newDealerHand: BlackjackPlayer = { id: '0', hand: [], gameStatus: 'Waiting' };
       testArea.dealer = newDealerHand;
       expect(mockListeners.dealerChange).not.toBeCalled();
     });
@@ -44,7 +51,11 @@ describe('GamingAreaController', () => {
   describe('Setting players property', () => {
     it('updates the model and emits a playersChange event if the property changes', () => {
       const newBlackjackPlayers = [
-        { id: 'player1', hand: [{ value: 'Ace', suit: 'Spades', faceUp: true }] },
+        {
+          id: 'player1',
+          hand: [{ value: 'Ace', suit: 'Spades', faceUp: true }],
+          gameStatus: 'Waiting',
+        },
       ];
       testArea.players = newBlackjackPlayers;
       expect(mockListeners.playersChange).toBeCalledWith(newBlackjackPlayers);
@@ -56,17 +67,17 @@ describe('GamingAreaController', () => {
       expect(mockListeners.playersChange).not.toBeCalled();
     });
   });
-  describe('Setting gameStatus property', () => {
-    it('updates the model and emits a gameStatusChange event if the property changes', () => {
-      const newValue = 'Playing';
-      testArea.gameStatus = newValue;
-      expect(mockListeners.gameStatusChange).toBeCalledWith(newValue);
-      expect(testArea.gameStatus).toEqual(newValue);
+  describe('Setting update property', () => {
+    it('updates the model and emits a updateChange event if the property changes', () => {
+      const newValue = { id: '1', action: 'Hit', timestamp: 'N/A' };
+      testArea.update = newValue;
+      expect(mockListeners.updateChange).toBeCalledWith(newValue);
+      expect(testArea.update).toEqual(newValue);
     });
-    it('does not emit a gameStatusChange event if the gameStatus property does not change', () => {
-      const existingValue = testAreaModel.gameStatus;
-      testArea.gameStatus = existingValue;
-      expect(mockListeners.gameStatusChange).not.toBeCalled();
+    it('does not emit a updateChange event if the update property does not change', () => {
+      const existingValue = testAreaModel.update;
+      testArea.update = existingValue;
+      expect(mockListeners.updateChange).not.toBeCalled();
     });
   });
   describe('gamingAreaModel', () => {
@@ -76,28 +87,49 @@ describe('GamingAreaController', () => {
     });
   });
   describe('updateFrom', () => {
-    it('Updates the isPlaying, elapsedTimeSec and video properties', () => {
+    it('Updates the dealer, players, gameStatus, and update', () => {
       const newModel: BlackjackArea = {
         id: testAreaModel.id,
-        dealer: { id: '0', hand: [{ value: 'Ace', suit: 'Spades', faceUp: true }] },
-        players: [{ id: 'player1', hand: [{ value: 'Ace', suit: 'Spades', faceUp: true }] }],
-        gameStatus: 'Playing',
+        dealer: {
+          id: '0',
+          hand: [{ value: 'Ace', suit: 'Spades', faceUp: true }],
+          gameStatus: 'Waiting',
+        },
+        players: [
+          {
+            id: 'player1',
+            hand: [{ value: 'Ace', suit: 'Spades', faceUp: true }],
+            gameStatus: 'Waiting',
+          },
+        ],
+        update: { id: '1', action: 'Hit', timestamp: 'N/A' },
+        bettingAmount: 0,
       };
       testArea.updateFrom(newModel);
       expect(testArea.dealer).toEqual(newModel.dealer);
       expect(testArea.players).toEqual(newModel.players);
-      expect(testArea.gameStatus).toEqual(newModel.gameStatus);
+      expect(testArea.update).toEqual(newModel.update);
       expect(mockListeners.dealerChange).toBeCalledWith(newModel.dealer);
       expect(mockListeners.playersChange).toBeCalledWith(newModel.players);
-      expect(mockListeners.gameStatusChange).toBeCalledWith(newModel.gameStatus);
+      expect(mockListeners.updateChange).toBeCalledWith(newModel.update);
     });
     it('Does not update the id property', () => {
       const existingID = testArea.id;
       const newModel: BlackjackArea = {
         id: nanoid(),
-        dealer: { id: '0', hand: [{ value: 'Ace', suit: 'Spades', faceUp: true }] },
-        players: [{ id: 'player1', hand: [{ value: 'Ace', suit: 'Spades', faceUp: true }] }],
-        gameStatus: 'Playing',
+        dealer: {
+          id: '0',
+          hand: [{ value: 'Ace', suit: 'Spades', faceUp: true }],
+          gameStatus: 'Waiting',
+        },
+        players: [
+          {
+            id: 'player1',
+            hand: [{ value: 'Ace', suit: 'Spades', faceUp: true }],
+            gameStatus: 'Waiting',
+          },
+        ],
+        bettingAmount: 0,
       };
       testArea.updateFrom(newModel);
       expect(testArea.id).toEqual(existingID);
