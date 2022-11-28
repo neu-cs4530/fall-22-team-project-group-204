@@ -4,7 +4,7 @@ import { BroadcastOperator } from 'socket.io';
 import IVideoClient from '../lib/IVideoClient';
 import Player from '../lib/Player';
 import TwilioVideo from '../lib/TwilioVideo';
-import { isGamingArea, isViewingArea } from '../TestUtils';
+import { isBlackjackArea, isViewingArea } from '../TestUtils';
 import {
   ChatMessage,
   ConversationArea as ConversationAreaModel,
@@ -14,12 +14,12 @@ import {
   ServerToClientEvents,
   SocketData,
   ViewingArea as ViewingAreaModel,
-  GamingArea as GamingAreaModel,
+  BlackjackArea as GamingAreaModel,
 } from '../types/CoveyTownSocket';
 import ConversationArea from './ConversationArea';
 import InteractableArea from './InteractableArea';
 import ViewingArea from './ViewingArea';
-import GamingArea from './GamingArea';
+import BlackjackArea from './BlackjackArea';
 
 /**
  * The Town class implements the logic for each town: managing the various events that
@@ -142,9 +142,12 @@ export default class Town {
     });
 
     // Set up a listener to process updates to interactables.
-    // Currently only knows how to process updates for ViewingArea's, and
+    // Currently only knows how to process updates for ViewingAreas and GamingAreas, and
     // ignores any other updates for any other kind of interactable.
-    // For ViewingArea's: dispatches an updateModel call to the viewingArea that
+    // For ViewingAreas: dispatches an updateModel call to the viewingArea that
+    // corresponds to the interactable being updated. Does not throw an error if
+    // the specified viewing area does not exist.
+    // For GamingAreas: dispatches an updateModel call to the BlackjackArea that
     // corresponds to the interactable being updated. Does not throw an error if
     // the specified viewing area does not exist.
     socket.on('interactableUpdate', (update: Interactable) => {
@@ -157,13 +160,13 @@ export default class Town {
           (viewingArea as ViewingArea).updateModel(update);
         }
       }
-      if (isGamingArea(update)) {
+      if (isBlackjackArea(update)) {
         newPlayer.townEmitter.emit('interactableUpdate', update);
         const gamingArea = this._interactables.find(
           eachInteractable => eachInteractable.id === update.id,
         );
         if (gamingArea) {
-          (gamingArea as GamingArea).updateModel(update);
+          (gamingArea as BlackjackArea).updateModel(update);
         }
       }
     });
@@ -298,7 +301,7 @@ export default class Town {
    * Creates a new gaming area in this town if there is not currently an active
    * gaming area with the same ID. The gaming area ID must match the name of a
    * gaming area that exists in this town's map, and the gaming area must not
-   * already have a dealerHand or playerHands
+   * already have a dealer or players
    *
    * If successful creating the gaming area, this method:
    *    Adds any players who are in the region defined by the gaming area to it
@@ -311,9 +314,11 @@ export default class Town {
    * gaming area with the specified ID or if there is already an active gaming area
    * with the specified ID or if there is no video URL specified
    */
-  public addGamingArea(gamingArea: GamingAreaModel): boolean {
-    const area = this._interactables.find(eachArea => eachArea.id === gamingArea.id) as GamingArea;
-    if (!area || area.playerHands || area.dealerHand) {
+  public addBlackjackArea(gamingArea: GamingAreaModel): boolean {
+    const area = this._interactables.find(
+      eachArea => eachArea.id === gamingArea.id,
+    ) as BlackjackArea;
+    if (!area || area.players || area.dealer) {
       return false;
     }
     area.updateModel(gamingArea);
@@ -394,7 +399,7 @@ export default class Town {
     const gamingAreas = objectLayer.objects
       .filter(eachObject => eachObject.type === 'GamingArea')
       .map(eachGamingAreaObj =>
-        GamingArea.fromMapObject(eachGamingAreaObj, this._broadcastEmitter),
+        BlackjackArea.fromMapObject(eachGamingAreaObj, this._broadcastEmitter),
       );
 
     this._interactables = this._interactables

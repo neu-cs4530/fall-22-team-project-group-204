@@ -1,27 +1,23 @@
 import { EventEmitter } from 'events';
 import TypedEventEmitter from 'typed-emitter';
-import { GamingArea, PlayerHand, PlayingCard } from '../types/CoveyTownSocket';
+import { BlackjackArea, BlackjackUpdate } from '../types/CoveyTownSocket';
+import { BlackjackPlayer } from '../types/CoveyTownSocket';
+import _ from 'lodash';
 
 /**
  * The events that a GamingAreaController can emit
  */
 export type GamingAreaEvents = {
-  /**
-   * A cardUpdateChange indicates whether a player chooses to hit or stay. The back end should
-   * confirm whether the player provided is currently playing, and update the game's status
-   * dependant on whether the player hit (true) or stayed (false)
-   */
-  cardUpdateChange: (playerId: string, hit: boolean) => void;
-
-  dealerHandChange: (dealerHand: PlayingCard[]) => void;
-  playerHandsChange: (playerHands: PlayerHand[]) => void;
+  dealerChange: (dealer: BlackjackPlayer) => void;
+  playersChange: (players: BlackjackPlayer[]) => void;
   gameStatusChange: (gameStatus: string) => void;
   bettingAmountChange: (bettingAmount: number) => void;
+  updateChange: (update: BlackjackUpdate | undefined) => void;
   activeGameAlert: (isPlaying: boolean) => void;
 };
 
 /**
- * A GamingAreaController manages the state for a GamingArea in the frontend app, serving as a bridge between the
+ * A GamingAreaController manages the state for a BlackjackArea in the frontend app, serving as a bridge between the
  * blackjack game on the player's browser and the backend representation of the game, ensuring that all players
  * are experiencing the same game state
  *
@@ -29,12 +25,12 @@ export type GamingAreaEvents = {
  * emits updates when the state is updated, @see GamingAreaEvents
  */
 export default class GamingAreaController extends (EventEmitter as new () => TypedEventEmitter<GamingAreaEvents>) {
-  private _model: GamingArea;
+  private _model: BlackjackArea;
 
   /**
    * Constructs a new GamingAreaController
    */
-  constructor(model: GamingArea) {
+  constructor(model: BlackjackArea) {
     super();
     this._model = model;
   }
@@ -49,51 +45,55 @@ export default class GamingAreaController extends (EventEmitter as new () => Typ
   /**
    * Returns a list of PlayingCards in the dealer's hand
    */
-  public get dealerHand() {
-    return this._model.dealerHand;
+  public get dealer() {
+    return this._model.dealer;
   }
 
   /**
    * Sets the dealer's hand
    */
-  public set dealerHand(dealerHand: PlayingCard[]) {
-    if (this.dealerHand != dealerHand) {
-      this._model.dealerHand = dealerHand;
-      this.emit('dealerHandChange', this.dealerHand);
+  public set dealer(dealer: BlackjackPlayer) {
+    if (
+      dealer.hand.length !== this.dealer.hand.length ||
+      _.xor(dealer.hand, this.dealer.hand).length > 0 ||
+      dealer.gameStatus != this.dealer.gameStatus
+    ) {
+      this._model.dealer = dealer;
+      this.emit('dealerChange', this.dealer);
     }
   }
 
   /**
-   * Returns a list of PlayerHands
+   * Returns a list of BlackjackPlayers
    */
-  public get playerHands() {
-    return this._model.playerHands;
+  public get players() {
+    return this._model.players;
   }
 
   /**
    * Sets the players' hands
    */
-  public set playerHands(playerHands: PlayerHand[]) {
-    if (this.playerHands != playerHands) {
-      this._model.playerHands = playerHands;
-      this.emit('playerHandsChange', this.playerHands);
+  public set players(players: BlackjackPlayer[]) {
+    if (players.length !== this.players.length || _.xor(players, this.players).length > 0) {
+      this._model.players = players;
+      this.emit('playersChange', this.players);
     }
   }
 
   /**
-   * Returns the game's status
+   * Returns the last update
    */
-  public get gameStatus() {
-    return this._model.gameStatus;
+  public get update() {
+    return this._model.update;
   }
 
   /**
-   * Sets the game's status
+   * Sets a new update for the Blackjack class
    */
-  public set gameStatus(gameStatus: string) {
-    if (this.gameStatus != gameStatus) {
-      this._model.gameStatus = gameStatus;
-      this.emit('gameStatusChange', this.gameStatus);
+  public set update(update: BlackjackUpdate | undefined) {
+    if (this.update != update) {
+      this._model.update = update;
+      this.emit('updateChange', this.update);
     }
   }
 
@@ -115,43 +115,29 @@ export default class GamingAreaController extends (EventEmitter as new () => Typ
   }
 
   /**
-   * Indicates how the player wants to advance their turn (hit: true, stay: false)
-   *
-   * @param playerId the id of the current player
-   * @param hit how the player advances their turn (hit or stay)
-   */
-  public advanceTurn(playerId: string, hit: boolean): void {
-    this.emit('cardUpdateChange', playerId, hit);
-  }
-
-  /**
    * Joins the game of blackjack if the player isn't already in the game
    * Leaves the game of blackjack if the player is already in the game
    *
    * @param playerId id of player trying to join
    */
   public toggleJoinGame(playerId: string): boolean {
-    const player = this.playerHands.find(playerHand => playerHand.id === playerId);
+    const player = this.players.find(playerHand => playerHand.id === playerId);
     if (!player) {
-      if (this.gameStatus === 'Playing') {
+      if (this.dealer.gameStatus === 'Playing') {
         this.emit('activeGameAlert', true);
-        console.log('activeGameAlert');
         return false;
       } else {
-        this.playerHands.push({ id: playerId, hand: [] });
-        this.emit('playerHandsChange', this.playerHands);
-        console.log('playerHandsChange');
+        this.players.push({ id: playerId, hand: [], gameStatus: 'Waiting' });
+        this.emit('playersChange', this.players);
         return true;
       }
     } else {
-      if (this.gameStatus === 'Playing') {
+      if (this.dealer.gameStatus === 'Playing') {
         this.emit('activeGameAlert', false);
-        console.log('activeGameAlert');
         return false;
       } else {
-        this.playerHands = this.playerHands.filter(playerHand => playerHand.id !== playerId);
-        this.emit('playerHandsChange', this.playerHands);
-        console.log('playerHandsChange');
+        this.players = this.players.filter(playerHand => playerHand.id !== playerId);
+        this.emit('playersChange', this.players);
         return true;
       }
     }
@@ -159,20 +145,20 @@ export default class GamingAreaController extends (EventEmitter as new () => Typ
 
   /**
    * Applies updates to this gaming area controller's model, setting the fields
-   * playerHands and dealerHand
+   * players and dealer
    *
    * @param updatedModel
    */
-  public updateFrom(updatedModel: GamingArea): void {
-    this.playerHands = updatedModel.playerHands;
-    this.dealerHand = updatedModel.dealerHand;
-    this.gameStatus = updatedModel.gameStatus;
+  public updateFrom(updatedModel: BlackjackArea): void {
+    this.players = updatedModel.players;
+    this.dealer = updatedModel.dealer;
+    this.update = updatedModel.update;
   }
 
   /**
-   * @returns GamingArea that represents the current state of this GamingAreaController
+   * @returns BlackjackArea that represents the current state of this GamingAreaController
    */
-  public gamingAreaModel(): GamingArea {
+  public gamingAreaModel(): BlackjackArea {
     return this._model;
   }
 }

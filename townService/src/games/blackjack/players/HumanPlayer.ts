@@ -37,14 +37,21 @@ export default class HumanPlayer {
     this._status = value;
   }
 
+  private _lastAction: string | undefined;
+
   constructor(status: GameStatus = GameStatus.Waiting, id: string = nanoid()) {
     this._hand = new Hand();
     this._status = status;
     this._id = id;
+    this._lastAction = undefined;
   }
 
   public addCard(newCard: Card, newCardHiddenStatus = true): void {
     this._hand.cards.push([newCard, newCardHiddenStatus]);
+  }
+
+  public updateCards(cards: Card[]): void {
+    this._hand.cards = cards.map(card => [card, false]);
   }
 
   public getNumericScore(): Array<number> {
@@ -60,6 +67,14 @@ export default class HumanPlayer {
     return scores;
   }
 
+  public getMaxScore(): number {
+    const scores = this.getNumericScore().filter(score => score < 22);
+    if (scores.length < 1) {
+      return -1;
+    }
+    return Math.max(...scores);
+  }
+
   public has21(): boolean {
     const scores = this.getNumericScore();
     return scores.includes(21);
@@ -70,7 +85,7 @@ export default class HumanPlayer {
   }
 
   public static parseNextMove(answerText: string): BlackjackAction {
-    const answerTextCleaned = answerText.toLowerCase();
+    const answerTextCleaned = answerText.toLowerCase().trim();
     switch (answerTextCleaned) {
       case 'h':
       case 'hit':
@@ -84,29 +99,30 @@ export default class HumanPlayer {
     }
   }
 
-  public async getNextMove(): Promise<string> {
-    const questionText = 'What would you like to do?\n1. [h]it\n2. [s]tay))';
-    // eslint-disable-next-line no-promise-executor-return
-    const question = () =>
-      new Promise<string>(resolve => HumanPlayer._rl.question(questionText, resolve)).finally(() =>
-        HumanPlayer._rl.close(),
-      );
-    const name = await question();
-    return name;
+  public updateMove(action: string) {
+    this._lastAction = action;
+  }
+
+  // TODO: take input in the form of the variable _lastAction
+  // Somehow, when the last action inputted by the player != undefined (which is updated by the BlackjackArea class),
+  // this function should return the _lastAction ('Hit' or 'Stay')
+  // It should also reset the value of _lastAction to be undefined
+  // This might be achieved somehow through keeping this method, replacing stdin with some other form of Readable, and
+  // passing the input in that way
+  public getNextMove(): string {
+    if (!this._lastAction) {
+      throw new Error("Player's last action is undefined");
+    }
+    return this._lastAction;
   }
 
   // I will have to mock this function to test
-  public async getBlackjackAction(): Promise<BlackjackAction> {
-    return new Promise(resolve => {
-      setTimeout(async () => {
-        resolve(HumanPlayer.parseNextMove(await this.getNextMove()));
-      }, 150);
-      // I tried to use setTimeout here to simulate async code, but it didnt work
-    });
+  public getBlackjackAction(): BlackjackAction {
+    return HumanPlayer.parseNextMove(this.getNextMove());
   }
 
   // This function will be more complicated as we advance
-  public async doTurn(): Promise<BlackjackAction> {
+  public doTurn(): BlackjackAction {
     return this.getBlackjackAction();
   }
 }
