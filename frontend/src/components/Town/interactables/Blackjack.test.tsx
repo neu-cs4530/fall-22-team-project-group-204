@@ -51,13 +51,17 @@ describe('Blackjack Modal', () => {
 
   beforeEach(() => {
     townController = mock<TownController>();
-    const dealer: BlackjackPlayer = { id: '0', hand: [] };
+    const dealer: BlackjackPlayer = {
+      id: '0',
+      hand: [],
+      gameStatus: 'Waiting',
+    };
     const players: BlackjackPlayer[] = [];
     gamingArea = new GamingAreaController({
       id: 'test',
       dealer: dealer,
       players: players,
-      gameStatus: 'Waiting',
+      bettingAmount: 0,
     });
     addListenerSpy = jest.spyOn(gamingArea, 'addListener');
     removeListenerSpy = jest.spyOn(gamingArea, 'removeListener');
@@ -111,7 +115,7 @@ describe('Blackjack Modal', () => {
       await waitFor(() => expect(renderData.getByText('100')).toBeInTheDocument());
       await waitFor(() => expect(renderData.getByText('500')).toBeInTheDocument());
       const numButtons = renderData.getAllByRole('button');
-      expect(numButtons).toHaveLength(9);
+      expect(numButtons).toHaveLength(11);
       const numChips = renderData.getAllByRole('button', { name: 'chip' });
       expect(numChips).toHaveLength(5);
       renderData.unmount();
@@ -123,6 +127,7 @@ describe('Blackjack Modal', () => {
         act(() => {
           gamingArea.emit('dealerChange', {
             id: nanoid(),
+            gameStatus: 'Waiting',
             hand: [
               { value: '3', suit: 'Hearts', faceUp: false },
               { value: '4', suit: 'Hearts', faceUp: true },
@@ -132,6 +137,7 @@ describe('Blackjack Modal', () => {
         act(() => {
           gamingArea.emit('dealerChange', {
             id: nanoid(),
+            gameStatus: 'Waiting',
             hand: [
               { value: '3', suit: 'Hearts', faceUp: false },
               { value: '4', suit: 'Hearts', faceUp: true },
@@ -141,6 +147,7 @@ describe('Blackjack Modal', () => {
         act(() => {
           gamingArea.emit('dealerChange', {
             id: nanoid(),
+            gameStatus: 'Waiting',
             hand: [
               { value: '3', suit: 'Hearts', faceUp: false },
               { value: '4', suit: 'Hearts', faceUp: true },
@@ -149,105 +156,108 @@ describe('Blackjack Modal', () => {
         });
         getSingleListenerAdded('dealerChange');
       });
-      // it('Registers exactly one playersChange listener', () => {
-      //   act(() => {
-      //     gamingArea.emit('playersChange', [
-      //       {
-      //         id: nanoid(),
-      //         hand: [
-      //           { value: '3', suit: 'Hearts', faceUp: false },
-      //           { value: '4', suit: 'Hearts', faceUp: true },
-      //         ],
-      //       },
-      //       {
-      //         id: nanoid(),
-      //         hand: [
-      //           { value: '3', suit: 'Hearts', faceUp: false },
-      //           { value: '4', suit: 'Hearts', faceUp: true },
-      //         ],
-      //       },
-      //     ]);
-      //   });
-      //   act(() => {
-      //     gamingArea.emit('playersChange', [
-      //       {
-      //         id: nanoid(),
-      //         hand: [
-      //           { value: '3', suit: 'Hearts', faceUp: false },
-      //           { value: '4', suit: 'Hearts', faceUp: true },
-      //         ],
-      //       },
-      //       {
-      //         id: nanoid(),
-      //         hand: [
-      //           { value: '5', suit: 'Hearts', faceUp: false },
-      //           { value: '6', suit: 'Hearts', faceUp: true },
-      //         ],
-      //       },
-      //     ]);
-      //   });
-      //   act(() => {
-      //     gamingArea.emit('playersChange', [
-      //       {
-      //         id: nanoid(),
-      //         hand: [
-      //           { value: '3', suit: 'Hearts', faceUp: false },
-      //           { value: '4', suit: 'Hearts', faceUp: true },
-      //         ],
-      //       },
-      //       {
-      //         id: nanoid(),
-      //         hand: [
-      //           { value: '5', suit: 'Hearts', faceUp: false },
-      //           { value: '6', suit: 'Hearts', faceUp: true },
-      //         ],
-      //       },
-      //     ]);
-      //   });
-      //   getSingleListenerAdded('playersChange');
-      // });
-      // it('Removes the playersChange listener at unmount', () => {
-      //   act(() => {
-      //     gamingArea.emit('playersChange', [
-      //       {
-      //         id: nanoid(),
-      //         hand: [
-      //           { value: '3', suit: 'Hearts', faceUp: false },
-      //           { value: '4', suit: 'Hearts', faceUp: true },
-      //         ],
-      //       },
-      //       {
-      //         id: nanoid(),
-      //         hand: [
-      //           { value: '5', suit: 'Hearts', faceUp: false },
-      //           { value: '6', suit: 'Hearts', faceUp: true },
-      //         ],
-      //       },
-      //     ]);
-      //   });
-      //   const listenerAdded = getSingleListenerAdded('playersChange');
-      //   cleanup();
-      //   expect(getSingleListenerRemoved('playersChange')).toBe(listenerAdded);
-      // });
-      it('Registers exactly one gameStatusChange listener', () => {
+      it('Removes the dealerChange listener at unmount', () => {
         act(() => {
-          gamingArea.emit('gameStatusChange', 'Playing');
+          gamingArea.emit('dealerChange', {
+            id: nanoid(),
+            gameStatus: 'Waiting',
+            hand: [
+              { value: '3', suit: 'Hearts', faceUp: false },
+              { value: '4', suit: 'Hearts', faceUp: true },
+            ],
+          });
         });
-        act(() => {
-          gamingArea.emit('gameStatusChange', 'Waiting');
-        });
-        act(() => {
-          gamingArea.emit('gameStatusChange', 'Playing');
-        });
-        getSingleListenerAdded('gameStatusChange');
-      });
-      it('Removes the gameStatusChange listener at unmount', () => {
-        act(() => {
-          gamingArea.emit('gameStatusChange', 'Waiting');
-        });
-        const listenerAdded = getSingleListenerAdded('gameStatusChange');
+        const listenerAdded = getSingleListenerAdded('dealerChange');
         cleanup();
-        expect(getSingleListenerRemoved('gameStatusChange')).toBe(listenerAdded);
+        expect(getSingleListenerRemoved('dealerChange')).toBe(listenerAdded);
+      });
+      it('Registers exactly one playersChange listener', () => {
+        act(() => {
+          gamingArea.emit('playersChange', [
+            {
+              id: nanoid(),
+              gameStatus: 'Waiting',
+              hand: [
+                { value: '3', suit: 'Hearts', faceUp: false },
+                { value: '4', suit: 'Hearts', faceUp: true },
+              ],
+            },
+            {
+              id: nanoid(),
+              gameStatus: 'Waiting',
+              hand: [
+                { value: '3', suit: 'Hearts', faceUp: false },
+                { value: '4', suit: 'Hearts', faceUp: true },
+              ],
+            },
+          ]);
+        });
+        act(() => {
+          gamingArea.emit('playersChange', [
+            {
+              id: nanoid(),
+              gameStatus: 'Waiting',
+              hand: [
+                { value: '3', suit: 'Hearts', faceUp: false },
+                { value: '4', suit: 'Hearts', faceUp: true },
+              ],
+            },
+            {
+              id: nanoid(),
+              gameStatus: 'Waiting',
+              hand: [
+                { value: '5', suit: 'Hearts', faceUp: false },
+                { value: '6', suit: 'Hearts', faceUp: true },
+              ],
+            },
+          ]);
+        });
+        act(() => {
+          gamingArea.emit('playersChange', [
+            {
+              id: nanoid(),
+              gameStatus: 'Waiting',
+              hand: [
+                { value: '3', suit: 'Hearts', faceUp: false },
+                { value: '4', suit: 'Hearts', faceUp: true },
+              ],
+            },
+            {
+              id: nanoid(),
+              gameStatus: 'Waiting',
+              hand: [
+                { value: '5', suit: 'Hearts', faceUp: false },
+                { value: '6', suit: 'Hearts', faceUp: true },
+              ],
+            },
+          ]);
+        });
+        getSingleListenerAdded('playersChange');
+      });
+      it('Removes the playersChange listener at unmount', () => {
+        act(() => {
+          gamingArea.emit('playersChange', [
+            {
+              id: nanoid(),
+              gameStatus: 'Waiting',
+              hand: [
+                { value: '3', suit: 'Hearts', faceUp: false },
+                { value: '4', suit: 'Hearts', faceUp: true },
+              ],
+            },
+            {
+              id: nanoid(),
+              gameStatus: 'Waiting',
+              hand: [
+                { value: '5', suit: 'Hearts', faceUp: false },
+                { value: '6', suit: 'Hearts', faceUp: true },
+              ],
+            },
+          ]);
+        });
+        const listenerAdded = getSingleListenerAdded('playersChange');
+        cleanup();
+        expect(getSingleListenerRemoved('playersChange')).toBe(listenerAdded);
       });
       it('Registers exactly one activeGameAlert listener', () => {
         act(() => {
