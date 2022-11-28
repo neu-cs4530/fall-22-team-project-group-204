@@ -1,6 +1,6 @@
 import Interactable, { KnownInteractableTypes } from '../Interactable';
 
-export default class GamingArea extends Interactable {
+export default class BlackjackArea extends Interactable {
   private _labelText?: Phaser.GameObjects.Text;
 
   private _isInteracting = false;

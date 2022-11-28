@@ -17,21 +17,21 @@ export type TownJoinResponse = {
   interactables: Interactable[];
 };
 
-export type Interactable = ViewingArea | ConversationArea | GamingArea;
+export type Interactable = ViewingArea | ConversationArea | BlackjackArea;
 
 export type TownSettingsUpdate = {
   friendlyName?: string;
   isPubliclyListed?: boolean;
 };
 
-export type Direction = 'front' | 'back' | 'left' | 'right';
+export type Direction = "front" | "back" | "left" | "right";
 export interface Player {
   id: string;
   userName: string;
   location: PlayerLocation;
-};
+}
 
-export type XY = { x: number, y: number };
+export type XY = { x: number; y: number };
 
 export interface PlayerLocation {
   /* The CENTER x coordinate of this player's location */
@@ -42,7 +42,7 @@ export interface PlayerLocation {
   rotation: Direction;
   moving: boolean;
   interactableID?: string;
-};
+}
 export type ChatMessage = {
   author: string;
   sid: string;
@@ -54,37 +54,41 @@ export interface PlayingCard {
   value: string;
   suit: string;
   faceUp: boolean;
-};
-
-export interface PlayerHand {
+}
+export interface BlackjackPlayer {
   id: string;
   hand: PlayingCard[];
-};
+  gameStatus: string;
+}
+export interface BlackjackUpdate {
+  id: string;
+  action: string;
+  timestamp: string;
+}
+export interface BlackjackArea {
+  id: string;
+  dealer: BlackjackPlayer;
+  players: BlackjackPlayer[];
+  update?: BlackjackUpdate;
+}
 
 export interface ConversationArea {
   id: string;
   topic?: string;
   occupantsByID: string[];
-};
+}
 export interface BoundingBox {
   x: number;
   y: number;
   width: number;
   height: number;
-};
+}
 
 export interface ViewingArea {
   id: string;
   video?: string;
   isPlaying: boolean;
   elapsedTimeSec: number;
-}
-
-export interface GamingArea {
-  id: string;
-  gameStatus: string
-  dealerHand: PlayingCard[];
-  playerHands: PlayerHand[];
 }
 
 export interface ServerToClientEvents {
@@ -103,7 +107,3 @@ export interface ClientToServerEvents {
   playerMovement: (movementData: PlayerLocation) => void;
   interactableUpdate: (update: Interactable) => void;
 }
-
-
-
-
