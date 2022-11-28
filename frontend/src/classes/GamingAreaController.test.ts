@@ -16,6 +16,7 @@ describe('GamingAreaController', () => {
       dealer: { id: '0', hand: [], gameStatus: 'Waiting' },
       players: [],
       update: undefined,
+      bettingAmount: 0,
     };
     testArea = new GamingAreaController(testAreaModel);
     mockClear(townController);
