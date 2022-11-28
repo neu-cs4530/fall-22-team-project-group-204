@@ -11,6 +11,7 @@ export type GamingAreaEvents = {
   dealerChange: (dealer: BlackjackPlayer) => void;
   playersChange: (players: BlackjackPlayer[]) => void;
   gameStatusChange: (gameStatus: string) => void;
+  bettingAmountChange: (bettingAmount: number) => void;
   updateChange: (update: BlackjackUpdate | undefined) => void;
   activeGameAlert: (isPlaying: boolean) => void;
 };
@@ -93,6 +94,23 @@ export default class GamingAreaController extends (EventEmitter as new () => Typ
     if (this.update != update) {
       this._model.update = update;
       this.emit('updateChange', this.update);
+    }
+  }
+
+  /**
+   * Returns the players' betting amount
+   */
+  public get bettingAmount() {
+    return this._model.bettingAmount;
+  }
+
+  /**
+   * Sets the players' betting amount
+   */
+  public set bettingAmount(bettingAmount: number) {
+    if (this.bettingAmount != bettingAmount) {
+      this._model.bettingAmount = bettingAmount;
+      this.emit('bettingAmountChange', this.bettingAmount);
     }
   }
 

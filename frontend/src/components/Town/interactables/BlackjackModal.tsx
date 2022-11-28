@@ -16,7 +16,7 @@ import {
   Text,
   useToast,
 } from '@chakra-ui/react';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
 import { useInteractable, useGamingAreaController } from '../../../classes/TownController';
 import useTownController from '../../../hooks/useTownController';
 import GamingAreaController from '../../../classes/GamingAreaController';
@@ -170,10 +170,46 @@ export function Hands({ hands }: { hands: BlackjackPlayer[] }) {
   return <Container>{handComponents}</Container>;
 }
 
-export function Chip({ chipValue, x, y }: { chipValue: number; x: number; y: number }) {
+export function Chip({
+  chipValue,
+  x,
+  y,
+  controller,
+  currBettingAmount,
+  setBettingAmount,
+  isPlaying,
+}: {
+  chipValue: number;
+  x: number;
+  y: number;
+  controller: GamingAreaController;
+  currBettingAmount: number;
+  setBettingAmount: Dispatch<SetStateAction<number>>;
+  isPlaying: boolean;
+}) {
+  const townController = useTownController();
+  const toast = useToast();
+
+  const updateBetting = () => {
+    if (isPlaying) {
+      const newBetValue: number = chipValue + currBettingAmount;
+      setBettingAmount(newBetValue);
+      townController.emitGamingAreaUpdate(controller);
+    } else {
+      const alert = 'Cannot place a bet before joining game!';
+      toast({
+        title: alert,
+        status: 'error',
+        duration: 2000,
+        isClosable: false,
+      });
+    }
+  };
+
   const chip = `assets/blackjack/chips/chip_${chipValue}.png`;
   return (
     <IconButton
+      onClick={updateBetting}
       variant='ghost'
       position='absolute'
       colorScheme='ghost'
@@ -231,6 +267,7 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
   const [timestamp, setTimestamp] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [startGameText, setStartGameText] = useState<string>('Start Game');
+  const [bettingAmount, setBettingAmount] = useState<number>(controller.bettingAmount);
 
   const toast = useToast();
 
@@ -357,11 +394,51 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
       </Text>
       <Hand cards={dealer.hand} x={450} y={100} />
       <Hands hands={players} />
-      <Chip chipValue={1} x={600} y={480} />
-      <Chip chipValue={5} x={650} y={480} />
-      <Chip chipValue={25} x={700} y={480} />
-      <Chip chipValue={100} x={750} y={480} />
-      <Chip chipValue={500} x={800} y={480} />
+      <Chip
+        chipValue={1}
+        x={600}
+        y={480}
+        controller={controller}
+        currBettingAmount={bettingAmount}
+        setBettingAmount={setBettingAmount}
+        isPlaying={players.map(player => player.id).includes(townController.userID)}
+      />
+      <Chip
+        chipValue={5}
+        x={650}
+        y={480}
+        controller={controller}
+        currBettingAmount={bettingAmount}
+        setBettingAmount={setBettingAmount}
+        isPlaying={players.map(player => player.id).includes(townController.userID)}
+      />
+      <Chip
+        chipValue={25}
+        x={700}
+        y={480}
+        controller={controller}
+        currBettingAmount={bettingAmount}
+        setBettingAmount={setBettingAmount}
+        isPlaying={players.map(player => player.id).includes(townController.userID)}
+      />
+      <Chip
+        chipValue={100}
+        x={750}
+        y={480}
+        controller={controller}
+        currBettingAmount={bettingAmount}
+        setBettingAmount={setBettingAmount}
+        isPlaying={players.map(player => player.id).includes(townController.userID)}
+      />
+      <Chip
+        chipValue={500}
+        x={800}
+        y={480}
+        controller={controller}
+        currBettingAmount={bettingAmount}
+        setBettingAmount={setBettingAmount}
+        isPlaying={players.map(player => player.id).includes(townController.userID)}
+      />
       <Text as='b' fontSize='md' left='615px' top='450px' position='absolute'>
         1
       </Text>
@@ -377,8 +454,23 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
       <Text as='b' fontSize='md' left='805px' top='450px' position='absolute'>
         500
       </Text>
-      <Button size='sm' left='697px' top='535px' colorScheme='gray' position='absolute'>
+      <Text as='b' fontSize='md' left='600px' top='400px' position='absolute'>
+        Betting Amount: {bettingAmount}
+      </Text>
+      <Button size='sm' left='660px' top='535px' colorScheme='gray' position='absolute'>
         Bet
+      </Button>
+      <Button
+        size='sm'
+        left='730px'
+        top='535px'
+        colorScheme='gray'
+        position='absolute'
+        onClick={() => {
+          setBettingAmount(0);
+          townController.emitGamingAreaUpdate(controller);
+        }}>
+        Clear
       </Button>
     </Box>
   );

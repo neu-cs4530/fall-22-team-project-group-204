@@ -41,6 +41,7 @@ export default class BlackJack {
         dealer: { id: '0', hand: [], gameStatus: 'Waiting' },
         players: [],
         update: undefined,
+        bettingAmount: 0,
       },
       { x: 0, y: 0, width: 0, height: 0 },
       mock<TownEmitter>(), // NOTE: may need to change in the future

@@ -70,6 +70,7 @@ export interface BlackjackArea {
   dealer: BlackjackPlayer;
   players: BlackjackPlayer[];
   update?: BlackjackUpdate;
+  bettingAmount: number;
 }
 
 export interface ConversationArea {

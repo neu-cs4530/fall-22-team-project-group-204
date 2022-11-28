@@ -265,6 +265,7 @@ export default class BlackjackArea extends InteractableArea {
       dealer: this._dealer,
       players: this._players,
       update: this._lastUpdate,
+      bettingAmount: 0,
     };
   }
 
@@ -282,6 +283,10 @@ export default class BlackjackArea extends InteractableArea {
     const dealer: BlackjackPlayer = { id: '0', hand: [], gameStatus: 'Waiting' };
     const players: BlackjackPlayer[] = [];
     const rect: BoundingBox = { x: mapObject.x, y: mapObject.y, width, height };
-    return new BlackjackArea({ id: name, players, dealer, update: undefined }, rect, townEmitter);
+    return new BlackjackArea(
+      { id: name, players, dealer, update: undefined, bettingAmount: 0 },
+      rect,
+      townEmitter,
+    );
   }
 }

@@ -16,6 +16,7 @@ describe('GamingAreaController', () => {
       dealer: { id: '0', hand: [], gameStatus: 'Waiting' },
       players: [],
       update: undefined,
+      bettingAmount: 0,
     };
     testArea = new GamingAreaController(testAreaModel);
     mockClear(townController);
@@ -102,6 +103,7 @@ describe('GamingAreaController', () => {
           },
         ],
         update: { id: '1', action: 'Hit', timestamp: 'N/A' },
+        bettingAmount: 0,
       };
       testArea.updateFrom(newModel);
       expect(testArea.dealer).toEqual(newModel.dealer);
@@ -127,6 +129,7 @@ describe('GamingAreaController', () => {
             gameStatus: 'Waiting',
           },
         ],
+        bettingAmount: 0,
       };
       testArea.updateFrom(newModel);
       expect(testArea.id).toEqual(existingID);
