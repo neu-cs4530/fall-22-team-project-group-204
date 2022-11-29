@@ -17,6 +17,8 @@ export default class HumanPlayer {
 
   private static _tableName = 'users';
 
+  private _name = 'CoolPlayer';
+
   private _usersRef;
 
   private _hand: Hand;
@@ -114,13 +116,21 @@ export default class HumanPlayer {
       wins: this._wins,
       ties: this._ties,
       secret_id: this._id,
+      name: this._name,
     }
+  }
+
+  public static async getPlayerRecord(id: string) {
+    const docRef = doc(db, HumanPlayer._tableName, id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) ret
+
   }
 
   public async updatePlayerRecord() {
     const docRef = doc(db, HumanPlayer._tableName, this._id);
     const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) return;
+    if (!docSnap.exists()) { throw new Error('Player does not exist in database'); }
     setDoc(docRef, this._document());
   }
 
