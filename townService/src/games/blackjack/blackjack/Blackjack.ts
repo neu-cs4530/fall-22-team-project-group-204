@@ -5,7 +5,9 @@ import GameStatus from '../players/GameStatus';
 import DealerPlayer from '../players/DealerPlayer';
 import HumanPlayer from '../players/HumanPlayer';
 // eslint-disable-next-line import/no-cycle
-import GamingArea from '../../../town/GamingArea';
+import BlackjackArea from '../../../town/BlackjackArea';
+import Card from '../../cards/Card';
+import BlackjackAction from './BlackjackAction';
 
 export default class BlackJack {
   // Going to have this DealerPlayer class handle the responsiblites of the Dealer and the Player.
@@ -25,24 +27,35 @@ export default class BlackJack {
     return this._players;
   }
 
-  // contains a reference to the GamingArea for sending notifications of changes
-  private _gamingArea: GamingArea;
+  // contains a reference to the BlackjackArea for sending notifications of changes
+  private _gamingArea: BlackjackArea;
 
-  // default GamingArea should never be used, but is good for testing purpose where gamingArea
+  // default BlackjackArea should never be used, but is good for testing purpose where gamingArea
   // is irrelevant
   constructor(
     players: HumanPlayer[] = [],
-    gamingArea: GamingArea = new GamingArea(
-      { id: 'invalidId', dealerHand: [], playerHands: [], gameStatus: 'Waiting' },
+    dealer: DealerPlayer = new DealerPlayer(GameStatus.Waiting, '0'),
+    gamingArea: BlackjackArea = new BlackjackArea(
+      {
+        id: 'invalidId',
+        dealer: { id: '0', hand: [], gameStatus: 'Waiting' },
+        players: [],
+        update: undefined,
+        bettingAmount: 0,
+      },
       { x: 0, y: 0, width: 0, height: 0 },
       mock<TownEmitter>(), // NOTE: may need to change in the future
     ),
   ) {
-    this._dealer = new DealerPlayer(GameStatus.Waiting, '0');
-    // We assume that there is at least one human player. I am going to start with the
-    // assumption of one Player but will make sure to expand tests to cover 2 players
+    this._dealer = dealer;
     this._players = players;
     this._gamingArea = gamingArea;
+  }
+
+  public updatePlayerCards(allCards: Card[][]): void {
+    this._players.forEach((player, index) => {
+      player.updateCards(allCards[index]);
+    });
   }
 
   public addPlayer(player: HumanPlayer): void {
@@ -60,7 +73,11 @@ export default class BlackJack {
   private _getActiveHumanPlayers(): HumanPlayer[] {
     const humanPlayers: HumanPlayer[] = [];
     this._players.forEach(player => {
-      if (player.status === GameStatus.Waiting || player.status === GameStatus.Playing) {
+      if (
+        player.status === GameStatus.Waiting ||
+        player.status === GameStatus.Playing ||
+        player.status === GameStatus.Staying
+      ) {
         humanPlayers.push(player as HumanPlayer);
       }
     });
@@ -74,6 +91,25 @@ export default class BlackJack {
     );
   }
 
+  public startGame(doDealing = true): void {
+    const players: HumanPlayer[] = this._getActiveHumanPlayers();
+    this._updateToPlaying();
+
+    if (doDealing) {
+      this._dealer.dealCards(players);
+    }
+
+    this._gamingArea.updateFromBlackjack(this.dealer, this.players);
+  }
+
+  public advanceGame(playerId: string, playerAction: BlackjackAction): void {
+    // you may need to replace this call of this._getActiveHumanPlayers with just a call to this._players
+    this._dealer.advanceGame(this._getActiveHumanPlayers(), playerId, playerAction);
+
+    // Also not sure when to call updateFromBlackjack
+    this._gamingArea.updateFromBlackjack(this.dealer, this.players);
+  }
+
   public async playGame(doDealing = true): Promise<void> {
     // maybe check that there is more than 1 player before i start the gameplay loop?
     const players: HumanPlayer[] = this._getActiveHumanPlayers();
@@ -83,7 +119,7 @@ export default class BlackJack {
       this._dealer.dealCards(players);
     }
 
-    this._gamingArea.updateFromBlackjack(this._dealer, players, GameStatus[this._dealer.status]);
+    this._gamingArea.updateFromBlackjack(this._dealer, players);
 
     while (!BlackJack._isGameOver([...players, this._dealer])) {
       await this._dealer.doTurns(players);

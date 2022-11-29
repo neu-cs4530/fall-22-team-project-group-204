@@ -17,6 +17,10 @@ export default class Hand {
     this._cards.push([card, isFaceUp]);
   }
 
+  public updateCards(cards: Card[]): void {
+    this._cards = cards.map(card => [card, true]);
+  }
+
   public getNumericScores(): number[] {
     let scores: number[] = [0];
     // need to figure out a better name than cardInfo
