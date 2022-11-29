@@ -73,11 +73,7 @@ export default class BlackJack {
   private _getActiveHumanPlayers(): HumanPlayer[] {
     const humanPlayers: HumanPlayer[] = [];
     this._players.forEach(player => {
-      if (
-        player.status === GameStatus.Waiting ||
-        player.status === GameStatus.Playing ||
-        player.status === GameStatus.Staying
-      ) {
+      if (player.status === GameStatus.Waiting || player.status === GameStatus.Playing) {
         humanPlayers.push(player as HumanPlayer);
       }
     });
@@ -110,19 +106,4 @@ export default class BlackJack {
     this._gamingArea.updateFromBlackjack(this.dealer, this.players);
   }
 
-  public async playGame(doDealing = true): Promise<void> {
-    // maybe check that there is more than 1 player before i start the gameplay loop?
-    const players: HumanPlayer[] = this._getActiveHumanPlayers();
-    this._updateToPlaying();
-
-    if (doDealing) {
-      this._dealer.dealCards(players);
-    }
-
-    this._gamingArea.updateFromBlackjack(this._dealer, players);
-
-    while (!BlackJack._isGameOver([...players, this._dealer])) {
-      await this._dealer.doTurns(players);
-    }
-  }
 }

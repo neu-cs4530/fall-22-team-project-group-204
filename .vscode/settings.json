@@ -1,4 +1,5 @@
 {
+    "editor.formatOnSave":false,
     "jest.jestCommandLine": "npx jest",
     "typescript.tsdk": "./townService/node_modules/typescript/lib",
     "files.eol": "\n"
