@@ -36,12 +36,19 @@ export default class BlackjackArea extends InteractableArea {
   // tells whether a player timed out recently
   private _timedOut: Map<string, boolean>;
 
+  // notes whether timeouts are enabled
+  private _timeoutsEnabled: boolean;
+
   public get dealer() {
     return this._dealer;
   }
 
   public get players() {
     return this._players;
+  }
+
+  public get update() {
+    return this._lastUpdate;
   }
 
   /**
@@ -64,6 +71,7 @@ export default class BlackjackArea extends InteractableArea {
     this._game = new BlackJack(playersProper, dealerProper, this);
     this._timeoutIds = new Map<string, NodeJS.Timeout>();
     this._timedOut = new Map<string, boolean>();
+    this._timeoutsEnabled = true;
   }
 
   /**
@@ -92,7 +100,7 @@ export default class BlackjackArea extends InteractableArea {
         playerHand.gameStatus === 'Playing'
       ) {
         this._game.advanceGame(playerHand.id, HumanPlayer.parseNextMove(update.action));
-        if (update.action === 'Stay') {
+        if (update.action === 'Stay' && this._timeoutsEnabled) {
           this._timedOut.set(playerHand.id, false);
           clearTimeout(this._timeoutIds.get(playerHand.id));
         }
@@ -110,19 +118,28 @@ export default class BlackjackArea extends InteractableArea {
         if (!this._game.players.map(p => p.id).includes(playerHand.id)) {
           this._game.addPlayer(new HumanPlayer(GameStatus.Waiting, playerHand.id));
         }
-        this._timeoutIds.set(
-          playerHand.id,
-          setTimeout(() => {
-            this._timedOut.set(playerHand.id, true);
-            this._game.advanceGame(playerHand.id, HumanPlayer.parseNextMove('Stay'));
-          }, this._timer * 1000),
-        );
+        if (this._timeoutsEnabled) {
+          this._timeoutIds.set(
+            playerHand.id,
+            setTimeout(() => {
+              this._timedOut.set(playerHand.id, true);
+              this._game.advanceGame(playerHand.id, HumanPlayer.parseNextMove('Stay'));
+            }, this._timer * 1000),
+          );
+        }
       });
       this._game.startGame();
     }
   }
 
-  // NOTE: refactor for array order checking later
+  /**
+   * Disables timeouts from causing asynchronous errors and stops game from restarting
+   * Used mostly for testing purposes
+   */
+  public disableTimeouts() {
+    this._timeoutsEnabled = false;
+  }
+
   /**
    * Obtains a model from the Blackjack backend whenever players or dealer are updated
    *
@@ -136,7 +153,11 @@ export default class BlackjackArea extends InteractableArea {
       gameStatus: GameStatus[dealer.status],
     };
     this._players = BlackjackArea.playersToBlackjackPlayers(players);
-    if (dealer.status !== GameStatus.Waiting && dealer.status !== GameStatus.Playing) {
+    if (
+      dealer.status !== GameStatus.Waiting &&
+      dealer.status !== GameStatus.Playing &&
+      this._timeoutsEnabled
+    ) {
       setTimeout(() => {
         this.endGame();
       }, 5000);
@@ -144,19 +165,22 @@ export default class BlackjackArea extends InteractableArea {
     this._emitAreaChanged();
   }
 
+  /**
+   * Ends the game by reseting all players decks and making a new Blackjack instance
+   */
   public endGame() {
     this._players.forEach(p => {
       p.gameStatus = 'Waiting';
       p.hand = [];
     });
-    this._players = this._players.filter(p => !this._timedOut.get(p.id));
+    if (this._timeoutsEnabled) this._players = this._players.filter(p => !this._timedOut.get(p.id));
     this._dealer = { id: '0', hand: [], gameStatus: 'Waiting' };
     const dealerProper = new DealerPlayer(GameStatus.Waiting, this._dealer.id);
     const playersProper = this._players.map(
       player => new HumanPlayer(GameStatus.Waiting, player.id),
     );
     this._game = new BlackJack(playersProper, dealerProper, this);
-    this._timedOut = new Map<string, boolean>();
+    if (this._timeoutsEnabled) this._timedOut = new Map<string, boolean>();
     this._emitAreaChanged();
   }
 
