@@ -135,4 +135,50 @@ describe('GamingAreaController', () => {
       expect(testArea.id).toEqual(existingID);
     });
   });
+  describe('toggleJoinGame', () => {
+    it('Joins a game if a player isnt already in it and game hasnt started', () => {
+      expect(testArea.players.length).toBe(0);
+      const success = testArea.toggleJoinGame('player1');
+      expect(testArea.players.length).toBe(1);
+      expect(testArea.players[0].id).toBe('player1');
+      expect(testArea.players[0].hand.length).toBe(0);
+      expect(testArea.players[0].gameStatus).toBe('Waiting');
+      expect(success).toBe(true);
+
+      expect(mockListeners.playersChange).toBeCalledWith(testArea.players);
+    });
+    it('Doesnt join a game if a player isnt already in it and a game has started', () => {
+      testArea.dealer.gameStatus = 'Playing';
+      expect(testArea.players.length).toBe(0);
+      const success = testArea.toggleJoinGame('player1');
+      expect(testArea.players.length).toBe(0);
+      expect(success).toBe(false);
+
+      expect(mockListeners.activeGameAlert).toBeCalledWith(true);
+    });
+    it('Leaves a game if a player is already in it and game hasnt started', () => {
+      expect(testArea.players.length).toBe(0);
+      testArea.toggleJoinGame('player1');
+      expect(testArea.players.length).toBe(1);
+      expect(testArea.players[0].id).toBe('player1');
+      const success = testArea.toggleJoinGame('player1');
+      expect(testArea.players.length).toBe(0);
+      expect(success).toBe(true);
+
+      expect(mockListeners.playersChange).toBeCalledWith(testArea.players);
+    });
+    it('Doesnt leave a game if a player is already in it and game has started', () => {
+      expect(testArea.players.length).toBe(0);
+      testArea.toggleJoinGame('player1');
+      expect(testArea.players.length).toBe(1);
+      expect(testArea.players[0].id).toBe('player1');
+      testArea.dealer.gameStatus = 'Playing';
+      const success = testArea.toggleJoinGame('player1');
+      expect(testArea.players.length).toBe(1);
+      expect(testArea.players[0].id).toBe('player1');
+      expect(success).toBe(false);
+
+      expect(mockListeners.activeGameAlert).toBeCalledWith(false);
+    });
+  });
 });
