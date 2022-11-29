@@ -1,6 +1,5 @@
 /* eslint-disable no-promise-executor-return */
 /* eslint-disable class-methods-use-this */
-import { setTimeout } from 'timers';
 import { ReadLine, createInterface } from 'readline';
 import { nanoid } from 'nanoid';
 import Hand from './Hand';

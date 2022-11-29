@@ -1,13 +1,12 @@
-<<<<<<< HEAD
-# Auth
-*.env
-townService/*.env
-
-=======
 # Environment Related Files
 *.env
 townService/*.env
->>>>>>> 639d3b45b764b65c2201bc4820ee4a66f02082e3
+
+# package-lock.json
+package-lock.json
+townService/package-lock.json
+frontend/package-lock.json
+
 # Logs
 logs
 *.log
