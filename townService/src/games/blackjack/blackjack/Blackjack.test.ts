@@ -1,13 +1,13 @@
 /* eslint-disable no-promise-executor-return */
 /* eslint-disable prettier/prettier */
 
-import Card from '../../cards/Card';
-import CardFactory from '../../cards/CardFactory';
-import Suit from '../../cards/Suit';
-import Value from '../../cards/Value';
+// import Card from '../../cards/Card';
+// import CardFactory from '../../cards/CardFactory';
+// import Suit from '../../cards/Suit';
+// import Value from '../../cards/Value';
 import DealerPlayer from '../players/DealerPlayer';
 import GameStatus from '../players/GameStatus';
-import Hand from '../players/Hand';
+// import Hand from '../players/Hand';
 import HumanPlayer from '../players/HumanPlayer';
 import BlackJack from './Blackjack';
 import BlackjackAction from './BlackjackAction';
@@ -38,6 +38,7 @@ describe('DealerPlayer', () => {
 
   describe('constructor', () => {
     it('Constructs a DealerPlayer properly', () => {
+      expect(blackjackInstance.dealer).toBeInstanceOf(DealerPlayer);
       const newBlackjackInstance = new BlackJack();
       expect(newBlackjackInstance.players).toStrictEqual([]);
       expect(newBlackjackInstance.dealer).not.toBeNull();

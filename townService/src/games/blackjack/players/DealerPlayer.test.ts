@@ -3,11 +3,11 @@
 
 import GameStatus from './GameStatus';
 import DealerPlayer from './DealerPlayer';
-import Hand from './Hand';
-import CardFactory from '../../cards/CardFactory';
-import Suit from '../../cards/Suit';
-import Value from '../../cards/Value';
-import Card from '../../cards/Card';
+// import Hand from './Hand';
+// import CardFactory from '../../cards/CardFactory';
+// import Suit from '../../cards/Suit';
+// import Value from '../../cards/Value';
+// import Card from '../../cards/Card';
 import HumanPlayer from './HumanPlayer';
 import BlackjackAction from '../blackjack/BlackjackAction';
 
@@ -36,6 +36,8 @@ describe('DealerPlayer', () => {
 
   describe('constructor', () => {
     it('Constructs a DealerPlayer properly', () => {
+      expect(players).toHaveLength(2);
+      expect(dealerPlayer).toBeDefined();
       const newDealerPlayer = new DealerPlayer(GameStatus.Waiting, '0');
       expect(newDealerPlayer.status).toBe(GameStatus.Waiting);
       expect(newDealerPlayer.id).toBe('0');
