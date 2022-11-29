@@ -24,10 +24,6 @@ describe('DealerPlayer', () => {
     playerOne = new HumanPlayer(GameStatus.Waiting, '1');
     playerTwo = new HumanPlayer(GameStatus.Waiting, '2');
     players = [playerOne, playerTwo];
-    playerOne.getBlackjackAction = jest.fn().mockReturnValue(BlackjackAction.Hit);
-    playerTwo.getBlackjackAction = jest.fn().mockReturnValue(BlackjackAction.Stay);
-    playerOne.doTurn = jest.fn().mockReturnValue(BlackjackAction.Hit);
-    playerTwo.doTurn = jest.fn().mockReturnValue(BlackjackAction.Stay);
   });
 
   afterAll(done => {
@@ -36,6 +32,7 @@ describe('DealerPlayer', () => {
 
   describe('constructor', () => {
     it('Constructs a DealerPlayer properly', () => {
+      // TODO: Remove these two expect statements (at very end)
       expect(players).toHaveLength(2);
       expect(dealerPlayer).toBeDefined();
       const newDealerPlayer = new DealerPlayer(GameStatus.Waiting, '0');
@@ -43,6 +40,26 @@ describe('DealerPlayer', () => {
       expect(newDealerPlayer.id).toBe('0');
     });
   });
+
+      describe('doRound', () => {
+      it('Does a round properly', async () => {
+        expect(playerOne.hand.cards).toStrictEqual([]);
+        expect(playerTwo.hand.cards).toStrictEqual([]);
+
+        dealerPlayer.dealCards(players);
+
+        dealerPlayer.advanceGame(players, '1', BlackjackAction.Hit);
+        dealerPlayer.advanceGame(players, '2', BlackjackAction.Stay);
+
+        const playerOneCards = playerOne.hand.cards;
+        expect(playerOneCards).not.toStrictEqual([]);
+        expect(playerOneCards.length === 2 || playerOneCards.length === 3).toBe(true);
+
+        const playerTwoCards = playerTwo.hand.cards;
+        expect(playerTwoCards).not.toStrictEqual([]);
+        expect(playerTwoCards.length).toBe(2);
+      });
+    });
 });
 
 //   describe('getters', () => {

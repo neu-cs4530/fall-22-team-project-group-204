@@ -90,12 +90,7 @@ export default class Town {
 
   private _connectedSockets: Set<CoveyTownSocket> = new Set();
 
-  constructor(
-    friendlyName: string,
-    isPubliclyListed: boolean,
-    townID: string,
-    broadcastEmitter: BroadcastOperator<ServerToClientEvents, SocketData>,
-  ) {
+  constructor(friendlyName: string, isPubliclyListed: boolean, townID: string, broadcastEmitter: BroadcastOperator<ServerToClientEvents, SocketData>) {
     this._townID = townID;
     this._capacity = 50;
     this._townUpdatePassword = nanoid(24);
@@ -153,18 +148,14 @@ export default class Town {
     socket.on('interactableUpdate', (update: Interactable) => {
       if (isViewingArea(update)) {
         newPlayer.townEmitter.emit('interactableUpdate', update);
-        const viewingArea = this._interactables.find(
-          eachInteractable => eachInteractable.id === update.id,
-        );
+        const viewingArea = this._interactables.find(eachInteractable => eachInteractable.id === update.id);
         if (viewingArea) {
           (viewingArea as ViewingArea).updateModel(update);
         }
       }
       if (isBlackjackArea(update)) {
         newPlayer.townEmitter.emit('interactableUpdate', update);
-        const gamingArea = this._interactables.find(
-          eachInteractable => eachInteractable.id === update.id,
-        );
+        const gamingArea = this._interactables.find(eachInteractable => eachInteractable.id === update.id);
         if (gamingArea) {
           (gamingArea as BlackjackArea).updateModel(update);
         }
@@ -197,18 +188,14 @@ export default class Town {
    * @param location New location for this player
    */
   private _updatePlayerLocation(player: Player, location: PlayerLocation): void {
-    const prevInteractable = this._interactables.find(
-      conv => conv.id === player.location.interactableID,
-    );
+    const prevInteractable = this._interactables.find(conv => conv.id === player.location.interactableID);
 
     if (!prevInteractable?.contains(location)) {
       if (prevInteractable) {
         // Remove from old area
         prevInteractable.remove(player);
       }
-      const newInteractable = this._interactables.find(
-        eachArea => eachArea.isActive && eachArea.contains(location),
-      );
+      const newInteractable = this._interactables.find(eachArea => eachArea.isActive && eachArea.contains(location));
       if (newInteractable) {
         newInteractable.add(player);
       }
@@ -229,9 +216,7 @@ export default class Town {
    * @param player Player to remove from their current conversation area
    */
   private _removePlayerFromInteractable(player: Player): void {
-    const area = this._interactables.find(
-      eachArea => eachArea.id === player.location.interactableID,
-    );
+    const area = this._interactables.find(eachArea => eachArea.id === player.location.interactableID);
     if (area) {
       area.remove(player);
     }
@@ -255,9 +240,7 @@ export default class Town {
    * with the specified ID
    */
   public addConversationArea(conversationArea: ConversationAreaModel): boolean {
-    const area = this._interactables.find(
-      eachArea => eachArea.id === conversationArea.id,
-    ) as ConversationArea;
+    const area = this._interactables.find(eachArea => eachArea.id === conversationArea.id) as ConversationArea;
     if (!area || !conversationArea.topic || area.topic) {
       return false;
     }
@@ -285,9 +268,7 @@ export default class Town {
    * with the specified ID or if there is no video URL specified
    */
   public addViewingArea(viewingArea: ViewingAreaModel): boolean {
-    const area = this._interactables.find(
-      eachArea => eachArea.id === viewingArea.id,
-    ) as ViewingArea;
+    const area = this._interactables.find(eachArea => eachArea.id === viewingArea.id) as ViewingArea;
     if (!area || !viewingArea.video || area.video) {
       return false;
     }
@@ -315,9 +296,7 @@ export default class Town {
    * with the specified ID or if there is no video URL specified
    */
   public addBlackjackArea(gamingArea: GamingAreaModel): boolean {
-    const area = this._interactables.find(
-      eachArea => eachArea.id === gamingArea.id,
-    ) as BlackjackArea;
+    const area = this._interactables.find(eachArea => eachArea.id === gamingArea.id) as BlackjackArea;
     if (!area || area.players || area.dealer) {
       return false;
     }
@@ -378,56 +357,35 @@ export default class Town {
    *  names are not unique
    */
   public initializeFromMap(map: ITiledMap) {
-    const objectLayer = map.layers.find(
-      eachLayer => eachLayer.name === 'Objects',
-    ) as ITiledMapObjectLayer;
+    const objectLayer = map.layers.find(eachLayer => eachLayer.name === 'Objects') as ITiledMapObjectLayer;
     if (!objectLayer) {
       throw new Error(`Unable to find objects layer in map`);
     }
     const viewingAreas = objectLayer.objects
       .filter(eachObject => eachObject.type === 'ViewingArea')
-      .map(eachViewingAreaObject =>
-        ViewingArea.fromMapObject(eachViewingAreaObject, this._broadcastEmitter),
-      );
+      .map(eachViewingAreaObject => ViewingArea.fromMapObject(eachViewingAreaObject, this._broadcastEmitter));
 
     const conversationAreas = objectLayer.objects
       .filter(eachObject => eachObject.type === 'ConversationArea')
-      .map(eachConvAreaObj =>
-        ConversationArea.fromMapObject(eachConvAreaObj, this._broadcastEmitter),
-      );
+      .map(eachConvAreaObj => ConversationArea.fromMapObject(eachConvAreaObj, this._broadcastEmitter));
 
-    const gamingAreas = objectLayer.objects
-      .filter(eachObject => eachObject.type === 'GamingArea')
-      .map(eachGamingAreaObj =>
-        BlackjackArea.fromMapObject(eachGamingAreaObj, this._broadcastEmitter),
-      );
+    const gamingAreas = objectLayer.objects.filter(eachObject => eachObject.type === 'GamingArea').map(eachGamingAreaObj => BlackjackArea.fromMapObject(eachGamingAreaObj, this._broadcastEmitter));
 
-    this._interactables = this._interactables
-      .concat(viewingAreas)
-      .concat(conversationAreas)
-      .concat(gamingAreas);
+    this._interactables = this._interactables.concat(viewingAreas).concat(conversationAreas).concat(gamingAreas);
     this._validateInteractables();
   }
 
   private _validateInteractables() {
     // Make sure that the IDs are unique
     const interactableIDs = this._interactables.map(eachInteractable => eachInteractable.id);
-    if (
-      interactableIDs.some(
-        item => interactableIDs.indexOf(item) !== interactableIDs.lastIndexOf(item),
-      )
-    ) {
-      throw new Error(
-        `Expected all interactable IDs to be unique, but found duplicate interactable ID in ${interactableIDs}`,
-      );
+    if (interactableIDs.some(item => interactableIDs.indexOf(item) !== interactableIDs.lastIndexOf(item))) {
+      throw new Error(`Expected all interactable IDs to be unique, but found duplicate interactable ID in ${interactableIDs}`);
     }
     // Make sure that there are no overlapping objects
     for (const interactable of this._interactables) {
       for (const otherInteractable of this._interactables) {
         if (interactable !== otherInteractable && interactable.overlaps(otherInteractable)) {
-          throw new Error(
-            `Expected interactables not to overlap, but found overlap between ${interactable.id} and ${otherInteractable.id}`,
-          );
+          throw new Error(`Expected interactables not to overlap, but found overlap between ${interactable.id} and ${otherInteractable.id}`);
         }
       }
     }

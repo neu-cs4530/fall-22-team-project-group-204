@@ -81,10 +81,7 @@ export default class BlackJack {
   }
 
   private static _isGameOver(players: HumanPlayer[]): boolean {
-    return (
-      players.some(player => player.status === GameStatus.Won) ||
-      players.every(player => player.status === GameStatus.Lost)
-    );
+    return players.some(player => player.status === GameStatus.Won) || players.every(player => player.status === GameStatus.Lost);
   }
 
   public startGame(doDealing = true): void {
@@ -105,5 +102,4 @@ export default class BlackJack {
     // Also not sure when to call updateFromBlackjack
     this._gamingArea.updateFromBlackjack(this.dealer, this.players);
   }
-
 }

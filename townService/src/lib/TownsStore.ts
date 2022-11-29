@@ -80,11 +80,7 @@ export default class TownsStore {
    * @param isPubliclyListed
    * @returns the new town controller
    */
-  async createTown(
-    friendlyName: string,
-    isPubliclyListed: boolean,
-    mapFile = '../frontend/public/assets/tilemaps/blackjackmap.json',
-  ): Promise<Town> {
+  async createTown(friendlyName: string, isPubliclyListed: boolean, mapFile = '../frontend/public/assets/tilemaps/blackjackmap.json'): Promise<Town> {
     if (friendlyName.length === 0) {
       throw new Error('FriendlyName must be specified');
     }
@@ -105,12 +101,7 @@ export default class TownsStore {
    * @param makePublic
    * @returns true upon success, or false otherwise
    */
-  updateTown(
-    townID: string,
-    townUpdatePassword: string,
-    friendlyName?: string,
-    makePublic?: boolean,
-  ): boolean {
+  updateTown(townID: string, townUpdatePassword: string, friendlyName?: string, makePublic?: boolean): boolean {
     const existingTown = this.getTownByID(townID);
     if (existingTown && passwordMatches(townUpdatePassword, existingTown.townUpdatePassword)) {
       if (friendlyName !== undefined) {

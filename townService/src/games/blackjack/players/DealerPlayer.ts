@@ -175,7 +175,7 @@ export default class DealerPlayer extends HumanPlayer {
   }
 
   private static _wonOrLost(status: PlayerStatusUpdateType): boolean {
-    return (status === PlayerStatusUpdateType.UpdatedToLost || status === PlayerStatusUpdateType.UpdatedToWon);
+    return status === PlayerStatusUpdateType.UpdatedToLost || status === PlayerStatusUpdateType.UpdatedToWon;
   }
 
   private static _nothing(status: PlayerStatusUpdateType): boolean {
@@ -190,7 +190,7 @@ export default class DealerPlayer extends HumanPlayer {
     return players.length === 1;
   }
 
-  private unhideFirstCard(): void {
+  private _unhideFirstCard(): void {
     this.hand.cards[0][1] = true;
   }
 
@@ -225,22 +225,24 @@ export default class DealerPlayer extends HumanPlayer {
 
     // note that I am passing the original players array here, so if it has length 1 we are the only player
     if (DealerPlayer._onlyPlayer(players) && player.status === GameStatus.Lost) {
-      this.unhideFirstCard();
+      this._unhideFirstCard();
       this.status = GameStatus.Won;
       return;
     }
 
-    while(this._willHit()) {
+    while (this._willHit()) {
       super.addCard(this._popCard());
     }
 
-    this.unhideFirstCard();
+    this._unhideFirstCard();
 
     if (super.hasBusted()) {
       this.status = GameStatus.Lost;
       // If the dealer busts, all remaining player hands win. If the dealer does not bust,
       // each remaining bet wins if its hand is higher than the dealer's and loses if it is lower. - from wikipedia
-      players.forEach(p => { p.status = GameStatus.Won; });
+      players.forEach(p => {
+        p.status = GameStatus.Won;
+      });
     }
 
     const dealerScore = super.getMaxScore();
@@ -253,5 +255,4 @@ export default class DealerPlayer extends HumanPlayer {
       players.forEach(p => p.compareToDealerScoreAndUpdate(dealerScore));
     }
   }
-
 }

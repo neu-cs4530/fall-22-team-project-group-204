@@ -1,10 +1,6 @@
 import { ITiledMapObject } from '@jonbell/tiled-map-type-guard';
 import Player from '../lib/Player';
-import {
-  BoundingBox,
-  ConversationArea as ConversationAreaModel,
-  TownEmitter,
-} from '../types/CoveyTownSocket';
+import { BoundingBox, ConversationArea as ConversationAreaModel, TownEmitter } from '../types/CoveyTownSocket';
 import InteractableArea from './InteractableArea';
 
 export default class ConversationArea extends InteractableArea {
@@ -23,11 +19,7 @@ export default class ConversationArea extends InteractableArea {
    * @param coordinates  the bounding box that defines this conversation area
    * @param townEmitter a broadcast emitter that can be used to emit updates to players
    */
-  public constructor(
-    { topic, id }: ConversationAreaModel,
-    coordinates: BoundingBox,
-    townEmitter: TownEmitter,
-  ) {
+  public constructor({ topic, id }: ConversationAreaModel, coordinates: BoundingBox, townEmitter: TownEmitter) {
     super(id, coordinates, townEmitter);
     this.topic = topic;
   }
@@ -66,10 +58,7 @@ export default class ConversationArea extends InteractableArea {
    * @param broadcastEmitter An emitter that can be used by this conversation area to broadcast updates
    * @returns
    */
-  public static fromMapObject(
-    mapObject: ITiledMapObject,
-    broadcastEmitter: TownEmitter,
-  ): ConversationArea {
+  public static fromMapObject(mapObject: ITiledMapObject, broadcastEmitter: TownEmitter): ConversationArea {
     const { name, width, height } = mapObject;
     if (!width || !height) {
       throw new Error(`Malformed viewing area ${name}`);
