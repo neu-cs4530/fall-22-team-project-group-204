@@ -217,7 +217,7 @@ export function Chip({
       top={y + 'px'}
       left={x + 'px'}
       icon={<Image width='40px' src={chip} />}
-      aria-label={''}
+      aria-label={'chip'}
     />
   );
 }
@@ -232,6 +232,7 @@ export function JoinLeaveButton({
   if (!isPlaying) {
     return (
       <Button
+        data-testid='joinButton'
         size='sm'
         left='50px'
         top='50px'
@@ -246,6 +247,7 @@ export function JoinLeaveButton({
   } else {
     return (
       <Button
+        data-testid='leaveButton'
         size='sm'
         left='50px'
         top='50px'
