@@ -10,6 +10,7 @@
         "heroku-postbuild": "cd townService && CI= NODE_ENV=development npm install && npm run build",
         "run-townservice": "heroku local -p 3001 web",
         "lint": "cd townService && npm run-script lint && cd ../frontend && npm run-script lint && cd ../shared && npm run-script lint",
+        "format": "cd frontend && npm run format && cd ../townService && npm run format",
         "zip": "npm-pack-zip"
     },
     "repository": {

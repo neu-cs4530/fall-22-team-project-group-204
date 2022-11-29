@@ -14,9 +14,7 @@ import useTownController from '../hooks/useTownController';
 import {
   ChatMessage,
   CoveyTownSocket,
-  PlayerHand,
   PlayerLocation,
-  PlayingCard,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
   BlackjackArea as GamingAreaModel,
