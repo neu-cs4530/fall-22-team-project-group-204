@@ -75,12 +75,7 @@ describe('ViewingArea', () => {
   });
   describe('fromMapObject', () => {
     it('Throws an error if the width or height are missing', () => {
-      expect(() =>
-        ViewingArea.fromMapObject(
-          { id: 1, name: nanoid(), visible: true, x: 0, y: 0 },
-          townEmitter,
-        ),
-      ).toThrowError();
+      expect(() => ViewingArea.fromMapObject({ id: 1, name: nanoid(), visible: true, x: 0, y: 0 }, townEmitter)).toThrowError();
     });
     it('Creates a new viewing area using the provided boundingBox and id, with isPlaying defaulting to false and progress to 0, and emitter', () => {
       const x = 30;
@@ -88,10 +83,7 @@ describe('ViewingArea', () => {
       const width = 10;
       const height = 20;
       const name = 'name';
-      const val = ViewingArea.fromMapObject(
-        { x, y, width, height, name, id: 10, visible: true },
-        townEmitter,
-      );
+      const val = ViewingArea.fromMapObject({ x, y, width, height, name, id: 10, visible: true }, townEmitter);
       expect(val.boundingBox).toEqual({ x, y, width, height });
       expect(val.id).toEqual(name);
       expect(val.isPlaying).toEqual(false);

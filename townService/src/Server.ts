@@ -42,29 +42,22 @@ app.use('/docs', swaggerUi.serve, async (_req: Express.Request, res: Express.Res
 RegisterRoutes(app);
 
 // Add a middleware for Express to handle errors
-app.use(
-  (
-    err: unknown,
-    _req: Express.Request,
-    res: Express.Response,
-    next: Express.NextFunction,
-  ): Express.Response | void => {
-    if (err instanceof ValidateError) {
-      return res.status(422).json({
-        message: 'Validation Failed',
-        details: err?.fields,
-      });
-    }
-    if (err instanceof Error) {
-      logError(err);
-      return res.status(500).json({
-        message: 'Internal Server Error',
-      });
-    }
+app.use((err: unknown, _req: Express.Request, res: Express.Response, next: Express.NextFunction): Express.Response | void => {
+  if (err instanceof ValidateError) {
+    return res.status(422).json({
+      message: 'Validation Failed',
+      details: err?.fields,
+    });
+  }
+  if (err instanceof Error) {
+    logError(err);
+    return res.status(500).json({
+      message: 'Internal Server Error',
+    });
+  }
 
-    return next();
-  },
-);
+  return next();
+});
 
 // Start the configured server, defaulting to port 8081 if $PORT is not set
 server.listen(process.env.PORT || 8081, () => {

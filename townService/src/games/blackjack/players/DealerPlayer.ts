@@ -175,7 +175,7 @@ export default class DealerPlayer extends HumanPlayer {
   }
 
   private static _wonOrLost(status: PlayerStatusUpdateType): boolean {
-    return (status === PlayerStatusUpdateType.UpdatedToLost || status === PlayerStatusUpdateType.UpdatedToWon);
+    return status === PlayerStatusUpdateType.UpdatedToLost || status === PlayerStatusUpdateType.UpdatedToWon;
   }
 
   private static _nothing(status: PlayerStatusUpdateType): boolean {
@@ -230,7 +230,7 @@ export default class DealerPlayer extends HumanPlayer {
       return;
     }
 
-    while(this._willHit()) {
+    while (this._willHit()) {
       super.addCard(this._popCard());
     }
 
@@ -240,7 +240,9 @@ export default class DealerPlayer extends HumanPlayer {
       this.status = GameStatus.Lost;
       // If the dealer busts, all remaining player hands win. If the dealer does not bust,
       // each remaining bet wins if its hand is higher than the dealer's and loses if it is lower. - from wikipedia
-      players.forEach(p => { p.status = GameStatus.Won; });
+      players.forEach(p => {
+        p.status = GameStatus.Won;
+      });
     }
 
     const dealerScore = super.getMaxScore();
@@ -253,5 +255,4 @@ export default class DealerPlayer extends HumanPlayer {
       players.forEach(p => p.compareToDealerScoreAndUpdate(dealerScore));
     }
   }
-
 }

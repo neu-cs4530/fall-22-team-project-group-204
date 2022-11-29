@@ -1,10 +1,6 @@
 import { ITiledMapObject } from '@jonbell/tiled-map-type-guard';
 import Player from '../lib/Player';
-import {
-  BoundingBox,
-  TownEmitter,
-  ViewingArea as ViewingAreaModel,
-} from '../types/CoveyTownSocket';
+import { BoundingBox, TownEmitter, ViewingArea as ViewingAreaModel } from '../types/CoveyTownSocket';
 import InteractableArea from './InteractableArea';
 
 export default class ViewingArea extends InteractableArea {
@@ -33,11 +29,7 @@ export default class ViewingArea extends InteractableArea {
    * @param coordinates the bounding box that defines this viewing area
    * @param townEmitter a broadcast emitter that can be used to emit updates to players
    */
-  public constructor(
-    { id, isPlaying, elapsedTimeSec: progress, video }: ViewingAreaModel,
-    coordinates: BoundingBox,
-    townEmitter: TownEmitter,
-  ) {
+  public constructor({ id, isPlaying, elapsedTimeSec: progress, video }: ViewingAreaModel, coordinates: BoundingBox, townEmitter: TownEmitter) {
     super(id, coordinates, townEmitter);
     this._video = video;
     this._elapsedTimeSec = progress;

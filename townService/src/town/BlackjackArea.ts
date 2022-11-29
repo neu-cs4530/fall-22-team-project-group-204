@@ -1,12 +1,5 @@
 import { ITiledMapObject } from '@jonbell/tiled-map-type-guard';
-import {
-  BoundingBox,
-  TownEmitter,
-  BlackjackArea as GamingAreaModel,
-  PlayingCard,
-  BlackjackPlayer,
-  BlackjackUpdate,
-} from '../types/CoveyTownSocket';
+import { BoundingBox, TownEmitter, BlackjackArea as GamingAreaModel, PlayingCard, BlackjackPlayer, BlackjackUpdate } from '../types/CoveyTownSocket';
 import InteractableArea from './InteractableArea';
 // eslint-disable-next-line import/no-cycle
 import BlackJack from '../games/blackjack/blackjack/Blackjack';
@@ -50,11 +43,7 @@ export default class BlackjackArea extends InteractableArea {
    * @param coordinates the bounding box that defines this viewing area
    * @param townEmitter a broadcast emitter that can be used to emit updates to players
    */
-  public constructor(
-    { id, dealer, players, update }: GamingAreaModel,
-    coordinates: BoundingBox,
-    townEmitter: TownEmitter,
-  ) {
+  public constructor({ id, dealer, players, update }: GamingAreaModel, coordinates: BoundingBox, townEmitter: TownEmitter) {
     super(id, coordinates, townEmitter);
     this._dealer = dealer;
     this._players = players;
@@ -75,22 +64,12 @@ export default class BlackjackArea extends InteractableArea {
     this._dealer = dealer;
     let newUpdate = false;
     this._players = players;
-    if (
-      this._lastUpdate?.action !== update?.action ||
-      this._lastUpdate?.id !== update?.id ||
-      this._lastUpdate?.timestamp !== update?.timestamp
-    ) {
+    if (this._lastUpdate?.action !== update?.action || this._lastUpdate?.id !== update?.id || this._lastUpdate?.timestamp !== update?.timestamp) {
       newUpdate = true;
     }
     this._lastUpdate = update;
     this._players.forEach(playerHand => {
-      if (
-        newUpdate &&
-        update !== undefined &&
-        update.action !== 'Start' &&
-        playerHand.id === update.id &&
-        playerHand.gameStatus === 'Playing'
-      ) {
+      if (newUpdate && update !== undefined && update.action !== 'Start' && playerHand.id === update.id && playerHand.gameStatus === 'Playing') {
         this._game.advanceGame(playerHand.id, HumanPlayer.parseNextMove(update.action));
         if (update.action === 'Stay') {
           this._timedOut.set(playerHand.id, false);
@@ -99,13 +78,7 @@ export default class BlackjackArea extends InteractableArea {
       }
     });
 
-    if (
-      newUpdate &&
-      update?.action === 'Start' &&
-      this.dealer.gameStatus === 'Waiting' &&
-      this._players.length > 0 &&
-      this._players.map(p => p.id).includes(update.id)
-    ) {
+    if (newUpdate && update?.action === 'Start' && this.dealer.gameStatus === 'Waiting' && this._players.length > 0 && this._players.map(p => p.id).includes(update.id)) {
       this._players.forEach(playerHand => {
         if (!this._game.players.map(p => p.id).includes(playerHand.id)) {
           this._game.addPlayer(new HumanPlayer(GameStatus.Waiting, playerHand.id));
@@ -152,9 +125,7 @@ export default class BlackjackArea extends InteractableArea {
     this._players = this._players.filter(p => !this._timedOut.get(p.id));
     this._dealer = { id: '0', hand: [], gameStatus: 'Waiting' };
     const dealerProper = new DealerPlayer(GameStatus.Waiting, this._dealer.id);
-    const playersProper = this._players.map(
-      player => new HumanPlayer(GameStatus.Waiting, player.id),
-    );
+    const playersProper = this._players.map(player => new HumanPlayer(GameStatus.Waiting, player.id));
     this._game = new BlackJack(playersProper, dealerProper, this);
     this._timedOut = new Map<string, boolean>();
     this._emitAreaChanged();
@@ -283,10 +254,6 @@ export default class BlackjackArea extends InteractableArea {
     const dealer: BlackjackPlayer = { id: '0', hand: [], gameStatus: 'Waiting' };
     const players: BlackjackPlayer[] = [];
     const rect: BoundingBox = { x: mapObject.x, y: mapObject.y, width, height };
-    return new BlackjackArea(
-      { id: name, players, dealer, update: undefined, bettingAmount: 0 },
-      rect,
-      townEmitter,
-    );
+    return new BlackjackArea({ id: name, players, dealer, update: undefined, bettingAmount: 0 }, rect, townEmitter);
   }
 }
