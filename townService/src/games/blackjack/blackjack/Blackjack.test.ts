@@ -38,6 +38,7 @@ describe('DealerPlayer', () => {
 
   describe('constructor', () => {
     it('Constructs a DealerPlayer properly', () => {
+      expect(blackjackInstance.dealer).toBeInstanceOf(DealerPlayer);
       const newBlackjackInstance = new BlackJack();
       expect(newBlackjackInstance.players).toStrictEqual([]);
       expect(newBlackjackInstance.dealer).not.toBeNull();
