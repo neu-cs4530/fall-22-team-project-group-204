@@ -38,7 +38,7 @@ export default class BlackJack {
     gamingArea: BlackjackArea = new BlackjackArea(
       {
         id: 'invalidId',
-        dealer: { id: '0', hand: [], gameStatus: 'Waiting' },
+        dealer: { id: 'dealer', hand: [], gameStatus: 'Waiting' },
         players: [],
         update: undefined,
         bettingAmount: 0,
@@ -58,7 +58,8 @@ export default class BlackJack {
     });
   }
 
-  public addPlayer(player: HumanPlayer): void {
+  public async addPlayer(player: HumanPlayer): Promise<void> {
+    await player.addToDatabase();
     this._players.push(player);
   }
 
