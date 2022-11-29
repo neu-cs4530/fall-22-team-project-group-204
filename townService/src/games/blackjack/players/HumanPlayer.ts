@@ -6,9 +6,18 @@ import Hand from './Hand';
 import GameStatus from './GameStatus';
 import BlackjackAction from '../blackjack/BlackjackAction';
 import Card from '../../cards/Card';
+import 'firebase/firestore';
+import db from '../../../database';
+import { addDoc, collection, doc, getDoc } from 'firebase/firestore';
+import 'firebase/compat/auth';
+import 'firebase/compat/database';
 
 export default class HumanPlayer {
   private static _rl: ReadLine = createInterface({ input: process.stdin, output: process.stdout });
+
+  private static _tableName = 'users';
+
+  private _usersRef;
 
   private _hand: Hand;
 
@@ -38,11 +47,65 @@ export default class HumanPlayer {
 
   private _lastAction: string | undefined;
 
-  constructor(status: GameStatus = GameStatus.Waiting, id: string = nanoid()) {
+  // represents how much currency a user has
+  private _wallet: number;
+
+  public get wallet(): number {
+    return this._wallet;
+  }
+
+  public set wallet(value: number) {
+    this._wallet = value;
+  }
+
+  private _wins: number;
+
+  public get wins(): number {
+    return this._wins;
+  }
+  public set wins(value: number) {
+    this._wins = value;
+  }
+
+  private _losses: number;
+
+  public get losses(): number {
+    return this._losses;
+  }
+  public set losses(value: number) {
+    this._losses = value;
+  }
+
+  private _ties: number;
+
+  public get ties(): number {
+    return this._ties;
+  }
+  public set ties(value: number) {
+    this._ties = value;
+  }
+
+  public addCurrency(amount: number) {
+    this._wallet += amount;
+  }
+
+  public async addToDatabase() {
+    const docRef = doc(db, HumanPlayer._tableName, this._id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) return;
+    addDoc(this._usersRef, { balance: this._wallet, losses: this._losses, wins: this._wins, ties: this._ties, secret_id: this._id });
+  }
+
+  constructor(status: GameStatus = GameStatus.Waiting, id: string = nanoid(), wallet: number = 500) {
     this._hand = new Hand();
     this._status = status;
     this._id = id;
     this._lastAction = undefined;
+    this._wallet = wallet;
+    this._wins = 0;
+    this._losses = 0;
+    this._ties = 0;
+    this._usersRef = collection(db, HumanPlayer._tableName);
   }
 
   public addCard(newCard: Card, newCardHiddenStatus = true): void {
