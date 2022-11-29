@@ -63,6 +63,7 @@ export default class BlackjackArea extends InteractableArea {
     townEmitter: TownEmitter,
   ) {
     super(id, coordinates, townEmitter);
+    console.log(players);
     this._dealer = dealer;
     this._players = players;
     this._lastUpdate = update;
@@ -91,6 +92,12 @@ export default class BlackjackArea extends InteractableArea {
       newUpdate = true;
     }
     this._lastUpdate = update;
+    players.forEach(p => {
+      if (!this._game.players.some(playerProper => playerProper.id === p.id)) {
+        this._game.players.push(new HumanPlayer(GameStatus.Waiting, p.id));
+      }
+    })
+    console.log(players);
     this._players.forEach(playerHand => {
       if (
         newUpdate &&
@@ -114,6 +121,8 @@ export default class BlackjackArea extends InteractableArea {
       this._players.length > 0 &&
       this._players.map(p => p.id).includes(update.id)
     ) {
+      console.log("a")
+      console.log(this._players);
       this._players.forEach(async playerHand => {
         if (!this._game.players.map(p => p.id).includes(playerHand.id)) {
           await this._game.addPlayer(new HumanPlayer(GameStatus.Waiting, playerHand.id));
@@ -124,10 +133,14 @@ export default class BlackjackArea extends InteractableArea {
             setTimeout(() => {
               this._timedOut.set(playerHand.id, true);
               this._game.advanceGame(playerHand.id, HumanPlayer.parseNextMove('Stay'));
+              console.log(this._players);
+              console.log(players);
             }, this._timer * 1000),
           );
         }
       });
+      console.log("b");
+      console.log(this._players);
       this._game.startGame();
     }
   }
@@ -153,7 +166,9 @@ export default class BlackjackArea extends InteractableArea {
       gameStatus: GameStatus[dealer.status],
     };
     this._players = BlackjackArea.playersToBlackjackPlayers(players);
-    if (
+    if (BlackJack.isGameOver([...players, dealer])) {
+      this.endGame();
+    } else if (
       dealer.status !== GameStatus.Waiting &&
       dealer.status !== GameStatus.Playing &&
       this._timeoutsEnabled
@@ -173,13 +188,21 @@ export default class BlackjackArea extends InteractableArea {
       p.gameStatus = 'Waiting';
       p.hand = [];
     });
+    this._game.players.forEach(async plyr => {
+      if (plyr.status === GameStatus.Won) {
+        await plyr.addWin();
+      } else if (plyr.status === GameStatus.Lost) {
+        await plyr.addLoss();
+      }
+    });
     if (this._timeoutsEnabled) this._players = this._players.filter(p => !this._timedOut.get(p.id));
     this._dealer = { id: '0', hand: [], gameStatus: 'Waiting' };
-    const dealerProper = new DealerPlayer(GameStatus.Waiting, this._dealer.id);
-    const playersProper = this._players.map(
-      player => new HumanPlayer(GameStatus.Waiting, player.id),
-    );
-    this._game = new BlackJack(playersProper, dealerProper, this);
+    this._game.dealer.hand.cards = [];
+    this._game.dealer.status = GameStatus.Waiting;
+    this._game.players.forEach(plyr => {
+      plyr.hand.cards = [];
+      plyr.status = GameStatus.Waiting;
+    });
     if (this._timeoutsEnabled) this._timedOut = new Map<string, boolean>();
     this._emitAreaChanged();
   }

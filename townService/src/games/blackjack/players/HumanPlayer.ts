@@ -2,7 +2,7 @@
 /* eslint-disable class-methods-use-this */
 import { ReadLine, createInterface } from 'readline';
 import { nanoid } from 'nanoid';
-import { addDoc, collection, doc, getDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import Hand from './Hand';
 import GameStatus from './GameStatus';
 import BlackjackAction from '../blackjack/BlackjackAction';
@@ -68,6 +68,11 @@ export default class HumanPlayer {
     this._wins = value;
   }
 
+  public async addWin() {
+    this._wins += 1;
+    await this.updatePlayerRecord();
+  }
+
   private _losses: number;
 
   public get losses(): number {
@@ -76,6 +81,11 @@ export default class HumanPlayer {
 
   public set losses(value: number) {
     this._losses = value;
+  }
+
+  public async addLoss() {
+    this._losses += 1;
+    await this.updatePlayerRecord();
   }
 
   private _ties: number;
@@ -88,21 +98,37 @@ export default class HumanPlayer {
     this._ties = value;
   }
 
+  public async addTie() {
+    this._ties += 1;
+    await this.updatePlayerRecord();
+  }
+
   public addCurrency(amount: number) {
     this._wallet += amount;
+  }
+
+  private _document() {
+    return {
+      balance: this._wallet,
+      losses: this._losses,
+      wins: this._wins,
+      ties: this._ties,
+      secret_id: this._id,
+    }
+  }
+
+  public async updatePlayerRecord() {
+    const docRef = doc(db, HumanPlayer._tableName, this._id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) return;
+    setDoc(docRef, this._document());
   }
 
   public async addToDatabase() {
     const docRef = doc(db, HumanPlayer._tableName, this._id);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) return;
-    addDoc(this._usersRef, {
-      balance: this._wallet,
-      losses: this._losses,
-      wins: this._wins,
-      ties: this._ties,
-      secret_id: this._id,
-    });
+    addDoc(this._usersRef, this._document());
   }
 
   constructor(status: GameStatus = GameStatus.Waiting, id: string = nanoid(), wallet = 500) {

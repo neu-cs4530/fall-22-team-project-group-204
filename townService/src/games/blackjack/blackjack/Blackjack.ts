@@ -85,7 +85,7 @@ export default class BlackJack {
     return humanPlayers;
   }
 
-  private static _isGameOver(players: HumanPlayer[]): boolean {
+  public static isGameOver(players: HumanPlayer[]): boolean {
     return (
       players.some(player => player.status === GameStatus.Won) ||
       players.every(player => player.status === GameStatus.Lost)
@@ -93,6 +93,10 @@ export default class BlackJack {
   }
 
   public startGame(doDealing = true): void {
+    console.log("c");
+    console.log(this._players);
+    console.log("d");
+    console.log(this._getActiveHumanPlayers());
     const players: HumanPlayer[] = this._getActiveHumanPlayers();
     this._updateToPlaying();
 
@@ -122,7 +126,7 @@ export default class BlackJack {
 
     this._gamingArea.updateFromBlackjack(this._dealer, players);
 
-    while (!BlackJack._isGameOver([...players, this._dealer])) {
+    while (!BlackJack.isGameOver([...players, this._dealer])) {
       await this._dealer.doTurns(players);
     }
   }
