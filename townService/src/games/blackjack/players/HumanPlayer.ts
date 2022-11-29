@@ -2,13 +2,13 @@
 /* eslint-disable class-methods-use-this */
 import { ReadLine, createInterface } from 'readline';
 import { nanoid } from 'nanoid';
+import { addDoc, collection, doc, getDoc } from 'firebase/firestore';
 import Hand from './Hand';
 import GameStatus from './GameStatus';
 import BlackjackAction from '../blackjack/BlackjackAction';
 import Card from '../../cards/Card';
-import 'firebase/firestore';
 import db from '../../../database';
-import { addDoc, collection, doc, getDoc } from 'firebase/firestore';
+
 import 'firebase/compat/auth';
 import 'firebase/compat/database';
 
@@ -63,6 +63,7 @@ export default class HumanPlayer {
   public get wins(): number {
     return this._wins;
   }
+
   public set wins(value: number) {
     this._wins = value;
   }
@@ -72,6 +73,7 @@ export default class HumanPlayer {
   public get losses(): number {
     return this._losses;
   }
+
   public set losses(value: number) {
     this._losses = value;
   }
@@ -81,6 +83,7 @@ export default class HumanPlayer {
   public get ties(): number {
     return this._ties;
   }
+
   public set ties(value: number) {
     this._ties = value;
   }
@@ -93,10 +96,16 @@ export default class HumanPlayer {
     const docRef = doc(db, HumanPlayer._tableName, this._id);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) return;
-    addDoc(this._usersRef, { balance: this._wallet, losses: this._losses, wins: this._wins, ties: this._ties, secret_id: this._id });
+    addDoc(this._usersRef, {
+      balance: this._wallet,
+      losses: this._losses,
+      wins: this._wins,
+      ties: this._ties,
+      secret_id: this._id,
+    });
   }
 
-  constructor(status: GameStatus = GameStatus.Waiting, id: string = nanoid(), wallet: number = 500) {
+  constructor(status: GameStatus = GameStatus.Waiting, id: string = nanoid(), wallet = 500) {
     this._hand = new Hand();
     this._status = status;
     this._id = id;
