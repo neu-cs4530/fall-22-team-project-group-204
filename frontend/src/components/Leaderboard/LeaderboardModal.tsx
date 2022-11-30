@@ -9,16 +9,16 @@ import {
 import { createColumnHelper } from '@tanstack/react-table';
 import React, { useCallback, useEffect } from 'react';
 import { PlayerStanding } from '../../../../shared/types/CoveyTownSocket';
-import { useGamingAreaController, useInteractable } from '../../classes/TownController';
 import useTownController from '../../hooks/useTownController';
-import BlackjackArea from '../Town/interactables/GamingArea';
 import { DataTable } from './DataTable';
 
-export default function LeaderboardModal(): JSX.Element {
-  const gamingArea = useInteractable<BlackjackArea>('gamingArea') as BlackjackArea;
-  const gamingAreaController = useGamingAreaController(gamingArea.name);
+export default function LeaderboardModal({
+  rankingData,
+}: {
+  rankingData: PlayerStanding[];
+}): JSX.Element {
   const coveyTownController = useTownController();
-  const data: PlayerStanding[] = gamingAreaController.leaderboard;
+  const data: PlayerStanding[] = rankingData;
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 

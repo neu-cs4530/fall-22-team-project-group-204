@@ -65,14 +65,12 @@ describe('Blackjack Modal', () => {
       dealer: dealer,
       players: players,
       bettingAmount: 0,
-      leaderboard: [],
     });
     townController.createBlackjackArea({
       id: 'test',
       dealer: dealer,
       players: players,
       bettingAmount: 0,
-      leaderboard: [],
     });
     addListenerSpy = jest.spyOn(gamingArea, 'addListener');
     removeListenerSpy = jest.spyOn(gamingArea, 'removeListener');

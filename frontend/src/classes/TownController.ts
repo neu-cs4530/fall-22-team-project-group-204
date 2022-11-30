@@ -644,7 +644,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         players: players,
         update: undefined,
         bettingAmount: 0,
-        leaderboard: [],
       });
       this._gamingAreas.push(newController);
       return newController;

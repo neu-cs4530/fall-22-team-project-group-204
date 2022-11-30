@@ -6,7 +6,6 @@ import {
   PlayingCard,
   BlackjackPlayer,
   BlackjackUpdate,
-  PlayerStanding,
 } from '../types/CoveyTownSocket';
 import InteractableArea from './InteractableArea';
 // eslint-disable-next-line import/no-cycle
@@ -22,8 +21,6 @@ export default class BlackjackArea extends InteractableArea {
   private _dealer: BlackjackPlayer;
 
   private _players: BlackjackPlayer[];
-
-  private _leaderboard: PlayerStanding[];
 
   private _lastUpdate: BlackjackUpdate | undefined;
 
@@ -61,7 +58,7 @@ export default class BlackjackArea extends InteractableArea {
    * @param townEmitter a broadcast emitter that can be used to emit updates to players
    */
   public constructor(
-    { id, dealer, players, leaderboard, update }: GamingAreaModel,
+    { id, dealer, players, update }: GamingAreaModel,
     coordinates: BoundingBox,
     townEmitter: TownEmitter,
   ) {
@@ -69,7 +66,6 @@ export default class BlackjackArea extends InteractableArea {
     console.log(players);
     this._dealer = dealer;
     this._players = players;
-    this._leaderboard = leaderboard;
     this._lastUpdate = update;
     const dealerProper = new DealerPlayer(GameStatus.Waiting, dealer.id);
     const playersProper = players.map(player => new HumanPlayer(GameStatus.Waiting, player.id));
@@ -126,9 +122,10 @@ export default class BlackjackArea extends InteractableArea {
       this._players.length > 0 &&
       this._players.map(p => p.id).includes(update.id)
     ) {
-      console.log('a');
-      console.log(this._players);
-      this._players.forEach(async playerHand => {
+      this._players.forEach(playerHand => {
+        if (!this._game.players.map(p => p.id).includes(playerHand.id)) {
+          this._game.addPlayer(new HumanPlayer(GameStatus.Waiting, playerHand.id));
+        }
         if (this._timeoutsEnabled) {
           this._timeoutIds.set(
             playerHand.id,
@@ -315,7 +312,6 @@ export default class BlackjackArea extends InteractableArea {
       players: this._players,
       update: this._lastUpdate,
       bettingAmount: 0,
-      leaderboard: this._leaderboard,
     };
   }
 
@@ -340,7 +336,6 @@ export default class BlackjackArea extends InteractableArea {
         dealer,
         update: undefined,
         bettingAmount: 0,
-        leaderboard: [],
       },
       rect,
       townEmitter,

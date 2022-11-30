@@ -80,13 +80,6 @@ export default class GamingAreaController extends (EventEmitter as new () => Typ
   }
 
   /**
-   * Returns the Blackjack leaderboard
-   */
-  public get leaderboard() {
-    return this._model.leaderboard;
-  }
-
-  /**
    * Returns the last update
    */
   public get update() {

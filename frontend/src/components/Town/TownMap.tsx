@@ -1,12 +1,11 @@
-import React from 'react';
 import Phaser from 'phaser';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import useTownController from '../../hooks/useTownController';
+import LeaderboardModal from '../Leaderboard/LeaderboardModal';
 import SocialSidebar from '../SocialSidebar/SocialSidebar';
+import BlackjackModal from './interactables/BlackjackModal';
 import NewConversationModal from './interactables/NewCoversationModal';
 import TownGameScene from './TownGameScene';
-import BlackjackModal from './interactables/BlackjackModal';
-import LeaderboardModal from '../Leaderboard/LeaderboardModal';
 
 export default function TownMap(): JSX.Element {
   const coveyTownController = useTownController();
@@ -47,11 +46,29 @@ export default function TownMap(): JSX.Element {
     };
   }, [coveyTownController]);
 
+  // Leaderboard
+  // const docRef = collection(db, 'users');
+  // const orderRef = query(docRef, orderBy('wins', 'desc'), orderBy('balance', 'desc'));
+  // const docsSnap = await getDocs(orderRef);
+
+  // const leaderboardData: PlayerStanding[] = [];
+  // let count = 1;
+  // docsSnap.forEach(doc => {
+  //   const playerRank: PlayerStanding = {
+  //     ranking: count,
+  //     name: doc.data().name,
+  //     wins: doc.data().wins,
+  //     balance: doc.data().balance,
+  //   };
+  //   leaderboardData.push(playerRank);
+  //   count += 1;
+  // });
+
   return (
     <div id='app-container'>
       <NewConversationModal />
       <BlackjackModal />
-      <LeaderboardModal />
+      <LeaderboardModal rankingData={[]} />
       <div id='map-container' />
       <div id='social-container'>
         <SocialSidebar />

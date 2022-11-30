@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import mock from 'jest-mock-extended/lib/Mock';
-import { PlayerStanding, TownEmitter } from 'src/types/CoveyTownSocket';
+import { TownEmitter } from 'src/types/CoveyTownSocket';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import GameStatus from '../players/GameStatus';
 import DealerPlayer from '../players/DealerPlayer';
@@ -29,12 +29,6 @@ export default class BlackJack {
     return this._players;
   }
 
-  private _leaderboard: PlayerStanding[];
-
-  public get leaderboard(): PlayerStanding[] {
-    return this._leaderboard;
-  }
-
   // contains a reference to the BlackjackArea for sending notifications of changes
   private _gamingArea: BlackjackArea;
 
@@ -50,7 +44,6 @@ export default class BlackJack {
         players: [],
         update: undefined,
         bettingAmount: 0,
-        leaderboard: [],
       },
       { x: 0, y: 0, width: 0, height: 0 },
       mock<TownEmitter>(), // NOTE: may need to change in the future
@@ -59,7 +52,6 @@ export default class BlackJack {
     this._dealer = dealer;
     this._players = players;
     this._gamingArea = gamingArea;
-    this._leaderboard = [];
   }
 
   public updatePlayerCards(allCards: Card[][]): void {
@@ -69,8 +61,8 @@ export default class BlackJack {
   }
 
   public async addPlayer(player: HumanPlayer): Promise<void> {
-    await player.addToDatabase();
     this._players.push(player);
+    await player.addToDatabase();
   }
 
   // update everyones status to Playing
@@ -141,28 +133,28 @@ export default class BlackJack {
     }
   }
 
-  public static async getLeaderboard(): Promise<PlayerStanding[]> {
-    const docRef = collection(db, 'users');
-    const orderRef = query(docRef, orderBy('wins', 'desc'), orderBy('balance', 'desc'));
-    const docsSnap = await getDocs(orderRef);
+  // public static async getLeaderboard(): Promise<PlayerStanding[]> {
+  //   const docRef = collection(db, 'users');
+  //   const orderRef = query(docRef, orderBy('wins', 'desc'), orderBy('balance', 'desc'));
+  //   const docsSnap = await getDocs(orderRef);
 
-    const leaderboardData: PlayerStanding[] = [];
-    let count = 1;
-    docsSnap.forEach(doc => {
-      const playerRank: PlayerStanding = {
-        ranking: count,
-        name: doc.data().name,
-        wins: doc.data().wins,
-        balance: doc.data().balance,
-      };
-      leaderboardData.push(playerRank);
-      count += 1;
-    });
-    return leaderboardData as PlayerStanding[];
-    // if (docsSnap.empty) return [];
+  //   const leaderboardData: PlayerStanding[] = [];
+  //   let count = 1;
+  //   docsSnap.forEach(doc => {
+  //     const playerRank: PlayerStanding = {
+  //       ranking: count,
+  //       name: doc.data().name,
+  //       wins: doc.data().wins,
+  //       balance: doc.data().balance,
+  //     };
+  //     leaderboardData.push(playerRank);
+  //     count += 1;
+  //   });
+  //   return leaderboardData as PlayerStanding[];
+  //   // if (docsSnap.empty) return [];
 
-    // return docsSnap.docs.map((doc, idx) => {
-    //   return { ranking: idx + 1, name: doc.data().name, wins: doc.data().wins, balance: doc.data().balance }
-    // })
-  }
+  //   // return docsSnap.docs.map((doc, idx) => {
+  //   //   return { ranking: idx + 1, name: doc.data().name, wins: doc.data().wins, balance: doc.data().balance }
+  //   // })
+  // }
 }
