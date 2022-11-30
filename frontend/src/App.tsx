@@ -19,6 +19,8 @@ import TownControllerContext from './contexts/TownControllerContext';
 import LoginControllerContext from './contexts/LoginControllerContext';
 import { TownsServiceClient } from './generated/client';
 
+export const TOWNS_SERVICE_URL = 'http://localhost:8081';
+
 function App() {
   const [townController, setTownController] = useState<TownController | null>(null);
 
@@ -41,7 +43,7 @@ function App() {
   } else {
     page = <PreJoinScreens />;
   }
-  const url = process.env.REACT_APP_TOWNS_SERVICE_URL;
+  const url = TOWNS_SERVICE_URL;
   assert(url);
   const townsService = new TownsServiceClient({ BASE: url }).towns;
   return (

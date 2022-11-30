@@ -174,6 +174,7 @@ export default function TownSelection(): JSX.Element {
               <FormLabel htmlFor='name'>Name</FormLabel>
               <Input
                 autoFocus
+                autoComplete='nope'
                 name='name'
                 placeholder='Your name'
                 value={userName}
@@ -190,6 +191,7 @@ export default function TownSelection(): JSX.Element {
                 <FormControl>
                   <FormLabel htmlFor='townName'>New Town Name</FormLabel>
                   <Input
+                    autoComplete='nope'
                     name='townName'
                     placeholder='New Town Name'
                     value={newTownName}

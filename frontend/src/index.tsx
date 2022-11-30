@@ -1,8 +1,16 @@
+/* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+
+if (!('process' in window)) {
+  // @ts-ignore
+  window.process = {};
+}
 
 ReactDOM.render(
   <React.StrictMode>

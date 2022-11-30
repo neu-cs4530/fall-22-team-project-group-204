@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import TypedEmitter from 'typed-emitter';
+import { TOWNS_SERVICE_URL } from '../App';
 import Interactable from '../components/Town/Interactable';
 import BlackjackArea from '../components/Town/interactables/GamingArea';
 import ViewingArea from '../components/Town/interactables/ViewingArea';
@@ -214,7 +215,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         */
     this.setMaxListeners(30);
 
-    const url = process.env.REACT_APP_TOWNS_SERVICE_URL;
+    const url = TOWNS_SERVICE_URL;
     assert(url);
     this._socket = io(url, { auth: { userName, townID } });
     this._townsService = new TownsServiceClient({ BASE: url }).towns;
