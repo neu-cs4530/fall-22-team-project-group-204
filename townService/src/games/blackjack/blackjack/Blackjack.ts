@@ -1,6 +1,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import mock from 'jest-mock-extended/lib/Mock';
 import { TownEmitter } from 'src/types/CoveyTownSocket';
+import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import GameStatus from '../players/GameStatus';
 import DealerPlayer from '../players/DealerPlayer';
 import HumanPlayer from '../players/HumanPlayer';
@@ -8,7 +9,14 @@ import HumanPlayer from '../players/HumanPlayer';
 import BlackjackArea from '../../../town/BlackjackArea';
 import Card from '../../cards/Card';
 import BlackjackAction from './BlackjackAction';
+import db from '../../../database';
 
+export type PlayerStanding = {
+  ranking: number;
+  name: string;
+  wins: number;
+  reward: number;
+};
 export default class BlackJack {
   // Going to have this DealerPlayer class handle the responsiblites of the Dealer and the Player.
   // I thought about this for a while, and think this is the best solution, if anyone disagrees lmk.
@@ -113,6 +121,9 @@ export default class BlackJack {
 
     // Also not sure when to call updateFromBlackjack
     this._gamingArea.updateFromBlackjack(this.dealer, this.players);
+
+    console.log('Leaderboard data:');
+    BlackJack.getLeaderboard();
   }
 
   public async playGame(doDealing = true): Promise<void> {
@@ -129,5 +140,16 @@ export default class BlackJack {
     while (!BlackJack.isGameOver([...players, this._dealer])) {
       await this._dealer.doTurns(players);
     }
+  }
+
+  public static async getLeaderboard(): Promise<PlayerStanding[]> {
+    const docRef = collection(db, 'users');
+    const orderRef = query(docRef, orderBy('wins', 'desc'), orderBy('balance', 'desc'));
+    const docsSnap = await getDocs(orderRef);
+
+    docsSnap.forEach(doc => {
+      console.log(doc.data());
+    });
+    return [];
   }
 }
