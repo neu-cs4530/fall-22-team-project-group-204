@@ -41,7 +41,7 @@ describe('BlackjackArea', () => {
 
       expect(testArea.occupantsByID).toEqual([extraPlayer.id]);
       const lastEmittedUpdate = getLastEmittedEvent(townEmitter, 'interactableUpdate');
-      expect(lastEmittedUpdate).toEqual({ id, dealer, players, update, bettingAmount });
+      expect(lastEmittedUpdate).toEqual({ id, dealer, players, update, bettingAmount, playerStandings });
     });
     it("Clears the player's conversationLabel and emits an update for their location", () => {
       testArea.remove(newPlayer);
