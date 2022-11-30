@@ -41,6 +41,22 @@ describe('HumanPlayer', () => {
     it('id getter works correctly', () => {
       expect(player.id).toBe('0');
     });
+
+    it('wallet getter works correctly', () => {
+      expect(player.wallet).toBe(500);
+    });
+
+    it('wins getter works correctly', () => {
+      expect(player.wins).toBe(0);
+    });
+
+    it('losses getter works correctly', () => {
+      expect(player.losses).toBe(0);
+    });
+
+    it('ties getter works correctly', () => {
+      expect(player.ties).toBe(0);
+    });
   });
 
   describe('setters', () => {
@@ -60,6 +76,30 @@ describe('HumanPlayer', () => {
       expect(player.status).toBe(GameStatus.Playing);
       player.status = GameStatus.Won;
       expect(player.status).toBe(GameStatus.Won);
+    });
+
+    it('Wallet setter works correctly', () => {
+      expect(player.wallet).toBe(500);
+      player.wallet = 700;
+      expect(player.wallet).toBe(700);
+    });
+
+    it('Wins setter works correctly', () => {
+      expect(player.wins).toBe(0);
+      player.wins = 700;
+      expect(player.wins).toBe(700);
+    });
+
+    it('Losses setter works correctly', () => {
+      expect(player.losses).toBe(0);
+      player.losses = 700;
+      expect(player.losses).toBe(700);
+    });
+
+    it('Ties setter works correctly', () => {
+      expect(player.ties).toBe(0);
+      player.ties = 700;
+      expect(player.ties).toBe(700);
     });
   });
 
@@ -145,17 +185,28 @@ describe('HumanPlayer', () => {
       });
     });
 
-    describe('getNextMove', () => {
-      // Not exactly sure how to test this currently, will finish later
+    describe('addCurrency', () => {
+      it('adds or subtracts currency to players wallet', () => {
+        expect(player.wallet).toBe(500);
+
+        player.addCurrency(600);
+
+        expect(player.wallet).toBe(1100);
+
+      });
     });
 
-    describe('getBlackjackAction', () => {
-      // Not exactly sure how to test this currently, will finish later
-    });
+    describe('compareToDealerScoreAndUpdate', () => {
+      it('determines if player wins or losses by comparing to dealers score', () => {
+        expect(player.status).toBe(GameStatus.Waiting);
 
-    describe('doTurn', () => {
-      // Not exactly sure how to test this currently, will finish later
+        player.compareToDealerScoreAndUpdate(25);
+
+        expect(player.status).toBe(GameStatus.Won);
+
+      });
     });
+    
   });
 
   describe('static methods', () => {
