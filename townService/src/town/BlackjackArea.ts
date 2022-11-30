@@ -310,6 +310,7 @@ export default class BlackjackArea extends InteractableArea {
       players: this._players,
       update: this._lastUpdate,
       bettingAmount: 0,
+      leaderboard: BlackJack.getLeaderboard(),
     };
   }
 
@@ -328,7 +329,14 @@ export default class BlackjackArea extends InteractableArea {
     const players: BlackjackPlayer[] = [];
     const rect: BoundingBox = { x: mapObject.x, y: mapObject.y, width, height };
     return new BlackjackArea(
-      { id: name, players, dealer, update: undefined, bettingAmount: 0 },
+      {
+        id: name,
+        players,
+        dealer,
+        update: undefined,
+        bettingAmount: 0,
+        leaderboard: BlackJack.getLeaderboard(),
+      },
       rect,
       townEmitter,
     );

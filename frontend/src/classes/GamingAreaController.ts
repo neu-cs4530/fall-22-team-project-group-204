@@ -1,8 +1,7 @@
 import { EventEmitter } from 'events';
-import TypedEventEmitter from 'typed-emitter';
-import { BlackjackArea, BlackjackUpdate } from '../types/CoveyTownSocket';
-import { BlackjackPlayer } from '../types/CoveyTownSocket';
 import _ from 'lodash';
+import TypedEventEmitter from 'typed-emitter';
+import { BlackjackArea, BlackjackPlayer, BlackjackUpdate } from '../types/CoveyTownSocket';
 
 /**
  * The events that a GamingAreaController can emit
@@ -78,6 +77,13 @@ export default class GamingAreaController extends (EventEmitter as new () => Typ
       this._model.players = players;
       this.emit('playersChange', this.players);
     }
+  }
+
+  /**
+   * Returns the Blackjack leaderboard
+   */
+  public get leaderboard() {
+    return this._model.leaderboard;
   }
 
   /**

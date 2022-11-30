@@ -71,6 +71,7 @@ export interface BlackjackArea {
   players: BlackjackPlayer[];
   update?: BlackjackUpdate;
   bettingAmount: number;
+  leaderboard: Promise<PlayerStanding[]>;
 }
 
 export interface ConversationArea {

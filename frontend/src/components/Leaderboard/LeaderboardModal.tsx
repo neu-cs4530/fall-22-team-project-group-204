@@ -8,81 +8,27 @@ import {
 } from '@chakra-ui/react';
 import { createColumnHelper } from '@tanstack/react-table';
 import React, { useCallback, useEffect } from 'react';
+import { useGamingAreaController } from '../../classes/TownController';
 import useTownController from '../../hooks/useTownController';
+import BlackjackArea from '../Town/interactables/GamingArea';
 import { DataTable } from './DataTable';
 
-export default function LeaderboardModal(): JSX.Element {
-  type PlayerStanding = {
-    ranking: number;
-    name: string;
-    wins: number;
-    balance: number;
-  };
+export type PlayerStanding = {
+  ranking: number;
+  name: string;
+  wins: number;
+  balance: number;
+};
 
-  const data: PlayerStanding[] = [
-    {
-      ranking: 1,
-      name: 'Player1',
-      wins: 6,
-      balance: 400,
-    },
-    {
-      ranking: 2,
-      name: 'Player2',
-      wins: 3,
-      balance: 500,
-    },
-    {
-      ranking: 3,
-      name: 'Player3',
-      wins: 2,
-      balance: 320,
-    },
-    {
-      ranking: 4,
-      name: 'Player4',
-      wins: 2,
-      balance: 320,
-    },
-    {
-      ranking: 5,
-      name: 'Player5',
-      wins: 1,
-      balance: 140,
-    },
-    {
-      ranking: 6,
-      name: 'Player6',
-      wins: 1,
-      balance: 140,
-    },
-    {
-      ranking: 7,
-      name: 'Player7',
-      wins: 1,
-      balance: 140,
-    },
-    {
-      ranking: 8,
-      name: 'Player8',
-      wins: 1,
-      balance: 140,
-    },
-    {
-      ranking: 9,
-      name: 'Player9',
-      wins: 0,
-      balance: 0,
-    },
-    {
-      ranking: 10,
-      name: 'Player10',
-      wins: 0,
-      balance: 0,
-    },
-  ];
-
+export default function LeaderboardModal({
+  gamingArea,
+}: {
+  gamingArea: BlackjackArea;
+}): JSX.Element {
+  const gamingAreaController = useGamingAreaController(gamingArea.name);
   const coveyTownController = useTownController();
+  const data: Promise<PlayerStanding[]> = gamingAreaController.leaderboard;
+
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const openLeaderboardModal = useCallback(() => {

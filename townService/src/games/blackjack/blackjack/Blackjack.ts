@@ -50,6 +50,7 @@ export default class BlackJack {
         players: [],
         update: undefined,
         bettingAmount: 0,
+        leaderboard: BlackJack.getLeaderboard(),
       },
       { x: 0, y: 0, width: 0, height: 0 },
       mock<TownEmitter>(), // NOTE: may need to change in the future
@@ -121,8 +122,6 @@ export default class BlackJack {
 
     // Also not sure when to call updateFromBlackjack
     this._gamingArea.updateFromBlackjack(this.dealer, this.players);
-
-    BlackJack.getLeaderboard();
   }
 
   public async playGame(doDealing = true): Promise<void> {
