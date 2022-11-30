@@ -6,10 +6,10 @@ import CardFactory from '../../cards/CardFactory';
 import Suit from '../../cards/Suit';
 import Value from '../../cards/Value';
 import BlackjackAction from '../blackjack/BlackjackAction';
-import DealerPlayer from '../players/DealerPlayer';
-import GameStatus from '../players/GameStatus';
-import Hand from '../players/Hand';
-import HumanPlayer from '../players/HumanPlayer';
+import DealerPlayer from "./DealerPlayer";
+import GameStatus from "./GameStatus";
+import Hand from "./Hand";
+import HumanPlayer from "./HumanPlayer";
 
 // We are effectively testing both the DealerPlayer class and the
 // Player class here
