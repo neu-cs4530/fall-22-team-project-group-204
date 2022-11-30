@@ -174,7 +174,6 @@ export default class HumanPlayer {
     this._lastAction = action;
   }
 
-  // TODO: take input in the form of the variable _lastAction
   // Somehow, when the last action inputted by the player != undefined (which is updated by the BlackjackArea class),
   // this function should return the _lastAction ('Hit' or 'Stay')
   // It should also reset the value of _lastAction to be undefined
