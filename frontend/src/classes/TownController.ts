@@ -214,7 +214,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         */
     this.setMaxListeners(30);
 
-    const url = 'http://localhost:8081';
+    const url = TOWNS_SERVICE_URL;
     assert(url);
     this._socket = io(url, { auth: { userName, townID } });
     this._townsService = new TownsServiceClient({ BASE: url }).towns;
