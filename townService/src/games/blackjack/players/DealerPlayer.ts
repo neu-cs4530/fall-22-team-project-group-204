@@ -69,8 +69,8 @@ export default class DealerPlayer extends HumanPlayer {
       .map(({ card }) => card);
   }
 
-  public updateCards(cards: Card[]): void {
-    this.hand.updateCards(cards);
+  public updateCards(deck: Card[]): void {
+    this.hand.updateCards(deck);
   }
 
   public shuffleDecks(): void {

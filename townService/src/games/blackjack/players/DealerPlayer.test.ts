@@ -168,6 +168,48 @@ describe('DealerPlayer', () => {
       });
     });
 
+    describe('updateDealer', () => {
+      it('updates the dealer with new dealer', () => {
+        dealerPlayer = new DealerPlayer(GameStatus.Waiting, '0');
+        dealerPlayer2 = new DealerPlayer(GameStatus.Playing, '1');
+        const cards: [Card, boolean][] = [
+        [CardFactory.getCard(Value.Ace, Suit.Diamonds), false],
+        [CardFactory.getCard(Value.King, Suit.Diamonds), true],
+        ];
+        const cards2: [Card, boolean][] = [
+        [CardFactory.getCard(Value.Three, Suit.Diamonds), false],
+        [CardFactory.getCard(Value.Ace, Suit.Diamonds), true],
+        ];
+        const newHand = new Hand(cards);
+        const newHand2 = new Hand(cards2);
+        dealerPlayer.hand = newHand;
+        dealerPlayer2.hand = newHand2;
+        expect(dealerPlayer.hand).toStrictEqual(newHand);
+        expect(dealerPlayer.status).toBe(GameStatus.Waiting);
+        
+        dealerPlayer.updateDealer(dealerPlayer2);
+
+        expect(dealerPlayer.hand).toStrictEqual(newHand2);
+        expect(dealerPlayer.status).toBe(GameStatus.Playing);
+
+      });
+    });
+
+    describe('updateCards', () => {
+      it('updates this hand of cards with the new cards', () => {
+        const masterDeck = dealerPlayer.deck;
+        const cards: [Card, boolean][] = [
+        [CardFactory.getCard(Value.Ace, Suit.Diamonds), false],
+        [CardFactory.getCard(Value.King, Suit.Diamonds), true],
+        ];
+        expect(dealerPlayer.deck).toBe(masterDeck);
+
+        dealerPlayer.updateCards(cards);
+
+        expect(dealerPlayer.deck).toBe(cards);
+      });
+    });
+
   //   describe('doRound', () => {
   //     it('Does a round properly', async () => {
   //       expect(playerOne.hand.cards).toStrictEqual([]);
