@@ -145,18 +145,10 @@ export default class BlackJack {
     const orderRef = query(docRef, orderBy('wins', 'desc'), orderBy('balance', 'desc'));
     const docsSnap = await getDocs(orderRef);
 
-    const leaderboardData: PlayerStanding[] = [];
-    let count = 1;
-    docsSnap.forEach(doc => {
-      const playerRank: PlayerStanding = {
-        ranking: count,
-        name: doc.data().name,
-        wins: doc.data().wins,
-        balance: doc.data().balance,
-      };
-      leaderboardData.push(playerRank);
-      count += 1;
-    });
-    return leaderboardData;
+    if (docsSnap.empty) return [];
+
+    return docsSnap.docs.map((doc, idx) => {
+      return { ranking: idx + 1, name: doc.data().name, wins: doc.data().wins, balance: doc.data().balance }
+    })
   }
 }
