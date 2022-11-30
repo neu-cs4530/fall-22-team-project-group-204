@@ -7,7 +7,6 @@
         "test-blackjack": "cd townService && npm run test-blackjack",
         "test-blackjack-file": "cd townService/src/games/blackjack/blackjack && jest Blackjack.test.ts --forceExit",
         "install": "cd townService && CI= NODE_ENV=development npm install && CI= NODE_ENV=development npm run prestart && cd ../frontend && CI= NODE_ENV=development npm install && CI= NODE_ENV=development npm run prestart && cd ../shared && CI= NODE_ENV=development npm install",
-        "install-windows": "cd townService && npm install && npm run prestart && cd ../frontend && npm install && npm run prestart && cd ../shared && npm install",
         "heroku-postbuild": "cd townService && CI= NODE_ENV=development npm install && npm run build",
         "run-townservice": "heroku local -p 3001 web",
         "lint": "cd townService && npm run-script lint && cd ../frontend && npm run-script lint && cd ../shared && npm run-script lint",
