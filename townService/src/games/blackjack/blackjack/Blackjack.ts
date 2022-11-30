@@ -42,6 +42,7 @@ export default class BlackJack {
         players: [],
         update: undefined,
         bettingAmount: 0,
+        playerStandings: [],
       },
       { x: 0, y: 0, width: 0, height: 0 },
       mock<TownEmitter>(), // NOTE: may need to change in the future

@@ -2,7 +2,7 @@
 /* eslint-disable class-methods-use-this */
 import { ReadLine, createInterface } from 'readline';
 import { nanoid } from 'nanoid';
-import { collection, doc, getDoc, setDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, orderBy, query, setDoc } from 'firebase/firestore';
 import Hand from './Hand';
 import GameStatus from './GameStatus';
 import BlackjackAction from '../blackjack/BlackjackAction';
@@ -118,6 +118,14 @@ export default class HumanPlayer {
       secret_id: this._id,
       name: this._name,
     };
+  }
+
+  public static async getAllPlayerRecords() {
+    const docRef = collection(db, 'users');
+    const orderRef = query(docRef, orderBy('wins', 'desc'), orderBy('balance', 'desc'));
+    const docsSnap = await getDocs(orderRef);
+
+    return docsSnap.docs.map(d => d.data());
   }
 
   public static async getPlayerRecord(id: string) {

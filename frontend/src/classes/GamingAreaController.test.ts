@@ -17,6 +17,7 @@ describe('GamingAreaController', () => {
       players: [],
       update: undefined,
       bettingAmount: 0,
+      playerStandings: [],
     };
     testArea = new GamingAreaController(testAreaModel);
     mockClear(townController);
@@ -89,6 +90,7 @@ describe('GamingAreaController', () => {
   describe('updateFrom', () => {
     it('Updates the dealer, players, gameStatus, and update', () => {
       const newModel: BlackjackArea = {
+        playerStandings: [],
         id: testAreaModel.id,
         dealer: {
           id: '0',
@@ -116,6 +118,7 @@ describe('GamingAreaController', () => {
     it('Does not update the id property', () => {
       const existingID = testArea.id;
       const newModel: BlackjackArea = {
+        playerStandings: [],
         id: nanoid(),
         dealer: {
           id: '0',

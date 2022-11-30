@@ -50,22 +50,22 @@ export default function TownMap(): JSX.Element {
   }, [coveyTownController]);
 
   // Leaderboard
-  const docRef = collection(db, 'users');
-  const orderRef = query(docRef, orderBy('wins', 'desc'), orderBy('balance', 'desc'));
-  const docsSnap = await getDocs(orderRef);
+  // const docRef = collection(db, 'users');
+  // const orderRef = query(docRef, orderBy('wins', 'desc'), orderBy('balance', 'desc'));
+  // const docsSnap = await getDocs(orderRef);
 
   const leaderboardData: PlayerStanding[] = [];
-  let count = 1;
-  docsSnap.forEach(doc => {
-    const playerRank: PlayerStanding = {
-      ranking: count,
-      name: doc.data().name,
-      wins: doc.data().wins,
-      balance: doc.data().balance,
-    };
-    leaderboardData.push(playerRank);
-    count += 1;
-  });
+  // let count = 1;
+  // docsSnap.forEach(doc => {
+  //   const playerRank: PlayerStanding = {
+  //     ranking: count,
+  //     name: doc.data().name,
+  //     wins: doc.data().wins,
+  //     balance: doc.data().balance,
+  //   };
+  //   leaderboardData.push(playerRank);
+  //   count += 1;
+  // });
 
   return (
     <div id='app-container'>

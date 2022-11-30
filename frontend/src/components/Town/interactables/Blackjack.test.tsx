@@ -61,12 +61,14 @@ describe('Blackjack Modal', () => {
     };
     const players: BlackjackPlayer[] = [];
     gamingArea = new GamingAreaController({
+      playerStandings: [],
       id: 'test',
       dealer: dealer,
       players: players,
       bettingAmount: 0,
     });
     townController.createBlackjackArea({
+      playerStandings: [],
       id: 'test',
       dealer: dealer,
       players: players,

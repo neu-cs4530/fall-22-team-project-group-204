@@ -1,4 +1,5 @@
 import { ITiledMapObject } from '@jonbell/tiled-map-type-guard';
+import { DocumentData } from 'firebase/firestore';
 import {
   BoundingBox,
   TownEmitter,
@@ -6,6 +7,7 @@ import {
   PlayingCard,
   BlackjackPlayer,
   BlackjackUpdate,
+  PlayerStanding,
 } from '../types/CoveyTownSocket';
 import InteractableArea from './InteractableArea';
 // eslint-disable-next-line import/no-cycle
@@ -39,6 +41,8 @@ export default class BlackjackArea extends InteractableArea {
   // notes whether timeouts are enabled
   private _timeoutsEnabled: boolean;
 
+  private _leaderboardData: PlayerStanding[];
+
   public get dealer() {
     return this._dealer;
   }
@@ -49,6 +53,10 @@ export default class BlackjackArea extends InteractableArea {
 
   public get update() {
     return this._lastUpdate;
+  }
+
+  private static _toPlayerStanding(data: DocumentData, idx: number): PlayerStanding {
+    return { ranking: idx, name: data.name, wins: data.wins, balance: data.balance };
   }
 
   /**
@@ -72,6 +80,15 @@ export default class BlackjackArea extends InteractableArea {
     this._timeoutIds = new Map<string, NodeJS.Timeout>();
     this._timedOut = new Map<string, boolean>();
     this._timeoutsEnabled = true;
+    this._leaderboardData = [];
+    setTimeout(() => {
+      HumanPlayer.getAllPlayerRecords().then(records => {
+        if (records.length === 0) return;
+        this._leaderboardData = records.map((record, idx) =>
+          BlackjackArea._toPlayerStanding(record, idx),
+        );
+      });
+    }, 3000);
   }
 
   /**
@@ -306,6 +323,7 @@ export default class BlackjackArea extends InteractableArea {
       players: this._players,
       update: this._lastUpdate,
       bettingAmount: 0,
+      playerStandings: this._leaderboardData,
     };
   }
 
@@ -330,6 +348,7 @@ export default class BlackjackArea extends InteractableArea {
         dealer,
         update: undefined,
         bettingAmount: 0,
+        playerStandings: [],
       },
       rect,
       townEmitter,
