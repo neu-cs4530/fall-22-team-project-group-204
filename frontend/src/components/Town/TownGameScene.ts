@@ -354,10 +354,10 @@ export default class TownGameScene extends Phaser.Scene {
 
     // Object layers in Tiled let you embed extra info into a map - like a spawn point or custom
     // collision shapes. In the tmx file, there's an object layer with a point named "Spawn Point"
-    const spawnPoint = this.map.findObject(
+    const spawnPoint = (this.map.findObject(
       'Objects',
       obj => obj.name === 'Spawn Point',
-    ) as unknown as Phaser.GameObjects.Components.Transform;
+    ) as unknown) as Phaser.GameObjects.Components.Transform;
 
     const labels = this.map.filterObjects('Objects', obj => obj.name === 'label');
     labels.forEach(label => {
@@ -491,20 +491,6 @@ export default class TownGameScene extends Phaser.Scene {
       })
       .setScrollFactor(0)
       .setDepth(30);
-
-    this.add
-      .text(500, 16, `Shift to view leaderboard`, {
-        font: '18px monospace',
-        color: '#000000',
-        padding: {
-          x: 20,
-          y: 10,
-        },
-        backgroundColor: '#ffffff',
-      })
-      .setScrollFactor(0)
-      .setDepth(30);
-
     this._ready = true;
     this.updatePlayers(this.coveyTownController.players);
     // Call any listeners that are waiting for the game to be initialized

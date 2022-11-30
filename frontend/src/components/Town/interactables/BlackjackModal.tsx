@@ -17,11 +17,12 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import React, { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
-import { useInteractable, useGamingAreaController } from '../../../classes/TownController';
-import useTownController from '../../../hooks/useTownController';
 import GamingAreaController from '../../../classes/GamingAreaController';
-import BlackjackArea from './GamingArea';
+import { useGamingAreaController, useInteractable } from '../../../classes/TownController';
+import useTownController from '../../../hooks/useTownController';
 import { BlackjackPlayer, PlayingCard } from '../../../types/CoveyTownSocket';
+import LeaderboardModal from '../../Leaderboard/LeaderboardModal';
+import BlackjackArea from './GamingArea';
 
 /**
  * Converts a PlayingCard into an id
@@ -430,6 +431,9 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
         setBettingAmount={setBettingAmount}
         isPlaying={players.map(player => player.id).includes(townController.userID)}
       />
+      <Text as='b' fontSize='md' left='700px' top='50px' position='absolute'>
+        Shift to View Leaderboard
+      </Text>
       <Text as='b' fontSize='md' left='615px' top='450px' position='absolute'>
         1
       </Text>
@@ -486,6 +490,7 @@ export function BlackjackModal({ gamingArea }: { gamingArea: BlackjackArea }): J
     setIsOpen(false);
   }, [coveyTownController, setIsOpen]);
 
+  console.log(gamingAreaController.playerStandings);
   return (
     <Modal
       isOpen={isOpen}
@@ -493,12 +498,17 @@ export function BlackjackModal({ gamingArea }: { gamingArea: BlackjackArea }): J
         closeModal();
         coveyTownController.unPause();
       }}
-      size='5xl'>
+      size='5xl'
+      blockScrollOnMount={false}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader></ModalHeader>
         <ModalCloseButton />
         <ModalBody>
+          <LeaderboardModal
+            controller={gamingAreaController}
+            rankingData={gamingAreaController.playerStandings}
+          />
           <Blackjack controller={gamingAreaController} />
         </ModalBody>
         <ModalFooter> </ModalFooter>

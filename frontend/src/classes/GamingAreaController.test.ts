@@ -90,7 +90,6 @@ describe('GamingAreaController', () => {
   describe('updateFrom', () => {
     it('Updates the dealer, players, gameStatus, and update', () => {
       const newModel: BlackjackArea = {
-        playerStandings: [],
         id: testAreaModel.id,
         dealer: {
           id: '0',
@@ -106,6 +105,7 @@ describe('GamingAreaController', () => {
         ],
         update: { id: '1', action: 'Hit', timestamp: 'N/A' },
         bettingAmount: 0,
+        playerStandings: [],
       };
       testArea.updateFrom(newModel);
       expect(testArea.dealer).toEqual(newModel.dealer);
@@ -118,7 +118,6 @@ describe('GamingAreaController', () => {
     it('Does not update the id property', () => {
       const existingID = testArea.id;
       const newModel: BlackjackArea = {
-        playerStandings: [],
         id: nanoid(),
         dealer: {
           id: '0',
@@ -133,6 +132,7 @@ describe('GamingAreaController', () => {
           },
         ],
         bettingAmount: 0,
+        playerStandings: [],
       };
       testArea.updateFrom(newModel);
       expect(testArea.id).toEqual(existingID);

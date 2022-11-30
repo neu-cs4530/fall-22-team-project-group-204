@@ -1,7 +1,12 @@
 import { EventEmitter } from 'events';
 import _ from 'lodash';
 import TypedEventEmitter from 'typed-emitter';
-import { BlackjackArea, BlackjackPlayer, BlackjackUpdate } from '../types/CoveyTownSocket';
+import {
+  BlackjackArea,
+  BlackjackPlayer,
+  BlackjackUpdate,
+  PlayerStanding,
+} from '../types/CoveyTownSocket';
 
 /**
  * The events that a GamingAreaController can emit
@@ -13,6 +18,7 @@ export type GamingAreaEvents = {
   bettingAmountChange: (bettingAmount: number) => void;
   updateChange: (update: BlackjackUpdate | undefined) => void;
   activeGameAlert: (isPlaying: boolean) => void;
+  leaderboardChange: (playerStandings: PlayerStanding[]) => void;
 };
 
 /**
@@ -76,6 +82,23 @@ export default class GamingAreaController extends (EventEmitter as new () => Typ
     if (players.length !== this.players.length || _.xor(players, this.players).length > 0) {
       this._model.players = players;
       this.emit('playersChange', this.players);
+    }
+  }
+
+  /**
+   * Returns the leaderboard data
+   */
+  public get playerStandings() {
+    return this._model.playerStandings;
+  }
+
+  /**
+   * Sets the leaderboard data
+   */
+  public set playerStandings(playerStandings: PlayerStanding[]) {
+    if (this.playerStandings != playerStandings) {
+      this._model.playerStandings = playerStandings;
+      this.emit('leaderboardChange', this.playerStandings);
     }
   }
 
@@ -152,6 +175,7 @@ export default class GamingAreaController extends (EventEmitter as new () => Typ
     this.players = updatedModel.players;
     this.dealer = updatedModel.dealer;
     this.update = updatedModel.update;
+    this.playerStandings = updatedModel.playerStandings;
   }
 
   /**

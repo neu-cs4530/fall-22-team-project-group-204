@@ -55,7 +55,15 @@ export default class BlackjackArea extends InteractableArea {
     return this._lastUpdate;
   }
 
+  public get playerStandings() {
+    return this._leaderboardData;
+  }
+
   private static _toPlayerStanding(data: DocumentData, idx: number): PlayerStanding {
+    idx += 1;
+    if (data.name === undefined) {
+      return { ranking: idx, name: 'Unknown', wins: data.wins, balance: data.balance };
+    }
     return { ranking: idx, name: data.name, wins: data.wins, balance: data.balance };
   }
 
@@ -341,6 +349,15 @@ export default class BlackjackArea extends InteractableArea {
     const dealer: BlackjackPlayer = { id: '0', hand: [], gameStatus: 'Waiting' };
     const players: BlackjackPlayer[] = [];
     const rect: BoundingBox = { x: mapObject.x, y: mapObject.y, width, height };
+    // let playerStandings: PlayerStanding[] = [];
+    // setTimeout(() => {
+    //   HumanPlayer.getAllPlayerRecords().then(records => {
+    //     if (records.length === 0) return;
+    //     playerStandings = records.map((record, idx) =>
+    //       BlackjackArea._toPlayerStanding(record, idx),
+    //     );
+    //   });
+    // }, 3000);
     return new BlackjackArea(
       {
         id: name,

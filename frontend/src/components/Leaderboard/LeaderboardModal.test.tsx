@@ -3,6 +3,7 @@ import { fireEvent, render, RenderResult, waitFor } from '@testing-library/react
 import { mock, MockProxy } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
 import React from 'react';
+import GamingAreaController from '../../classes/GamingAreaController';
 import TownController from '../../classes/TownController';
 import TownControllerContext from '../../contexts/TownControllerContext';
 import { mockTownController } from '../../TestUtils';
@@ -23,6 +24,7 @@ jest.mock('@chakra-ui/react', () => {
 
 describe('Leaderboard Modal', () => {
   let renderData: RenderResult;
+  let gamingArea: GamingAreaController;
   let mockedTownController: MockProxy<TownController>;
   let doneButton: HTMLElement;
 
@@ -36,7 +38,7 @@ describe('Leaderboard Modal', () => {
     renderData = render(
       <ChakraProvider>
         <TownControllerContext.Provider value={mockedTownController}>
-          <LeaderboardModal rankingData={[]} />
+          <LeaderboardModal controller={gamingArea} rankingData={[]} />
         </TownControllerContext.Provider>
       </ChakraProvider>,
     );

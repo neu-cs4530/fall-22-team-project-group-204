@@ -7,20 +7,36 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { createColumnHelper } from '@tanstack/react-table';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { PlayerStanding } from '../../../../shared/types/CoveyTownSocket';
+import GamingAreaController from '../../classes/GamingAreaController';
 import useTownController from '../../hooks/useTownController';
 import { DataTable } from './DataTable';
 
 export default function LeaderboardModal({
+  controller,
   rankingData,
 }: {
+  controller: GamingAreaController;
   rankingData: PlayerStanding[];
 }): JSX.Element {
   const coveyTownController = useTownController();
-  const data: PlayerStanding[] = rankingData;
+  const [playerStandings, setPlayerStandings] = useState<PlayerStanding[]>(rankingData);
 
-  console.log(data);
+  // const data: PlayerStanding[] = rankingData;
+  useEffect(() => {
+    // const setNewDealerHand = (hand: BlackjackPlayer) => {
+    //   setPlayerStandings(hand);
+    //   setStartGameText(hand.gameStatus == 'Waiting' ? 'Start Game' : 'Game In Progress');
+    // };
+    controller.addListener('leaderboardChange', setPlayerStandings);
+    return () => {
+      controller.removeListener('leaderboardChange', setPlayerStandings);
+    };
+  }, [controller, coveyTownController]);
+
+  console.log('Ranking Data:');
+  console.log(rankingData);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const openLeaderboardModal = useCallback(() => {
@@ -75,7 +91,7 @@ export default function LeaderboardModal({
     <Modal size='xl' isOpen={isOpen} onClose={closeLeaderboardModal} scrollBehavior='inside'>
       <ModalContent>
         <ModalHeader>Blackjack Leaderboard</ModalHeader>
-        <DataTable columns={columns} data={data} />
+        <DataTable columns={columns} data={playerStandings} />
         <ModalFooter>
           <Button
             colorScheme='blue'
