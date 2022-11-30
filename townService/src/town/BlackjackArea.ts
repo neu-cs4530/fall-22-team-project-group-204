@@ -114,9 +114,9 @@ export default class BlackjackArea extends InteractableArea {
       this._players.length > 0 &&
       this._players.map(p => p.id).includes(update.id)
     ) {
-      this._players.forEach(async playerHand => {
+      this._players.forEach(playerHand => {
         if (!this._game.players.map(p => p.id).includes(playerHand.id)) {
-          await this._game.addPlayer(new HumanPlayer(GameStatus.Waiting, playerHand.id));
+          this._game.addPlayer(new HumanPlayer(GameStatus.Waiting, playerHand.id));
         }
         if (this._timeoutsEnabled) {
           this._timeoutIds.set(
