@@ -8,7 +8,7 @@ import GamingAreaController, { GamingAreaEvents } from '../../../classes/GamingA
 import TownController from '../../../classes/TownController';
 import TownControllerContext from '../../../contexts/TownControllerContext';
 import { BlackjackPlayer } from '../../../types/CoveyTownSocket';
-import { Blackjack, PlayingCardImage, Hand, Hands } from './BlackjackModal';
+import { Blackjack, Hand, Hands, PlayingCardImage } from './BlackjackModal';
 
 const mockToast = jest.fn();
 
@@ -65,12 +65,14 @@ describe('Blackjack Modal', () => {
       dealer: dealer,
       players: players,
       bettingAmount: 0,
+      playerStandings: [],
     });
     townController.createBlackjackArea({
       id: 'test',
       dealer: dealer,
       players: players,
       bettingAmount: 0,
+      playerStandings: [],
     });
     addListenerSpy = jest.spyOn(gamingArea, 'addListener');
     removeListenerSpy = jest.spyOn(gamingArea, 'removeListener');

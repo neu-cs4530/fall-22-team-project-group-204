@@ -95,6 +95,7 @@ export default class DealerPlayer extends HumanPlayer {
   // Deals 2 cards to every player in the input array, and then deals 2 cards
   // to itself. Throws an error if the input array is empty
   public dealCards(players: HumanPlayer[]): void {
+    // TODO: Add this check back in
     if (!players || players.length === 0) {
       throw new Error("Can't play Blackjack with 0 people!");
     }

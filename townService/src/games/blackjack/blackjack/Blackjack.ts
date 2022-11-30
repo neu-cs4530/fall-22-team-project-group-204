@@ -42,6 +42,7 @@ export default class BlackJack {
         players: [],
         update: undefined,
         bettingAmount: 0,
+        playerStandings: [],
       },
       { x: 0, y: 0, width: 0, height: 0 },
       mock<TownEmitter>(), // NOTE: may need to change in the future
@@ -85,7 +86,7 @@ export default class BlackJack {
     return humanPlayers;
   }
 
-  private static _isGameOver(players: HumanPlayer[]): boolean {
+  public static isGameOver(players: HumanPlayer[]): boolean {
     return (
       players.some(player => player.status === GameStatus.Won) ||
       players.every(player => player.status === GameStatus.Lost)
@@ -122,8 +123,33 @@ export default class BlackJack {
 
     this._gamingArea.updateFromBlackjack(this._dealer, players);
 
-    while (!BlackJack._isGameOver([...players, this._dealer])) {
+    while (!BlackJack.isGameOver([...players, this._dealer])) {
       await this._dealer.doTurns(players);
     }
   }
+
+  // public static async getLeaderboard(): Promise<PlayerStanding[]> {
+  //   const docRef = collection(db, 'users');
+  //   const orderRef = query(docRef, orderBy('wins', 'desc'), orderBy('balance', 'desc'));
+  //   const docsSnap = await getDocs(orderRef);
+
+  //   const leaderboardData: PlayerStanding[] = [];
+  //   let count = 1;
+  //   docsSnap.forEach(doc => {
+  //     const playerRank: PlayerStanding = {
+  //       ranking: count,
+  //       name: doc.data().name,
+  //       wins: doc.data().wins,
+  //       balance: doc.data().balance,
+  //     };
+  //     leaderboardData.push(playerRank);
+  //     count += 1;
+  //   });
+  //   return leaderboardData as PlayerStanding[];
+  //   // if (docsSnap.empty) return [];
+
+  //   // return docsSnap.docs.map((doc, idx) => {
+  //   //   return { ranking: idx + 1, name: doc.data().name, wins: doc.data().wins, balance: doc.data().balance }
+  //   // })
+  // }
 }

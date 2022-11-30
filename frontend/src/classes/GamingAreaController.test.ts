@@ -1,8 +1,8 @@
 import { mock, mockClear, MockProxy } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
 import { BlackjackArea, BlackjackPlayer } from '../generated/client';
-import TownController from './TownController';
 import GamingAreaController, { GamingAreaEvents } from './GamingAreaController';
+import TownController from './TownController';
 
 describe('GamingAreaController', () => {
   // A valid ViewingAreaController to be reused within the tests
@@ -17,6 +17,7 @@ describe('GamingAreaController', () => {
       players: [],
       update: undefined,
       bettingAmount: 0,
+      playerStandings: [],
     };
     testArea = new GamingAreaController(testAreaModel);
     mockClear(townController);
@@ -104,6 +105,7 @@ describe('GamingAreaController', () => {
         ],
         update: { id: '1', action: 'Hit', timestamp: 'N/A' },
         bettingAmount: 0,
+        playerStandings: [],
       };
       testArea.updateFrom(newModel);
       expect(testArea.dealer).toEqual(newModel.dealer);
@@ -130,6 +132,7 @@ describe('GamingAreaController', () => {
           },
         ],
         bettingAmount: 0,
+        playerStandings: [],
       };
       testArea.updateFrom(newModel);
       expect(testArea.id).toEqual(existingID);

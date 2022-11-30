@@ -15,6 +15,7 @@ import {
   SocketData,
   ViewingArea as ViewingAreaModel,
   BlackjackArea as GamingAreaModel,
+  PlayerStanding,
 } from '../types/CoveyTownSocket';
 import ConversationArea from './ConversationArea';
 import InteractableArea from './InteractableArea';

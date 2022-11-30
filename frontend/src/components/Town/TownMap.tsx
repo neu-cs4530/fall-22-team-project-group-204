@@ -1,12 +1,10 @@
-import React from 'react';
 import Phaser from 'phaser';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import useTownController from '../../hooks/useTownController';
 import SocialSidebar from '../SocialSidebar/SocialSidebar';
+import BlackjackModal from './interactables/BlackjackModal';
 import NewConversationModal from './interactables/NewCoversationModal';
 import TownGameScene from './TownGameScene';
-import BlackjackModal from './interactables/BlackjackModal';
-import LeaderboardModal from '../Leaderboard/LeaderboardModal';
 
 export default function TownMap(): JSX.Element {
   const coveyTownController = useTownController();
@@ -51,7 +49,6 @@ export default function TownMap(): JSX.Element {
     <div id='app-container'>
       <NewConversationModal />
       <BlackjackModal />
-      <LeaderboardModal />
       <div id='map-container' />
       <div id='social-container'>
         <SocialSidebar />

@@ -1,4 +1,5 @@
 import { ITiledMapObject } from '@jonbell/tiled-map-type-guard';
+import { DocumentData } from 'firebase/firestore';
 import {
   BoundingBox,
   TownEmitter,
@@ -6,6 +7,7 @@ import {
   PlayingCard,
   BlackjackPlayer,
   BlackjackUpdate,
+  PlayerStanding,
 } from '../types/CoveyTownSocket';
 import InteractableArea from './InteractableArea';
 // eslint-disable-next-line import/no-cycle
@@ -39,6 +41,8 @@ export default class BlackjackArea extends InteractableArea {
   // notes whether timeouts are enabled
   private _timeoutsEnabled: boolean;
 
+  private _leaderboardData: PlayerStanding[];
+
   public get dealer() {
     return this._dealer;
   }
@@ -49,6 +53,18 @@ export default class BlackjackArea extends InteractableArea {
 
   public get update() {
     return this._lastUpdate;
+  }
+
+  public get playerStandings() {
+    return this._leaderboardData;
+  }
+
+  private static _toPlayerStanding(data: DocumentData, idx: number): PlayerStanding {
+    idx += 1;
+    if (data.name === undefined) {
+      return { ranking: idx, name: 'Unknown', wins: data.wins, balance: data.balance };
+    }
+    return { ranking: idx, name: data.name, wins: data.wins, balance: data.balance };
   }
 
   /**
@@ -72,6 +88,15 @@ export default class BlackjackArea extends InteractableArea {
     this._timeoutIds = new Map<string, NodeJS.Timeout>();
     this._timedOut = new Map<string, boolean>();
     this._timeoutsEnabled = true;
+    this._leaderboardData = [];
+    setTimeout(() => {
+      HumanPlayer.getAllPlayerRecords().then(records => {
+        if (records.length === 0) return;
+        this._leaderboardData = records.map((record, idx) =>
+          BlackjackArea._toPlayerStanding(record, idx),
+        );
+      });
+    }, 3000);
   }
 
   /**
@@ -91,6 +116,12 @@ export default class BlackjackArea extends InteractableArea {
       newUpdate = true;
     }
     this._lastUpdate = update;
+    players.forEach(async p => {
+      if (!this._game.players.some(playerProper => playerProper.id === p.id)) {
+        await this._game.addPlayer(new HumanPlayer(GameStatus.Waiting, p.id));
+      }
+    });
+
     this._players.forEach(playerHand => {
       if (
         newUpdate &&
@@ -153,7 +184,9 @@ export default class BlackjackArea extends InteractableArea {
       gameStatus: GameStatus[dealer.status],
     };
     this._players = BlackjackArea.playersToBlackjackPlayers(players);
-    if (
+    if (BlackJack.isGameOver([...players, dealer])) {
+      this.endGame();
+    } else if (
       dealer.status !== GameStatus.Waiting &&
       dealer.status !== GameStatus.Playing &&
       this._timeoutsEnabled
@@ -166,20 +199,28 @@ export default class BlackjackArea extends InteractableArea {
   }
 
   /**
-   * Ends the game by reseting all players decks and making a new Blackjack instance
+   * Ends the game by resetting all players decks and making a new Blackjack instance
    */
   public endGame() {
     this._players.forEach(p => {
       p.gameStatus = 'Waiting';
       p.hand = [];
     });
+    this._game.players.forEach(async plyr => {
+      if (plyr.status === GameStatus.Won) {
+        await plyr.addWin();
+      } else if (plyr.status === GameStatus.Lost) {
+        await plyr.addLoss();
+      }
+    });
     if (this._timeoutsEnabled) this._players = this._players.filter(p => !this._timedOut.get(p.id));
     this._dealer = { id: '0', hand: [], gameStatus: 'Waiting' };
-    const dealerProper = new DealerPlayer(GameStatus.Waiting, this._dealer.id);
-    const playersProper = this._players.map(
-      player => new HumanPlayer(GameStatus.Waiting, player.id),
-    );
-    this._game = new BlackJack(playersProper, dealerProper, this);
+    this._game.dealer.hand.cards = [];
+    this._game.dealer.status = GameStatus.Waiting;
+    this._game.players.forEach(plyr => {
+      plyr.hand.cards = [];
+      plyr.status = GameStatus.Waiting;
+    });
     if (this._timeoutsEnabled) this._timedOut = new Map<string, boolean>();
     this._emitAreaChanged();
   }
@@ -290,6 +331,7 @@ export default class BlackjackArea extends InteractableArea {
       players: this._players,
       update: this._lastUpdate,
       bettingAmount: 0,
+      playerStandings: this._leaderboardData,
     };
   }
 
@@ -307,8 +349,24 @@ export default class BlackjackArea extends InteractableArea {
     const dealer: BlackjackPlayer = { id: '0', hand: [], gameStatus: 'Waiting' };
     const players: BlackjackPlayer[] = [];
     const rect: BoundingBox = { x: mapObject.x, y: mapObject.y, width, height };
+    // let playerStandings: PlayerStanding[] = [];
+    // setTimeout(() => {
+    //   HumanPlayer.getAllPlayerRecords().then(records => {
+    //     if (records.length === 0) return;
+    //     playerStandings = records.map((record, idx) =>
+    //       BlackjackArea._toPlayerStanding(record, idx),
+    //     );
+    //   });
+    // }, 3000);
     return new BlackjackArea(
-      { id: name, players, dealer, update: undefined, bettingAmount: 0 },
+      {
+        id: name,
+        players,
+        dealer,
+        update: undefined,
+        bettingAmount: 0,
+        playerStandings: [],
+      },
       rect,
       townEmitter,
     );

@@ -491,20 +491,6 @@ export default class TownGameScene extends Phaser.Scene {
       })
       .setScrollFactor(0)
       .setDepth(30);
-
-    this.add
-      .text(500, 16, `Shift to view leaderboard`, {
-        font: '18px monospace',
-        color: '#000000',
-        padding: {
-          x: 20,
-          y: 10,
-        },
-        backgroundColor: '#ffffff',
-      })
-      .setScrollFactor(0)
-      .setDepth(30);
-
     this._ready = true;
     this.updatePlayers(this.coveyTownController.players);
     // Call any listeners that are waiting for the game to be initialized

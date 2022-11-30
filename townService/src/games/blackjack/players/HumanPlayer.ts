@@ -2,7 +2,7 @@
 /* eslint-disable class-methods-use-this */
 import { ReadLine, createInterface } from 'readline';
 import { nanoid } from 'nanoid';
-import { addDoc, collection, doc, getDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, orderBy, query, setDoc } from 'firebase/firestore';
 import Hand from './Hand';
 import GameStatus from './GameStatus';
 import BlackjackAction from '../blackjack/BlackjackAction';
@@ -16,6 +16,8 @@ export default class HumanPlayer {
   private static _rl: ReadLine = createInterface({ input: process.stdin, output: process.stdout });
 
   private static _tableName = 'users';
+
+  private _name = 'CoolPlayer';
 
   private _usersRef;
 
@@ -68,6 +70,11 @@ export default class HumanPlayer {
     this._wins = value;
   }
 
+  public async addWin() {
+    this._wins += 1;
+    await this.updatePlayerRecord();
+  }
+
   private _losses: number;
 
   public get losses(): number {
@@ -76,6 +83,11 @@ export default class HumanPlayer {
 
   public set losses(value: number) {
     this._losses = value;
+  }
+
+  public async addLoss() {
+    this._losses += 1;
+    await this.updatePlayerRecord();
   }
 
   private _ties: number;
@@ -88,21 +100,60 @@ export default class HumanPlayer {
     this._ties = value;
   }
 
+  public async addTie() {
+    this._ties += 1;
+    await this.updatePlayerRecord();
+  }
+
   public addCurrency(amount: number) {
     this._wallet += amount;
   }
 
-  public async addToDatabase() {
-    const docRef = doc(db, HumanPlayer._tableName, this._id);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) return;
-    addDoc(this._usersRef, {
+  private _document() {
+    return {
       balance: this._wallet,
       losses: this._losses,
       wins: this._wins,
       ties: this._ties,
       secret_id: this._id,
-    });
+      name: this._name,
+    };
+  }
+
+  public static async getAllPlayerRecords() {
+    const docRef = collection(db, 'users');
+    const orderRef = query(docRef, orderBy('wins', 'desc'), orderBy('balance', 'desc'));
+    const docsSnap = await getDocs(orderRef);
+
+    return docsSnap.docs.map(d => d.data());
+  }
+
+  public static async getPlayerRecord(id: string) {
+    const docRef = doc(db, HumanPlayer._tableName, id);
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) {
+      throw new Error('Player does not exist in database!');
+    }
+
+    return docSnap.data();
+  }
+
+  public async updatePlayerRecord() {
+    const docRef = doc(db, HumanPlayer._tableName, this._id);
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) {
+      throw new Error('Player does not exist in database!');
+    }
+    setDoc(docRef, this._document());
+  }
+
+  public async addToDatabase() {
+    const docRef = doc(db, HumanPlayer._tableName, this._id);
+    /* eslint-disable no-console */
+    console.log(`PlayerId: ${this._id}`);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) return;
+    setDoc(docRef, this._document());
   }
 
   constructor(status: GameStatus = GameStatus.Waiting, id: string = nanoid(), wallet = 500) {

@@ -7,82 +7,29 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { createColumnHelper } from '@tanstack/react-table';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { PlayerStanding } from '../../../../shared/types/CoveyTownSocket';
+import GamingAreaController from '../../classes/GamingAreaController';
 import useTownController from '../../hooks/useTownController';
 import { DataTable } from './DataTable';
 
-export default function LeaderboardModal(): JSX.Element {
-  type PlayerStanding = {
-    ranking: number;
-    name: string;
-    wins: number;
-    reward: number;
-  };
-
-  const data: PlayerStanding[] = [
-    {
-      ranking: 1,
-      name: 'Player1',
-      wins: 6,
-      reward: 400,
-    },
-    {
-      ranking: 2,
-      name: 'Player2',
-      wins: 3,
-      reward: 500,
-    },
-    {
-      ranking: 3,
-      name: 'Player3',
-      wins: 2,
-      reward: 320,
-    },
-    {
-      ranking: 4,
-      name: 'Player4',
-      wins: 2,
-      reward: 320,
-    },
-    {
-      ranking: 5,
-      name: 'Player5',
-      wins: 1,
-      reward: 140,
-    },
-    {
-      ranking: 6,
-      name: 'Player6',
-      wins: 1,
-      reward: 140,
-    },
-    {
-      ranking: 7,
-      name: 'Player7',
-      wins: 1,
-      reward: 140,
-    },
-    {
-      ranking: 8,
-      name: 'Player8',
-      wins: 1,
-      reward: 140,
-    },
-    {
-      ranking: 9,
-      name: 'Player9',
-      wins: 0,
-      reward: 0,
-    },
-    {
-      ranking: 10,
-      name: 'Player10',
-      wins: 0,
-      reward: 0,
-    },
-  ];
-
+export default function LeaderboardModal({
+  controller,
+}: {
+  controller: GamingAreaController;
+}): JSX.Element {
   const coveyTownController = useTownController();
+  const [playerStandings, setPlayerStandings] = useState<PlayerStanding[]>(
+    controller.playerStandings,
+  );
+
+  useEffect(() => {
+    controller.addListener('leaderboardChange', setPlayerStandings);
+    return () => {
+      controller.removeListener('leaderboardChange', setPlayerStandings);
+    };
+  }, [controller, coveyTownController]);
+
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const openLeaderboardModal = useCallback(() => {
@@ -127,7 +74,7 @@ export default function LeaderboardModal(): JSX.Element {
       cell: info => info.getValue(),
       header: 'Wins',
     }),
-    columnHelper.accessor('reward', {
+    columnHelper.accessor('balance', {
       cell: info => info.getValue(),
       header: 'Reward',
     }),
@@ -137,7 +84,7 @@ export default function LeaderboardModal(): JSX.Element {
     <Modal size='xl' isOpen={isOpen} onClose={closeLeaderboardModal} scrollBehavior='inside'>
       <ModalContent>
         <ModalHeader>Blackjack Leaderboard</ModalHeader>
-        <DataTable columns={columns} data={data} />
+        <DataTable columns={columns} data={playerStandings} />
         <ModalFooter>
           <Button
             colorScheme='blue'
