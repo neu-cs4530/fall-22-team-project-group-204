@@ -69,8 +69,8 @@ export default class DealerPlayer extends HumanPlayer {
       .map(({ card }) => card);
   }
 
-  public updateCards(cards: Card[]): void {
-    this.hand.updateCards(cards);
+  public updateCards(deck: Card[]): void {
+    this.hand.updateCards(deck);
   }
 
   public shuffleDecks(): void {
@@ -114,10 +114,6 @@ export default class DealerPlayer extends HumanPlayer {
     return scores.length > 0;
   }
 
-  public async doRound(players: HumanPlayer[]): Promise<void> {
-    await this.doTurns(players);
-  }
-
   private _setEveryoneElseToLost(players: HumanPlayer[], dealerWon = false): void {
     players.forEach(player => {
       player.status = GameStatus.Lost;
@@ -154,13 +150,13 @@ export default class DealerPlayer extends HumanPlayer {
 
   // Update's the players status if needed and reports if the game
   // needs to be exited early
-  private _updatePlayerStatusAndReport(
-    player: HumanPlayer,
-    otherPlayers: HumanPlayer[],
-  ): PlayerStatusUpdateType {
+  private _updatePlayerStatusAndReport(player: HumanPlayer, otherPlayers: HumanPlayer[]): PlayerStatusUpdateType {
     if (player.has21()) {
       player.status = GameStatus.Won;
-      // this._setEveryoneElseToLost(otherPlayers);
+      // eslint-disable-next-line prettier/prettier
+      if (otherPlayers.length === 0 || otherPlayers.every(thePlayer => thePlayer.status === GameStatus.Lost)) {
+        this.status = GameStatus.Lost;
+      }
       return PlayerStatusUpdateType.UpdatedToWon;
     }
     if (otherPlayers.every(p => p.status === GameStatus.Lost) && super.status === GameStatus.Lost) {
@@ -178,48 +174,24 @@ export default class DealerPlayer extends HumanPlayer {
     super.addCard(newCard, super.hand.cards.length !== 0);
   }
 
-  private _isGameOver(players: HumanPlayer[]): boolean {
-    // make this a method and set said players GameStatus to Won
-    const allButOneBusted = this._allButOneBusted(players);
-    const allButDealerBusted = this._allButDealerBusted(players);
-    const allBusted = this._allBusted(players);
-    const somePlayerWon = players.some(player => player.status === GameStatus.Won);
-    const dealerWon = this.status === GameStatus.Won;
-    return allButOneBusted || allButDealerBusted || allBusted || somePlayerWon || dealerWon;
+  private static _wonOrLost(status: PlayerStatusUpdateType): boolean {
+    return status === PlayerStatusUpdateType.UpdatedToLost || status === PlayerStatusUpdateType.UpdatedToWon;
   }
 
-  private _allBusted(players: HumanPlayer[]): boolean {
-    return (
-      players.every(player => player.status === GameStatus.Lost) && this.status === GameStatus.Lost
-    );
+  private static _nothing(status: PlayerStatusUpdateType): boolean {
+    return status === PlayerStatusUpdateType.Nothing;
   }
 
-  private _allButOneBusted(players: HumanPlayer[]): boolean {
-    let idxToUpdate = -1;
-    let count = 0;
-    for (let i = 0; i < players.length; i++) {
-      if (players[i].status === GameStatus.Lost) {
-        count += 1;
-      } else {
-        idxToUpdate = i;
-      }
-    }
-
-    if (count === players.length - 1 && this.status === GameStatus.Lost && idxToUpdate !== -1) {
-      players[idxToUpdate].status = GameStatus.Won;
-      this._setEveryoneElseToLost(players.filter(p => p !== players[idxToUpdate]));
-      return true;
-    }
-    return false;
+  private static _remainingPlayersDone(players: HumanPlayer[]): boolean {
+    return players.every(player => player.status === GameStatus.Won || player.status === GameStatus.Lost);
   }
 
-  private _allButDealerBusted(players: HumanPlayer[]): boolean {
-    const allBusted = players.every(player => player.status === GameStatus.Lost);
-    if (allBusted && this.status !== GameStatus.Lost) {
-      this.status = GameStatus.Won;
-      return true;
-    }
-    return false;
+  private static _onlyPlayer(players: HumanPlayer[]): boolean {
+    return players.length === 1;
+  }
+
+  private _unhideFirstCard(): void {
+    this.hand.cards[0][1] = true;
   }
 
   public advanceGame(players: HumanPlayer[], playerId: string, action: BlackjackAction): void {
@@ -233,86 +205,54 @@ export default class DealerPlayer extends HumanPlayer {
       throw new Error("This is not a valid player's id!");
     }
 
-    let playerUpdateStatus = this._updatePlayerStatusAndReport(player, otherPlayers);
-    const wonLost = [PlayerStatusUpdateType.UpdatedToLost, PlayerStatusUpdateType.UpdatedToWon];
-    if (wonLost.includes(playerUpdateStatus)) {
-      return;
-    }
-    if (player.status === GameStatus.Staying) {
-      return;
-    }
+    // updates status and then checks if it is won or loss
+    // NOTE: I am assuming that the players status has already been checked or that they immediately got 21
+    // if this check is true, and in that case we don't need to worry about updating the dealers status
+    if (DealerPlayer._wonOrLost(this._updatePlayerStatusAndReport(player, otherPlayers))) return;
 
     if (action === BlackjackAction.Hit) {
       player.addCard(this._popCard());
-    } else if (action === BlackjackAction.Stay) {
-      player.status = GameStatus.Staying;
-    }
-    playerUpdateStatus = this._updatePlayerStatusAndReport(player, otherPlayers);
-    const allRemainingDone = players.reduce(
-      (a, b) =>
-        (b.status === GameStatus.Staying ||
-          b.status === GameStatus.Lost ||
-          b.status === GameStatus.Won) &&
-        a,
-      true,
-    );
-    if (allRemainingDone) {
-      if (super.hasBusted()) {
-        this.status = GameStatus.Lost;
-      }
-
-      this.hand.cards[0][1] = true;
-      while (this._willHit()) {
-        super.addCard(this._popCard());
-      }
-
-      const dealerScore = super.getMaxScore();
-      const maxPlayerScore = Math.max(...players.map(p => p.getMaxScore()));
-      if (super.has21() || dealerScore > maxPlayerScore) {
-        this.status = GameStatus.Won;
-        this._setEveryoneElseToLost(players, true);
-      } else {
-        this.status = GameStatus.Lost;
-        players.forEach(p => {
-          if (p.getMaxScore() > dealerScore) {
-            p.status = GameStatus.Won;
-          } else {
-            p.status = GameStatus.Lost;
-          }
-        });
-      }
-    }
-  }
-
-  public async doTurns(players: HumanPlayer[]): Promise<void> {
-    if (!players || players.length === 0) {
-      throw new Error("Can't play Blackjack with 0 people!");
+      if (DealerPlayer._nothing(this._updatePlayerStatusAndReport(player, otherPlayers))) return;
     }
 
-    await this.doHumanTurns(players);
+    // so if we are here then 1 of 3 things MUST be true
+    // 1. We hit and busted (If this is true and we are the only player, we will immediately set the dealers status to won and return)
+    // 2. We hit and got 21 (If this is true and we are the only player, it is still possible for the dealer to win - if they had 21 in less cards)
+    // 3. We stayed
+    // In all three cases we may want to updates the dealers status, so we go through with this check
 
-    if (super.hasBusted()) {
-      this.status = GameStatus.Lost;
-    }
+    if (!DealerPlayer._remainingPlayersDone(otherPlayers)) return;
 
-    if (this._isGameOver(players)) {
-      // again - will remove this and refactor once we come to a better conclusion
-      // for what to do in the case of multiple winners at the same time
-      if (super.status !== GameStatus.Won) {
-        this.status = GameStatus.Lost;
-      }
+    // note that I am passing the original players array here, so if it has length 1 we are the only player
+    if (DealerPlayer._onlyPlayer(players) && player.status === GameStatus.Lost) {
+      this._unhideFirstCard();
+      this.status = GameStatus.Won;
       return;
     }
 
-    if (this._willHit()) {
+    while (this._willHit()) {
       super.addCard(this._popCard());
     }
 
-    if (super.has21()) {
-      this.status = GameStatus.Won;
-      this._setEveryoneElseToLost(players);
-    } else if (super.hasBusted()) {
+    this._unhideFirstCard();
+
+    if (super.hasBusted()) {
       this.status = GameStatus.Lost;
+      // If the dealer busts, all remaining player hands win. If the dealer does not bust,
+      // each remaining bet wins if its hand is higher than the dealer's and loses if it is lower. - from wikipedia
+      players.forEach(p => {
+        p.status = GameStatus.Won;
+      });
+    }
+
+    const dealerScore = super.getMaxScore();
+    const maxPlayerScore = Math.max(...players.map(p => p.getMaxScore()));
+    if (super.has21() || dealerScore > maxPlayerScore) {
+      this.status = GameStatus.Won;
+      this._setEveryoneElseToLost(players, true);
+    } else {
+      this.status = GameStatus.Lost;
+      players.forEach(p => p.compareToDealerScoreAndUpdate(dealerScore));
     }
   }
 }

@@ -67,12 +67,7 @@ describe('ConversationArea', () => {
   });
   describe('fromMapObject', () => {
     it('Throws an error if the width or height are missing', () => {
-      expect(() =>
-        ConversationArea.fromMapObject(
-          { id: 1, name: nanoid(), visible: true, x: 0, y: 0 },
-          townEmitter,
-        ),
-      ).toThrowError();
+      expect(() => ConversationArea.fromMapObject({ id: 1, name: nanoid(), visible: true, x: 0, y: 0 }, townEmitter)).toThrowError();
     });
     it('Creates a new conversation area using the provided boundingBox and id, with an empty occupants list', () => {
       const x = 30;
@@ -80,10 +75,7 @@ describe('ConversationArea', () => {
       const width = 10;
       const height = 20;
       const name = 'name';
-      const val = ConversationArea.fromMapObject(
-        { x, y, width, height, name, id: 10, visible: true },
-        townEmitter,
-      );
+      const val = ConversationArea.fromMapObject({ x, y, width, height, name, id: 10, visible: true }, townEmitter);
       expect(val.boundingBox).toEqual({ x, y, width, height });
       expect(val.id).toEqual(name);
       expect(val.topic).toBeUndefined();

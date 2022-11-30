@@ -3,13 +3,7 @@ import { BroadcastOperator } from 'socket.io';
 import { mock, mockDeep, MockProxy } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
 import { SocketReservedEventsMap } from 'socket.io/dist/socket';
-import {
-  EventNames,
-  EventParams,
-  ReservedOrUserEventNames,
-  ReservedOrUserListener,
-  TypedEventBroadcaster,
-} from 'socket.io/dist/typed-events';
+import { EventNames, EventParams, ReservedOrUserEventNames, ReservedOrUserListener, TypedEventBroadcaster } from 'socket.io/dist/typed-events';
 import Player from './lib/Player';
 import {
   BoundingBox,
@@ -30,11 +24,7 @@ import {
  * @param params
  * @returns
  */
-export function createConversationForTesting(params?: {
-  conversationID?: string;
-  conversationTopic?: string;
-  boundingBox?: BoundingBox;
-}): ConversationArea {
+export function createConversationForTesting(params?: { conversationID?: string; conversationTopic?: string; boundingBox?: BoundingBox }): ConversationArea {
   return {
     id: params?.conversationID || nanoid(),
     occupantsByID: [],
@@ -46,26 +36,18 @@ export function defaultLocation(): PlayerLocation {
   return { x: 0, y: 0, moving: false, rotation: 'front', interactableID: undefined };
 }
 
-export type ClientEventTypes = ReservedOrUserEventNames<
-  SocketReservedEventsMap,
-  ClientToServerEvents
->;
+export type ClientEventTypes = ReservedOrUserEventNames<SocketReservedEventsMap, ClientToServerEvents>;
 
 /**
  * Resets all recorded mock calls for the given emitter (optionally only for a given event name)
  * @param mockEmitter
  * @param eventName
  */
-export function clearEmittedEvents<Ev extends EventNames<ServerToClientEvents>>(
-  mockEmitter: MockProxy<TypedEventBroadcaster<ServerToClientEvents>>,
-  eventName?: Ev,
-) {
+export function clearEmittedEvents<Ev extends EventNames<ServerToClientEvents>>(mockEmitter: MockProxy<TypedEventBroadcaster<ServerToClientEvents>>, eventName?: Ev) {
   if (!eventName) {
     mockEmitter.emit.mock.calls = [];
   } else {
-    mockEmitter.emit.mock.calls = mockEmitter.emit.mock.calls.filter(
-      eachCall => eachCall[0] !== eventName,
-    );
+    mockEmitter.emit.mock.calls = mockEmitter.emit.mock.calls.filter(eachCall => eachCall[0] !== eventName);
   }
 }
 /**
@@ -112,9 +94,7 @@ export function extractSessionToken(player: MockedPlayer): string {
  * @returns the corresponding event handler for that event name
  * @throws Error if no handler was registered
  */
-export function getEventListener<
-  Ev extends ReservedOrUserEventNames<SocketReservedEventsMap, ClientToServerEvents>,
->(
+export function getEventListener<Ev extends ReservedOrUserEventNames<SocketReservedEventsMap, ClientToServerEvents>>(
   mockSocket: MockProxy<CoveyTownSocket>,
   eventName: Ev,
 ): ReservedOrUserListener<SocketReservedEventsMap, ClientToServerEvents, Ev> {
@@ -122,11 +102,7 @@ export function getEventListener<
   if (ret) {
     const param = ret[1];
     if (param) {
-      return param as unknown as ReservedOrUserListener<
-        SocketReservedEventsMap,
-        ClientToServerEvents,
-        Ev
-      >;
+      return param as unknown as ReservedOrUserListener<SocketReservedEventsMap, ClientToServerEvents, Ev>;
     }
   }
   throw new Error(`No event listener found for event ${eventName}`);
@@ -143,13 +119,7 @@ export class MockedPlayer {
 
   player: Player | undefined;
 
-  constructor(
-    socket: MockProxy<CoveyTownSocket>,
-    socketToRoomMock: MockProxy<TypedEventBroadcaster<ServerToClientEvents>>,
-    userName: string,
-    townID: string,
-    player: Player | undefined,
-  ) {
+  constructor(socket: MockProxy<CoveyTownSocket>, socketToRoomMock: MockProxy<TypedEventBroadcaster<ServerToClientEvents>>, userName: string, townID: string, player: Player | undefined) {
     this.socket = socket;
     this.socketToRoomMock = socketToRoomMock;
     this.userName = userName;
@@ -191,9 +161,7 @@ export function mockPlayer(townID: string): MockedPlayer {
  */
 export function expectArraysToContainSameMembers<T>(actual: T[], expected: T[]): void {
   expect(actual.length).toBe(expected.length);
-  expected.forEach(expectedVal =>
-    expect(actual.find(actualVal => actualVal === expectedVal)).toBeDefined(),
-  );
+  expected.forEach(expectedVal => expect(actual.find(actualVal => actualVal === expectedVal)).toBeDefined());
 }
 
 export function isViewingArea(interactable: Interactable): interactable is ViewingArea {

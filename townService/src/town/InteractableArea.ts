@@ -97,9 +97,7 @@ export default abstract class InteractableArea {
    * @param allPlayers list of players to examine and potentially add to this interactable area
    */
   public addPlayersWithinBounds(allPlayers: Player[]) {
-    allPlayers
-      .filter(eachPlayer => this.contains(eachPlayer.location))
-      .forEach(eachContainedPlayer => this.add(eachContainedPlayer));
+    allPlayers.filter(eachPlayer => this.contains(eachPlayer.location)).forEach(eachContainedPlayer => this.add(eachContainedPlayer));
   }
 
   /**
@@ -141,8 +139,7 @@ export default abstract class InteractableArea {
     });
     const rect1 = toRectPoints(this);
     const rect2 = toRectPoints(otherInteractable);
-    const noOverlap =
-      rect1.x1 >= rect2.x2 || rect2.x1 >= rect1.x2 || rect1.y1 >= rect2.y2 || rect2.y1 >= rect1.y2;
+    const noOverlap = rect1.x1 >= rect2.x2 || rect2.x1 >= rect1.x2 || rect1.y1 >= rect2.y2 || rect2.y1 >= rect1.y2;
     return !noOverlap;
   }
 

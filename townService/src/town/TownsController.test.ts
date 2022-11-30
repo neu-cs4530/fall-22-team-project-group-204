@@ -4,15 +4,7 @@ import { nanoid } from 'nanoid';
 import { Town } from '../api/Model';
 import { ConversationArea, Interactable, TownEmitter, ViewingArea } from '../types/CoveyTownSocket';
 import TownsStore from '../lib/TownsStore';
-import {
-  createConversationForTesting,
-  getLastEmittedEvent,
-  extractSessionToken,
-  mockPlayer,
-  isViewingArea,
-  isConversationArea,
-  MockedPlayer,
-} from '../TestUtils';
+import { createConversationForTesting, getLastEmittedEvent, extractSessionToken, mockPlayer, isViewingArea, isConversationArea, MockedPlayer } from '../TestUtils';
 import { TownsController } from './TownsController';
 
 type TestTownData = {
@@ -38,14 +30,8 @@ describe('TownsController integration tests', () => {
   let controller: TownsController;
 
   const createdTownEmitters: Map<string, DeepMockProxy<TownEmitter>> = new Map();
-  async function createTownForTesting(
-    friendlyNameToUse?: string,
-    isPublic = false,
-  ): Promise<TestTownData> {
-    const friendlyName =
-      friendlyNameToUse !== undefined
-        ? friendlyNameToUse
-        : `${isPublic ? 'Public' : 'Private'}TestingTown=${nanoid()}`;
+  async function createTownForTesting(friendlyNameToUse?: string, isPublic = false): Promise<TestTownData> {
+    const friendlyName = friendlyNameToUse !== undefined ? friendlyNameToUse : `${isPublic ? 'Public' : 'Private'}TestingTown=${nanoid()}`;
     const ret = await controller.createTown({
       friendlyName,
       isPubliclyListed: isPublic,
@@ -188,9 +174,7 @@ describe('TownsController integration tests', () => {
       expectTownListMatches(await controller.listTowns(), pubTown1);
     });
     it('Should fail if the townID does not exist', async () => {
-      await expect(
-        controller.updateTown(nanoid(), nanoid(), { friendlyName: 'test', isPubliclyListed: true }),
-      ).rejects.toThrow();
+      await expect(controller.updateTown(nanoid(), nanoid(), { friendlyName: 'test', isPubliclyListed: true })).rejects.toThrow();
     });
   });
 
@@ -231,22 +215,14 @@ describe('TownsController integration tests', () => {
       const initialData = getLastEmittedEvent(player.socket, 'initialize');
       const conversationArea = createConversationForTesting({
         boundingBox: { x: 10, y: 10, width: 1, height: 1 },
-        conversationID: initialData.interactables.find(
-          eachInteractable => 'occupantsByID' in eachInteractable,
-        )?.id,
+        conversationID: initialData.interactables.find(eachInteractable => 'occupantsByID' in eachInteractable)?.id,
       });
-      await controller.createConversationArea(
-        town.townID,
-        extractSessionToken(player),
-        conversationArea,
-      );
+      await controller.createConversationArea(town.townID, extractSessionToken(player), conversationArea);
 
       const player2 = mockPlayer(town.townID);
       await controller.joinTown(player2.socket);
       const initialData2 = getLastEmittedEvent(player2.socket, 'initialize');
-      const createdArea = initialData2.interactables.find(
-        eachInteractable => eachInteractable.id === conversationArea.id,
-      ) as ConversationArea;
+      const createdArea = initialData2.interactables.find(eachInteractable => eachInteractable.id === conversationArea.id) as ConversationArea;
       expect(createdArea.topic).toEqual(conversationArea.topic);
       expect(initialData2.interactables.length).toEqual(initialData.interactables.length);
     });
@@ -276,27 +252,17 @@ describe('TownsController integration tests', () => {
         );
       });
       it('Returns an error message if the town ID is invalid', async () => {
-        await expect(
-          controller.createConversationArea(nanoid(), sessionToken, createConversationForTesting()),
-        ).rejects.toThrow();
+        await expect(controller.createConversationArea(nanoid(), sessionToken, createConversationForTesting())).rejects.toThrow();
       });
       it('Checks for a valid session token before creating a conversation area', async () => {
         const conversationArea = createConversationForTesting();
         const invalidSessionToken = nanoid();
 
-        await expect(
-          controller.createConversationArea(
-            testingTown.townID,
-            invalidSessionToken,
-            conversationArea,
-          ),
-        ).rejects.toThrow();
+        await expect(controller.createConversationArea(testingTown.townID, invalidSessionToken, conversationArea)).rejects.toThrow();
       });
       it('Returns an error message if addConversation returns false', async () => {
         const conversationArea = createConversationForTesting();
-        await expect(
-          controller.createConversationArea(testingTown.townID, sessionToken, conversationArea),
-        ).rejects.toThrow();
+        await expect(controller.createConversationArea(testingTown.townID, sessionToken, conversationArea)).rejects.toThrow();
       });
     });
 
@@ -331,9 +297,7 @@ describe('TownsController integration tests', () => {
           video: nanoid(),
           isPlaying: true,
         };
-        await expect(
-          controller.createViewingArea(nanoid(), sessionToken, newViewingArea),
-        ).rejects.toThrow();
+        await expect(controller.createViewingArea(nanoid(), sessionToken, newViewingArea)).rejects.toThrow();
       });
       it('Checks for a valid session token before creating a viewing area', async () => {
         const invalidSessionToken = nanoid();
@@ -344,16 +308,12 @@ describe('TownsController integration tests', () => {
           video: nanoid(),
           isPlaying: true,
         };
-        await expect(
-          controller.createViewingArea(testingTown.townID, invalidSessionToken, newViewingArea),
-        ).rejects.toThrow();
+        await expect(controller.createViewingArea(testingTown.townID, invalidSessionToken, newViewingArea)).rejects.toThrow();
       });
       it('Returns an error message if addViewingArea returns false', async () => {
         const viewingArea = interactables.find(isViewingArea) as ViewingArea;
         viewingArea.id = nanoid();
-        await expect(
-          controller.createViewingArea(testingTown.townID, sessionToken, viewingArea),
-        ).rejects.toThrow();
+        await expect(controller.createViewingArea(testingTown.townID, sessionToken, viewingArea)).rejects.toThrow();
       });
     });
   });

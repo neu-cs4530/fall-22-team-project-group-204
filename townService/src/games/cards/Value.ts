@@ -16,21 +16,7 @@ enum Value {
   Ace,
 }
 
-export const VALUES: Value[] = [
-  Value.Two,
-  Value.Three,
-  Value.Four,
-  Value.Five,
-  Value.Six,
-  Value.Seven,
-  Value.Eight,
-  Value.Nine,
-  Value.Ten,
-  Value.Jack,
-  Value.Queen,
-  Value.King,
-  Value.Ace,
-];
+export const VALUES: Value[] = [Value.Two, Value.Three, Value.Four, Value.Five, Value.Six, Value.Seven, Value.Eight, Value.Nine, Value.Ten, Value.Jack, Value.Queen, Value.King, Value.Ace];
 
 const valueStringLookup: Map<Value, Array<string>> = new Map([
   [Value.Ace, ['A', 'Ace', '1', 'One', '11', 'Eleven']],

@@ -117,6 +117,14 @@ export default class HumanPlayer {
     this._usersRef = collection(db, HumanPlayer._tableName);
   }
 
+  public compareToDealerScoreAndUpdate(dealerScore: number): void {
+    if (this.getMaxScore() > dealerScore) {
+      this._status = GameStatus.Won;
+    } else {
+      this._status = GameStatus.Lost;
+    }
+  }
+
   public addCard(newCard: Card, newCardHiddenStatus = true): void {
     this._hand.cards.push([newCard, newCardHiddenStatus]);
   }

@@ -1,8 +1,8 @@
 enum GameStatus {
   Waiting,
   Playing,
-  Staying,
   Lost,
+  Tied,
   Won,
   Spectator,
 }

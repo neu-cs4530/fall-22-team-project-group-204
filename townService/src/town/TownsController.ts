@@ -1,29 +1,10 @@
 import assert from 'assert';
-import {
-  Body,
-  Controller,
-  Delete,
-  Example,
-  Get,
-  Header,
-  Patch,
-  Path,
-  Post,
-  Response,
-  Route,
-  Tags,
-} from 'tsoa';
+import { Body, Controller, Delete, Example, Get, Header, Patch, Path, Post, Response, Route, Tags } from 'tsoa';
 
 import { Town, TownCreateParams, TownCreateResponse } from '../api/Model';
 import InvalidParametersError from '../lib/InvalidParametersError';
 import CoveyTownsStore from '../lib/TownsStore';
-import {
-  ConversationArea,
-  CoveyTownSocket,
-  TownSettingsUpdate,
-  ViewingArea,
-  BlackjackArea,
-} from '../types/CoveyTownSocket';
+import { ConversationArea, CoveyTownSocket, TownSettingsUpdate, ViewingArea, BlackjackArea } from '../types/CoveyTownSocket';
 
 /**
  * This is the town route
@@ -55,11 +36,7 @@ export class TownsController extends Controller {
   @Example<TownCreateResponse>({ townID: 'stringID', townUpdatePassword: 'secretPassword' })
   @Post()
   public async createTown(@Body() request: TownCreateParams): Promise<TownCreateResponse> {
-    const { townID, townUpdatePassword } = await this._townsStore.createTown(
-      request.friendlyName,
-      request.isPubliclyListed,
-      request.mapFile,
-    );
+    const { townID, townUpdatePassword } = await this._townsStore.createTown(request.friendlyName, request.isPubliclyListed, request.mapFile);
     return {
       townID,
       townUpdatePassword,
@@ -75,17 +52,8 @@ export class TownsController extends Controller {
    */
   @Patch('{townID}')
   @Response<InvalidParametersError>(400, 'Invalid password or update values specified')
-  public async updateTown(
-    @Path() townID: string,
-    @Header('X-CoveyTown-Password') townUpdatePassword: string,
-    @Body() requestBody: TownSettingsUpdate,
-  ): Promise<void> {
-    const success = this._townsStore.updateTown(
-      townID,
-      townUpdatePassword,
-      requestBody.friendlyName,
-      requestBody.isPubliclyListed,
-    );
+  public async updateTown(@Path() townID: string, @Header('X-CoveyTown-Password') townUpdatePassword: string, @Body() requestBody: TownSettingsUpdate): Promise<void> {
+    const success = this._townsStore.updateTown(townID, townUpdatePassword, requestBody.friendlyName, requestBody.isPubliclyListed);
     if (!success) {
       throw new InvalidParametersError('Invalid password or update values specified');
     }
@@ -98,10 +66,7 @@ export class TownsController extends Controller {
    */
   @Delete('{townID}')
   @Response<InvalidParametersError>(400, 'Invalid password or update values specified')
-  public async deleteTown(
-    @Path() townID: string,
-    @Header('X-CoveyTown-Password') townUpdatePassword: string,
-  ): Promise<void> {
+  public async deleteTown(@Path() townID: string, @Header('X-CoveyTown-Password') townUpdatePassword: string): Promise<void> {
     const success = this._townsStore.deleteTown(townID, townUpdatePassword);
     if (!success) {
       throw new InvalidParametersError('Invalid password or update values specified');
@@ -116,11 +81,7 @@ export class TownsController extends Controller {
    */
   @Post('{townID}/conversationArea')
   @Response<InvalidParametersError>(400, 'Invalid values specified')
-  public async createConversationArea(
-    @Path() townID: string,
-    @Header('X-Session-Token') sessionToken: string,
-    @Body() requestBody: ConversationArea,
-  ): Promise<void> {
+  public async createConversationArea(@Path() townID: string, @Header('X-Session-Token') sessionToken: string, @Body() requestBody: ConversationArea): Promise<void> {
     const town = this._townsStore.getTownByID(townID);
     if (!town?.getPlayerBySessionToken(sessionToken)) {
       throw new InvalidParametersError('Invalid values specified');
@@ -144,11 +105,7 @@ export class TownsController extends Controller {
    */
   @Post('{townID}/viewingArea')
   @Response<InvalidParametersError>(400, 'Invalid values specified')
-  public async createViewingArea(
-    @Path() townID: string,
-    @Header('X-Session-Token') sessionToken: string,
-    @Body() requestBody: ViewingArea,
-  ): Promise<void> {
+  public async createViewingArea(@Path() townID: string, @Header('X-Session-Token') sessionToken: string, @Body() requestBody: ViewingArea): Promise<void> {
     const town = this._townsStore.getTownByID(townID);
     if (!town) {
       throw new InvalidParametersError('Invalid values specified');
@@ -175,11 +132,7 @@ export class TownsController extends Controller {
    */
   @Post('{townID}/gamingArea')
   @Response<InvalidParametersError>(400, 'Invalid values specified')
-  public async createBlackjackArea(
-    @Path() townID: string,
-    @Header('X-Session-Token') sessionToken: string,
-    @Body() requestBody: BlackjackArea,
-  ): Promise<void> {
+  public async createBlackjackArea(@Path() townID: string, @Header('X-Session-Token') sessionToken: string, @Body() requestBody: BlackjackArea): Promise<void> {
     const town = this._townsStore.getTownByID(townID);
     if (!town) {
       throw new InvalidParametersError('Invalid values specified');
