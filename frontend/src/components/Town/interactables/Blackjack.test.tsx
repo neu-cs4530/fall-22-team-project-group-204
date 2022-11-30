@@ -97,7 +97,7 @@ describe('Blackjack Modal', () => {
         `Expected to find exactly one addListener call for ${eventName} but found ${addedListeners.length}`,
       );
     }
-    return (addedListeners[0][1] as unknown) as GamingAreaEvents[Ev];
+    return addedListeners[0][1] as unknown as GamingAreaEvents[Ev];
   }
   /**
    * Retrieve the listener pased to "removeListener" for a given eventName
@@ -114,7 +114,7 @@ describe('Blackjack Modal', () => {
         `Expected to find exactly one removeListeners call for ${eventName} but found ${removedListeners.length}`,
       );
     }
-    return (removedListeners[0][1] as unknown) as GamingAreaEvents[Ev];
+    return removedListeners[0][1] as unknown as GamingAreaEvents[Ev];
   }
   describe('Rendering Blackjack for first time', () => {
     it('Has Blackjack button and text components', async () => {

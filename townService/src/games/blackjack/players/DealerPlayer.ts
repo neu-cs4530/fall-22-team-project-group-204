@@ -224,7 +224,6 @@ export default class DealerPlayer extends HumanPlayer {
   }
 
   public advanceGame(players: HumanPlayer[], playerId: string, action: BlackjackAction): void {
-    console.log(players);
     if (!players || players.length === 0) {
       throw new Error("Can't play Blackjack with 0 people!");
     }

@@ -103,10 +103,6 @@ export default class BlackJack {
   }
 
   public startGame(doDealing = true): void {
-    console.log('c');
-    console.log(this._players);
-    console.log('d');
-    console.log(this._getActiveHumanPlayers());
     const players: HumanPlayer[] = this._getActiveHumanPlayers();
     this._updateToPlaying();
 

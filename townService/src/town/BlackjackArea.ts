@@ -66,7 +66,6 @@ export default class BlackjackArea extends InteractableArea {
     townEmitter: TownEmitter,
   ) {
     super(id, coordinates, townEmitter);
-    console.log(players);
     this._dealer = dealer;
     this._players = players;
     this._leaderboard = leaderboard;
@@ -102,7 +101,6 @@ export default class BlackjackArea extends InteractableArea {
       }
     });
 
-    console.log(players);
     this._players.forEach(playerHand => {
       if (
         newUpdate &&
@@ -126,8 +124,6 @@ export default class BlackjackArea extends InteractableArea {
       this._players.length > 0 &&
       this._players.map(p => p.id).includes(update.id)
     ) {
-      console.log('a');
-      console.log(this._players);
       this._players.forEach(async playerHand => {
         if (this._timeoutsEnabled) {
           this._timeoutIds.set(
@@ -135,14 +131,10 @@ export default class BlackjackArea extends InteractableArea {
             setTimeout(() => {
               this._timedOut.set(playerHand.id, true);
               this._game.advanceGame(playerHand.id, HumanPlayer.parseNextMove('Stay'));
-              console.log(this._players);
-              console.log(players);
             }, this._timer * 1000),
           );
         }
       });
-      console.log('b');
-      console.log(this._players);
       this._game.startGame();
     }
   }
