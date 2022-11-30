@@ -92,11 +92,11 @@ export default class BlackjackArea extends InteractableArea {
       newUpdate = true;
     }
     this._lastUpdate = update;
-    players.forEach(p => {
+    players.forEach(async p => {
       if (!this._game.players.some(playerProper => playerProper.id === p.id)) {
-        this._game.players.push(new HumanPlayer(GameStatus.Waiting, p.id));
+        await this._game.addPlayer(new HumanPlayer(GameStatus.Waiting, p.id));
       }
-    })
+    });
     console.log(players);
     this._players.forEach(playerHand => {
       if (
@@ -121,12 +121,9 @@ export default class BlackjackArea extends InteractableArea {
       this._players.length > 0 &&
       this._players.map(p => p.id).includes(update.id)
     ) {
-      console.log("a")
+      console.log('a');
       console.log(this._players);
       this._players.forEach(async playerHand => {
-        if (!this._game.players.map(p => p.id).includes(playerHand.id)) {
-          await this._game.addPlayer(new HumanPlayer(GameStatus.Waiting, playerHand.id));
-        }
         if (this._timeoutsEnabled) {
           this._timeoutIds.set(
             playerHand.id,
@@ -139,7 +136,7 @@ export default class BlackjackArea extends InteractableArea {
           );
         }
       });
-      console.log("b");
+      console.log('b');
       console.log(this._players);
       this._game.startGame();
     }
@@ -181,7 +178,7 @@ export default class BlackjackArea extends InteractableArea {
   }
 
   /**
-   * Ends the game by reseting all players decks and making a new Blackjack instance
+   * Ends the game by resetting all players decks and making a new Blackjack instance
    */
   public endGame() {
     this._players.forEach(p => {
