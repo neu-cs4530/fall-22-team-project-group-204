@@ -5,8 +5,13 @@
 // import CardFactory from '../../cards/CardFactory';
 // import Suit from '../../cards/Suit';
 // import Value from '../../cards/Value';
+import Card from 'src/games/cards/Card';
+import CardFactory from 'src/games/cards/CardFactory';
+import Suit from 'src/games/cards/Suit';
+import Value from 'src/games/cards/Value';
 import DealerPlayer from '../players/DealerPlayer';
 import GameStatus from '../players/GameStatus';
+import Hand from '../players/Hand';
 // import Hand from '../players/Hand';
 import HumanPlayer from '../players/HumanPlayer';
 import BlackJack from './Blackjack';
@@ -54,7 +59,7 @@ describe('DealerPlayer', () => {
       expect(anotherBlackjackInstance.dealer).not.toBeNull();
       expect(anotherBlackjackInstance.dealer).toBeInstanceOf(DealerPlayer);
     });
-  });});
+  });
 
   describe('getters', () => {
     it('Dealer getter works correctly', () => {
@@ -70,24 +75,9 @@ describe('DealerPlayer', () => {
   });
 
   describe('class methods', () => {
-    describe('playGame', () => {
-      it('Correctly plays Blackjack', async () => {
-        /*
-        Apologies that this test isn't thorough. I just want to do a sanity test check to know that
-        it is handling the basic gameplay and async functions correctly. It is much easier for me to change
-        and refactor this code once I have a full set of suits.
-        I will come back later and test the edge cases of Blackjack. (We have to try to think of weird scenarios and test them)
-        */
-        await blackjackInstance.playGame();
-        expect(blackjackInstance.players).toStrictEqual(players);
-        expect(blackjackInstance.dealer).toBeInstanceOf(DealerPlayer);
 
-        const fullPlayers = [...blackjackInstance.players, blackjackInstance.dealer];
-        const someoneWon = fullPlayers.some(player => player.status === GameStatus.Won);
-        expect(someoneWon).toBe(true);
-      });
       /**
-       * 
+       *
         #4 all players bust including dealer
         #5 all players win except dealer busts
         #6 all players win including dealer
@@ -95,10 +85,10 @@ describe('DealerPlayer', () => {
         #8 Player bust & all others win
         #9 Player loses & all others win
         #10 Player wins & all others lose
-       * 
-       * 
-       * 
-       * 
+       *
+       *
+       *
+       *
          #4 dealer busts, all players win (with 1 player)
          #5 dealer busts, all players win (with 2 players)
          #6 all players are dealt blackjack except dealer (not sure who wins here - follow casino rules)
@@ -140,9 +130,9 @@ describe('DealerPlayer', () => {
         expect(playerThree.getNumericScore()).toStrictEqual([25]);
         expect(blackjackInstance.dealer.getNumericScore()).toStrictEqual([28]);
 
-        blackJackInstance.advanceGame(players, '1', BlackjackAction.Stay);
-        blackJackInstance.advanceGame(players, '2', BlackjackAction.Stay);
-        blackJackInstance.advanceGame(players, '3', BlackjackAction.Stay);
+        blackjackInstance.advanceGame('1', BlackjackAction.Stay);
+        blackjackInstance.advanceGame('2', BlackjackAction.Stay);
+        blackjackInstance.advanceGame('3', BlackjackAction.Stay);
 
         expect(playerOne.getNumericScore()).toStrictEqual([21]);
         expect(playerOne.status).toBe(GameStatus.Won);
@@ -172,7 +162,7 @@ describe('DealerPlayer', () => {
         [CardFactory.getCard(Value.King, Suit.Hearts), true],
         [CardFactory.getCard(Value.Three, Suit.Diamonds), false],
         [CardFactory.getCard(Value.King, Suit.Spades), false]];
-        
+
     const handArray4: [Card, boolean][] = [
         [CardFactory.getCard(Value.King, Suit.Hearts), true],
         [CardFactory.getCard(Value.Six, Suit.Hearts), false],
@@ -195,10 +185,10 @@ describe('DealerPlayer', () => {
 
     // Dealer does his turn automatically so only need to call
     // .advanceGame 3 times (as opposed to four)
-    blackJackInstance.advanceGame(players, '1', BlackjackAction.Stay);
-    blackJackInstance.advanceGame(players, '2', BlackjackAction.Stay);
-    blackJackInstance.advanceGame(players, '3', BlackjackAction.Stay);
-    
+    blackjackInstance.advanceGame('1', BlackjackAction.Stay);
+    blackjackInstance.advanceGame('2', BlackjackAction.Stay);
+    blackjackInstance.advanceGame('3', BlackjackAction.Stay);
+
     expect(playerOne.getNumericScore()).toStrictEqual([24]);
     expect(playerOne.status).toBe(GameStatus.Lost);
 
@@ -247,9 +237,9 @@ describe('DealerPlayer', () => {
         expect(playerThree.getNumericScore()).toStrictEqual([25]);
         expect(blackjackInstance.dealer.getNumericScore()).toStrictEqual([18]);
 
-        blackJackInstance.advanceGame(players, '1', BlackjackAction.Stay);
-        blackJackInstance.advanceGame(players, '2', BlackjackAction.Stay);
-        blackJackInstance.advanceGame(players, '3', BlackjackAction.Stay);
+        blackjackInstance.advanceGame('1', BlackjackAction.Stay);
+        blackjackInstance.advanceGame('2', BlackjackAction.Stay);
+        blackjackInstance.advanceGame('3', BlackjackAction.Stay);
 
         expect(playerOne.getNumericScore()).toStrictEqual([25]);
         expect(playerOne.status).toBe(GameStatus.Lost);
@@ -263,7 +253,7 @@ describe('DealerPlayer', () => {
         expect(blackjackInstance.dealer.getNumericScore()).toStrictEqual([18]);
         expect(blackjackInstance.dealer.status).toBe(GameStatus.Won);
       });
-      
+
       it('Blackjack Edge Case #4 dealer busts, all players win (with 1 player) ', async () => {
 
         const handArray: [Card, boolean][] = [
@@ -274,7 +264,7 @@ describe('DealerPlayer', () => {
           [CardFactory.getCard(Value.Queen, Suit.Clubs), true],
           [CardFactory.getCard(Value.Six, Suit.Diamonds), false],
         ];
-        
+
 
         const hand = new Hand(handArray);
         playerOne.hand = hand;
@@ -284,7 +274,7 @@ describe('DealerPlayer', () => {
         expect(playerOne.getNumericScore()).toStrictEqual([11]);
         expect(blackjackInstance.dealer.getNumericScore()).toStrictEqual([26]);
 
-        blackJackInstance.advanceGame(players, '1', BlackjackAction.Stay);
+        blackjackInstance.advanceGame('1', BlackjackAction.Stay);
 
         expect(playerOne.getNumericScore()).toStrictEqual([11]);
         expect(playerOne.status).toBe(GameStatus.Won);
@@ -301,7 +291,7 @@ describe('DealerPlayer', () => {
           [CardFactory.getCard(Value.Queen, Suit.Diamonds), false],
         ];
         const handArray3: [Card, boolean][] = [
-          [CardFactory.getCard(Value.Ace, Suit.Diamonds), true],
+          [CardFactory.getCard(Value.Four, Suit.Diamonds), true],
           [CardFactory.getCard(Value.King, Suit.Spades), false],
           [CardFactory.getCard(Value.Ten, Suit.Hearts), false],
           [CardFactory.getCard(Value.Eight, Suit.Hearts), false],
@@ -315,23 +305,21 @@ describe('DealerPlayer', () => {
 
         expect(playerOne.getNumericScore()).toStrictEqual([21]);
         expect(playerTwo.getNumericScore()).toStrictEqual([21]);
-        expect(blackjackInstance.dealer.getNumericScore()).toStrictEqual([21]);
+        expect(blackjackInstance.dealer.getNumericScore()).toStrictEqual([32]);
 
-        blackJackInstance.advanceGame(players, '1', BlackjackAction.Stay);
-        blackJackInstance.advanceGame(players, '2', BlackjackAction.Stay);
+        blackjackInstance.advanceGame('1', BlackjackAction.Stay);
+        blackjackInstance.advanceGame('2', BlackjackAction.Stay);
 
         // Nikhil your intuition on this is right - I need to go back and fix this
         expect(playerOne.getNumericScore()).toStrictEqual([21]);
         expect(playerOne.status).toBe(GameStatus.Won);
         expect(playerTwo.getNumericScore()).toStrictEqual([21]);
-        expect(playerTwo.status).toBe(GameStatus.Playing);
-        expect(playerThree.getNumericScore()).toStrictEqual([21]);
-        expect(playerThree.status).toBe(GameStatus.Playing);
-        expect(blackjackInstance.dealer.getNumericScore()).toStrictEqual([21]);
+        expect(playerTwo.status).toBe(GameStatus.Won);
+        expect(blackjackInstance.dealer.getNumericScore()).toStrictEqual([32]);
         expect(blackjackInstance.dealer.status).toBe(GameStatus.Lost);
       });
-      it('Blackjack Edge Case #7 one player gets 22', async () => {
-    
+      it('Blackjack Edge Case #6 all players are dealt blackjack except dealer', async () => {
+
         const handArray: [Card, boolean][] = [
           [CardFactory.getCard(Value.Queen, Suit.Hearts), true],
           [CardFactory.getCard(Value.King, Suit.Diamonds), false],
@@ -350,33 +338,33 @@ describe('DealerPlayer', () => {
           [CardFactory.getCard(Value.Ace, Suit.Spades), false],
         ];
 
-        const hand = new Hand(handArray);
+        const hand = new Hand(handArray4);
         playerOne.hand = hand;
         const hand2 = new Hand(handArray2);
         playerTwo.hand = hand2;
         const hand3 = new Hand(handArray3);
         playerThree.hand = hand3;
-        blackjackInstance.dealer.hand = new Hand(handArray4);
+        blackjackInstance.dealer.hand = new Hand(handArray);
 
-        expect(playerOne.getNumericScore()).toStrictEqual([22]);
+        expect(playerOne.getNumericScore()).toStrictEqual([21]);
         expect(playerTwo.getNumericScore()).toStrictEqual([21]);
         expect(playerThree.getNumericScore()).toStrictEqual([21]);
-        expect(blackjackInstance.dealer.getNumericScore()).toStrictEqual([21]);
+        expect(blackjackInstance.dealer.getNumericScore()).toStrictEqual([22]);
 
-        blackJackInstance.advanceGame(players, '1', BlackjackAction.Stay);
-        blackJackInstance.advanceGame(players, '2', BlackjackAction.Stay);
-        blackJackInstance.advanceGame(players, '3', BlackjackAction.Stay);
+        blackjackInstance.advanceGame('1', BlackjackAction.Stay);
+        blackjackInstance.advanceGame('2', BlackjackAction.Stay);
+        blackjackInstance.advanceGame('3', BlackjackAction.Stay);
 
-        expect(playerOne.getNumericScore()).toStrictEqual([22]);
+        expect(playerOne.getNumericScore()).toStrictEqual([21]);
         expect(playerOne.status).toBe(GameStatus.Lost);
         expect(playerTwo.getNumericScore()).toStrictEqual([21]);
         expect(playerTwo.status).toBe(GameStatus.Won);
         expect(playerThree.getNumericScore()).toStrictEqual([21]);
         expect(playerThree.status).toBe(GameStatus.Playing);
-        expect(blackjackInstance.dealer.getNumericScore()).toStrictEqual([21]);
+        expect(blackjackInstance.dealer.getNumericScore()).toStrictEqual([22]);
         expect(blackjackInstance.dealer.status).toBe(GameStatus.Lost);
       });
-      it('Blackjack Edge Case #8 Player bust & all others win', async () => {
+      it('Blackjack Edge Case #7 all players are dealt blackjack including dealer', async () => {
 
         const handArray: [Card, boolean][] = [
           [CardFactory.getCard(Value.Ace, Suit.Hearts), true],
@@ -384,17 +372,15 @@ describe('DealerPlayer', () => {
         ];
         const handArray2: [Card, boolean][] = [
           [CardFactory.getCard(Value.Queen, Suit.Clubs), true],
-          [CardFactory.getCard(Value.Three, Suit.Diamonds), false],
-          [CardFactory.getCard(Value.Seven, Suit.Diamonds), false],
+          [CardFactory.getCard(Value.Ace, Suit.Diamonds), false],
         ];
         const handArray3: [Card, boolean][] = [
           [CardFactory.getCard(Value.King, Suit.Hearts), true],
-          [CardFactory.getCard(Value.King, Suit.Spades), false],
-          [CardFactory.getCard(Value.Five, Suit.Spades), false],
+          [CardFactory.getCard(Value.Ace, Suit.Spades), false],
         ];
         const handArray4: [Card, boolean][] = [
           [CardFactory.getCard(Value.King, Suit.Hearts), true],
-          [CardFactory.getCard(Value.King, Suit.Spades), false],
+          [CardFactory.getCard(Value.Ace, Suit.Clubs), false],
         ];
 
         const hand = new Hand(handArray);
@@ -406,32 +392,32 @@ describe('DealerPlayer', () => {
         blackjackInstance.dealer.hand = new Hand(handArray4);
 
         expect(playerOne.getNumericScore()).toStrictEqual([21]);
-        expect(playerTwo.getNumericScore()).toStrictEqual([20]);
-        expect(playerThree.getNumericScore()).toStrictEqual([25]);
-        expect(blackjackInstance.dealer.getNumericScore()).toStrictEqual([20]);
+        expect(playerTwo.getNumericScore()).toStrictEqual([21]);
+        expect(playerThree.getNumericScore()).toStrictEqual([21]);
+        expect(blackjackInstance.dealer.getNumericScore()).toStrictEqual([21]);
 
-        blackJackInstance.advanceGame(players, '1', BlackjackAction.Stay);
-        blackJackInstance.advanceGame(players, '2', BlackjackAction.Stay);
-        blackJackInstance.advanceGame(players, '3', BlackjackAction.Stay);
+        blackjackInstance.advanceGame('1', BlackjackAction.Stay);
+        blackjackInstance.advanceGame('2', BlackjackAction.Stay);
+        blackjackInstance.advanceGame('3', BlackjackAction.Stay);
 
         expect(playerOne.getNumericScore()).toStrictEqual([21]);
-        expect(playerOne.status).toBe(GameStatus.Won);
-        expect(playerTwo.getNumericScore()).toStrictEqual([20]);
-        expect(playerTwo.status).toBe(GameStatus.Playing);
-        expect(playerThree.getNumericScore()).toStrictEqual([25]);
+        expect(playerOne.status).toBe(GameStatus.Lost);
+        expect(playerTwo.getNumericScore()).toStrictEqual([21]);
+        expect(playerTwo.status).toBe(GameStatus.Lost);
+        expect(playerThree.getNumericScore()).toStrictEqual([21]);
         // TODO: FIX THIS TEST / LINE
-        expect(playerThree.status).toBe(GameStatus.Playing);
-        expect(blackjackInstance.dealer.getNumericScore()).toStrictEqual([20]);
-        expect(blackjackInstance.dealer.status).toBe(GameStatus.Lost);
+        expect(playerThree.status).toBe(GameStatus.Lost);
+        expect(blackjackInstance.dealer.getNumericScore()).toStrictEqual([21]);
+        expect(blackjackInstance.dealer.status).toBe(GameStatus.Won);
       });
-      it('Blackjack Edge Case #9 Player loses & all others win', async () => {
+      it('Blackjack Edge Case #8 Dealer dealt blackjack immediately, all others under 21', async () => {
 
         const handArray: [Card, boolean][] = [
-          [CardFactory.getCard(Value.Ace, Suit.Hearts), true],
+          [CardFactory.getCard(Value.Two, Suit.Hearts), true],
           [CardFactory.getCard(Value.King, Suit.Diamonds), false],
         ];
         const handArray2: [Card, boolean][] = [
-          [CardFactory.getCard(Value.Ace, Suit.Clubs), true],
+          [CardFactory.getCard(Value.Two, Suit.Clubs), true],
           [CardFactory.getCard(Value.Queen, Suit.Diamonds), false],
         ];
         const handArray3: [Card, boolean][] = [
@@ -451,70 +437,23 @@ describe('DealerPlayer', () => {
         playerThree.hand = hand3;
         blackjackInstance.dealer.hand = new Hand(handArray4);
 
-        expect(playerOne.getNumericScore()).toStrictEqual([21]);
-        expect(playerTwo.getNumericScore()).toStrictEqual([21]);
+        expect(playerOne.getNumericScore()).toStrictEqual([12]);
+        expect(playerTwo.getNumericScore()).toStrictEqual([12]);
         expect(playerThree.getNumericScore()).toStrictEqual([20]);
         expect(blackjackInstance.dealer.getNumericScore()).toStrictEqual([21]);
 
-        blackJackInstance.advanceGame(players, '1', BlackjackAction.Stay);
-        blackJackInstance.advanceGame(players, '2', BlackjackAction.Stay);
-        blackJackInstance.advanceGame(players, '3', BlackjackAction.Stay);
+        blackjackInstance.advanceGame('1', BlackjackAction.Stay);
+        blackjackInstance.advanceGame('2', BlackjackAction.Stay);
+        blackjackInstance.advanceGame('3', BlackjackAction.Stay);
 
-        expect(playerOne.getNumericScore()).toStrictEqual([21]);
-        expect(playerOne.status).toBe(GameStatus.Won);
-        expect(playerTwo.getNumericScore()).toStrictEqual([21]);
-        expect(playerTwo.status).toBe(GameStatus.Playing);
+        expect(playerOne.getNumericScore()).toStrictEqual([12]);
+        expect(playerOne.status).toBe(GameStatus.Lost);
+        expect(playerTwo.getNumericScore()).toStrictEqual([12]);
+        expect(playerTwo.status).toBe(GameStatus.Lost);
         expect(playerThree.getNumericScore()).toStrictEqual([20]);
-        expect(playerThree.status).toBe(GameStatus.Playing);
+        expect(playerThree.status).toBe(GameStatus.Lost);
         expect(blackjackInstance.dealer.getNumericScore()).toStrictEqual([21]);
-        expect(blackjackInstance.dealer.status).toBe(GameStatus.Lost);
+        expect(blackjackInstance.dealer.status).toBe(GameStatus.Won);
       });
-      it('Blackjack Edge Case #10 Player wins & all others lose', async () => {
-
-        const handArray: [Card, boolean][] = [
-          [CardFactory.getCard(Value.Ace, Suit.Hearts), true],
-          [CardFactory.getCard(Value.King, Suit.Diamonds), false],
-        ];
-        const handArray2: [Card, boolean][] = [
-          [CardFactory.getCard(Value.Queen, Suit.Clubs), true],
-          [CardFactory.getCard(Value.Three, Suit.Diamonds), false],
-          [CardFactory.getCard(Value.Seven, Suit.Diamonds), false],
-        ];
-        const handArray3: [Card, boolean][] = [
-          [CardFactory.getCard(Value.King, Suit.Hearts), true],
-          [CardFactory.getCard(Value.King, Suit.Spades), false],
-        ];
-        const handArray4: [Card, boolean][] = [
-          [CardFactory.getCard(Value.King, Suit.Hearts), true],
-          [CardFactory.getCard(Value.King, Suit.Spades), false],
-        ];
-
-        const hand = new Hand(handArray);
-        playerOne.hand = hand;
-        const hand2 = new Hand(handArray2);
-        playerTwo.hand = hand2;
-        const hand3 = new Hand(handArray3);
-        playerThree.hand = hand3;
-        blackjackInstance.dealer.hand = new Hand(handArray4);
-
-        expect(playerOne.getNumericScore()).toStrictEqual([11, 21]);
-        expect(playerTwo.getNumericScore()).toStrictEqual([20]);
-        expect(playerThree.getNumericScore()).toStrictEqual([20]);
-        expect(blackjackInstance.dealer.getNumericScore()).toStrictEqual([20]);
-
-        blackJackInstance.advanceGame(players, '1', BlackjackAction.Stay);
-        blackJackInstance.advanceGame(players, '2', BlackjackAction.Stay);
-        blackJackInstance.advanceGame(players, '3', BlackjackAction.Stay);        
-
-        expect(playerOne.getNumericScore()).toStrictEqual([11, 21]);
-        expect(playerOne.status).toBe(GameStatus.Won);
-        expect(playerTwo.getNumericScore()).toStrictEqual([20]);
-        expect(playerTwo.status).toBe(GameStatus.Playing);
-        expect(playerThree.getNumericScore()).toStrictEqual([20]);
-        expect(playerThree.status).toBe(GameStatus.Playing);
-        expect(blackjackInstance.dealer.getNumericScore()).toStrictEqual([20]);
-        expect(blackjackInstance.dealer.status).toBe(GameStatus.Lost);
-      });
-    });
   });
 });
