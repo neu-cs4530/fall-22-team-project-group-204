@@ -131,9 +131,16 @@ export default class BlackjackArea extends InteractableArea {
         playerHand.gameStatus === 'Playing'
       ) {
         this._game.advanceGame(playerHand.id, HumanPlayer.parseNextMove(update.action));
-        if (update.action === 'Stay' && this._timeoutsEnabled) {
+        if (
+          update.action === 'Stay' &&
+          this._timeoutsEnabled &&
+          this._timedOut.get(playerHand.id) === undefined
+        ) {
           this._timedOut.set(playerHand.id, false);
-          clearTimeout(this._timeoutIds.get(playerHand.id));
+          const timeout = this._timeoutIds.get(playerHand.id);
+          if (timeout) {
+            clearTimeout(timeout);
+          }
         }
       }
     });
@@ -184,6 +191,19 @@ export default class BlackjackArea extends InteractableArea {
       gameStatus: GameStatus[dealer.status],
     };
     this._players = BlackjackArea.playersToBlackjackPlayers(players);
+    this._players.forEach(playerHand => {
+      if (
+        (playerHand.gameStatus === 'Won' || playerHand.gameStatus === 'Lost') &&
+        this._timeoutsEnabled &&
+        this._timedOut.get(playerHand.id) === undefined
+      ) {
+        this._timedOut.set(playerHand.id, false);
+        const timeout = this._timeoutIds.get(playerHand.id);
+        if (timeout) {
+          clearTimeout(timeout);
+        }
+      }
+    });
     if (
       dealer.status !== GameStatus.Waiting &&
       dealer.status !== GameStatus.Playing &&
