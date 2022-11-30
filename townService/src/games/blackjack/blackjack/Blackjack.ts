@@ -159,5 +159,10 @@ export default class BlackJack {
       count += 1;
     });
     return leaderboardData as PlayerStanding[];
+    // if (docsSnap.empty) return [];
+
+    // return docsSnap.docs.map((doc, idx) => {
+    //   return { ranking: idx + 1, name: doc.data().name, wins: doc.data().wins, balance: doc.data().balance }
+    // })
   }
 }
