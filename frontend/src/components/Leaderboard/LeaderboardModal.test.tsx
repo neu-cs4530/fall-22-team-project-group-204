@@ -38,7 +38,7 @@ describe('Leaderboard Modal', () => {
     renderData = render(
       <ChakraProvider>
         <TownControllerContext.Provider value={mockedTownController}>
-          <LeaderboardModal controller={gamingArea} rankingData={[]} />
+          <LeaderboardModal controller={gamingArea} />
         </TownControllerContext.Provider>
       </ChakraProvider>,
     );

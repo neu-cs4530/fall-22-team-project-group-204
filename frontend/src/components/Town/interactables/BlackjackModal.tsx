@@ -490,7 +490,6 @@ export function BlackjackModal({ gamingArea }: { gamingArea: BlackjackArea }): J
     setIsOpen(false);
   }, [coveyTownController, setIsOpen]);
 
-  console.log(gamingAreaController.playerStandings);
   return (
     <Modal
       isOpen={isOpen}
@@ -505,10 +504,7 @@ export function BlackjackModal({ gamingArea }: { gamingArea: BlackjackArea }): J
         <ModalHeader></ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <LeaderboardModal
-            controller={gamingAreaController}
-            rankingData={gamingAreaController.playerStandings}
-          />
+          <LeaderboardModal controller={gamingAreaController} />
           <Blackjack controller={gamingAreaController} />
         </ModalBody>
         <ModalFooter> </ModalFooter>

@@ -15,13 +15,13 @@ import { DataTable } from './DataTable';
 
 export default function LeaderboardModal({
   controller,
-  rankingData,
 }: {
   controller: GamingAreaController;
-  rankingData: PlayerStanding[];
 }): JSX.Element {
   const coveyTownController = useTownController();
-  const [playerStandings, setPlayerStandings] = useState<PlayerStanding[]>(rankingData);
+  const [playerStandings, setPlayerStandings] = useState<PlayerStanding[]>(
+    controller.playerStandings,
+  );
 
   // const data: PlayerStanding[] = rankingData;
   useEffect(() => {
@@ -36,7 +36,7 @@ export default function LeaderboardModal({
   }, [controller, coveyTownController]);
 
   console.log('Ranking Data:');
-  console.log(rankingData);
+  console.log(controller.playerStandings);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const openLeaderboardModal = useCallback(() => {
