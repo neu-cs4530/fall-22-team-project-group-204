@@ -20,6 +20,7 @@ export default function LeaderboardModal({
   const coveyTownController = useTownController();
   const data: PlayerStanding[] = rankingData;
 
+  console.log(data);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const openLeaderboardModal = useCallback(() => {

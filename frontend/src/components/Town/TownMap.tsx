@@ -1,7 +1,7 @@
-import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import { collection, DocumentData, getDocs, orderBy, Query, query } from 'firebase/firestore';
 import Phaser from 'phaser';
 import React, { useEffect } from 'react';
-import db from '../../../../townService/src/database';
+import db from '../../database';
 import useTownController from '../../hooks/useTownController';
 import { PlayerStanding } from '../../types/CoveyTownSocket';
 import LeaderboardModal from '../Leaderboard/LeaderboardModal';
@@ -9,6 +9,27 @@ import SocialSidebar from '../SocialSidebar/SocialSidebar';
 import BlackjackModal from './interactables/BlackjackModal';
 import NewConversationModal from './interactables/NewCoversationModal';
 import TownGameScene from './TownGameScene';
+
+async function getLeaderboardData(
+  orderRef: Query<DocumentData>,
+  leaderboardData: PlayerStanding[],
+) {
+  const docsSnap = await getDocs(orderRef);
+
+  let count = 1;
+  docsSnap.forEach(doc => {
+    const playerRank: PlayerStanding = {
+      ranking: count,
+      name: doc.data().name,
+      wins: doc.data().wins,
+      balance: doc.data().balance,
+    };
+    if (playerRank.name !== undefined) {
+      leaderboardData.push(playerRank);
+      count += 1;
+    }
+  });
+}
 
 export default function TownMap(): JSX.Element {
   const coveyTownController = useTownController();
@@ -71,7 +92,7 @@ export default function TownMap(): JSX.Element {
     <div id='app-container'>
       <NewConversationModal />
       <BlackjackModal />
-      <LeaderboardModal rankingData={[]} />
+      <LeaderboardModal rankingData={leaderboardData} />
       <div id='map-container' />
       <div id='social-container'>
         <SocialSidebar />
