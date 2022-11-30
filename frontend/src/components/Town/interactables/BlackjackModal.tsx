@@ -23,11 +23,11 @@ import GamingAreaController from '../../../classes/GamingAreaController';
 import BlackjackArea from './GamingArea';
 import { BlackjackPlayer, PlayingCard } from '../../../types/CoveyTownSocket';
 
-// i need to figure out how the back and front end communicate :C
-
-// import Value, { getValueNumbers } from '../../../../../townService/src/games/cards/Value';
-// import Suit from '../../../../../townService/src/games/cards/Suit';
-
+/**
+ * Converts a PlayingCard into an id
+ * @param card playing card with suit and value
+ * @returns card id
+ */
 function cardToId(card: PlayingCard): number {
   if (card.faceUp == false) {
     return 53;
@@ -75,51 +75,31 @@ function cardToId(card: PlayingCard): number {
   throw new Error('Value not found in table: ' + value);
 }
 
-// export function Card({ value, suit }: { value: Value; suit: Suit }) {
-//   let cardValueId: number;
-//   switch (value) {
-//     case Value.Ace:
-//       cardValueId = 13;
-//       break;
-//     case Value.King:
-//       cardValueId = 12;
-//       break;
-//     case Value.Queen:
-//       cardValueId = 11;
-//       break;
-//     case Value.Jack:
-//       cardValueId = 10;
-//       break;
-//     default:
-//       cardValueId = getValueNumbers(value)[0] - 1;
-//       break;
-//   }
-//   let cardId: number;
-//   switch (suit) {
-//     case Suit.Spades:
-//       cardId = cardValueId;
-//       break;
-//     case Suit.Clubs:
-//       cardId = cardValueId + 13;
-//       break;
-//     case Suit.Diamonds:
-//       cardId = cardValueId + 26;
-//       break;
-//     case Suit.Hearts:
-//       cardId = cardValueId + 39;
-//       break;
-//   }
-//   const cardIdString = ('0' + cardId).slice(-2);
-//   const card = `assets/blackjack/playingcards/playingcards_${cardIdString}.png`;
-//   return <Image src={card} />;
-// }
-
+/**
+ * Returns an Image with a given cardId
+ * @param props cardId, position
+ * @returns an image of the card
+ */
 export function PlayingCardImage({ cardId, x, y }: { cardId: number; x: number; y: number }) {
   const cardIdString = ('0' + cardId).slice(-2);
   const card = `assets/blackjack/playingcards/playingcards_${cardIdString}.png`;
-  return <Image width='64px' position='absolute' src={card} top={y + 'px'} left={x + 'px'} />;
+  return (
+    <Image
+      data-testid='playingCardImage'
+      width='64px'
+      position='absolute'
+      src={card}
+      top={y + 'px'}
+      left={x + 'px'}
+    />
+  );
 }
 
+/**
+ * Returns a Hand of cards
+ * @param props playing cards, position
+ * @returns a Hand of cards
+ */
 export function Hand({ cards, x, y }: { cards: PlayingCard[]; x: number; y: number }) {
   const handComponent = cards.map((card, index) => {
     return (
@@ -127,15 +107,21 @@ export function Hand({ cards, x, y }: { cards: PlayingCard[]; x: number; y: numb
     );
   });
   return (
-    <Container>
-      <Image position='absolute' src='assets/blackjack/marker.png' top={y} left={x} width='50px' />
+    <Container data-testid='hand'>
+      <Image
+        data-testid='marker'
+        position='absolute'
+        src='assets/blackjack/marker.png'
+        top={y}
+        left={x}
+        width='50px'
+      />
       {handComponent}
     </Container>
   );
 }
 
-export function Hands({ hands }: { hands: BlackjackPlayer[] }) {
-  const townController = useTownController();
+export function Hands({ hands, userID }: { hands: BlackjackPlayer[]; userID: string }) {
   const positions = [
     [100, 175],
     [100, 325],
@@ -144,7 +130,7 @@ export function Hands({ hands }: { hands: BlackjackPlayer[] }) {
   ];
   let offset = 0;
   const handComponents = hands.map((hand, index) => {
-    if (hand.id == townController.userID) {
+    if (hand.id == userID) {
       offset = -1;
       return <Hand key={index} cards={hand.hand} x={450} y={400} />;
     } else {
@@ -158,7 +144,7 @@ export function Hands({ hands }: { hands: BlackjackPlayer[] }) {
       );
     }
   });
-  if (!hands.map(hand => hand.id).includes(townController.userID)) {
+  if (!hands.map(hand => hand.id).includes(userID)) {
     handComponents.push(<Hand key={handComponents.length} cards={[]} x={450} y={400} />);
     offset = -1;
   }
@@ -328,6 +314,7 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
         isPlaying={isPlaying}
       />
       <Button
+        data-testid='hitButton'
         size='sm'
         left='200px'
         top='500px'
@@ -345,6 +332,7 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
         Hit
       </Button>
       <Button
+        data-testid='standButton'
         size='sm'
         left='240px'
         top='500px'
@@ -362,6 +350,7 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
         Stand
       </Button>
       <Button
+        data-testid='startGameButton'
         size='sm'
         left='120px'
         top='50px'
@@ -395,7 +384,7 @@ export function Blackjack({ controller }: { controller: GamingAreaController }) 
         })()}
       </Text>
       <Hand cards={dealer.hand} x={450} y={100} />
-      <Hands hands={players} />
+      <Hands hands={players} userID={townController.userID} />
       <Chip
         chipValue={1}
         x={600}
