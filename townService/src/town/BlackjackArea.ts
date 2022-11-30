@@ -184,9 +184,7 @@ export default class BlackjackArea extends InteractableArea {
       gameStatus: GameStatus[dealer.status],
     };
     this._players = BlackjackArea.playersToBlackjackPlayers(players);
-    if (BlackJack.isGameOver([...players, dealer])) {
-      this.endGame();
-    } else if (
+    if (
       dealer.status !== GameStatus.Waiting &&
       dealer.status !== GameStatus.Playing &&
       this._timeoutsEnabled
