@@ -23,20 +23,13 @@ export default function LeaderboardModal({
     controller.playerStandings,
   );
 
-  // const data: PlayerStanding[] = rankingData;
   useEffect(() => {
-    // const setNewDealerHand = (hand: BlackjackPlayer) => {
-    //   setPlayerStandings(hand);
-    //   setStartGameText(hand.gameStatus == 'Waiting' ? 'Start Game' : 'Game In Progress');
-    // };
     controller.addListener('leaderboardChange', setPlayerStandings);
     return () => {
       controller.removeListener('leaderboardChange', setPlayerStandings);
     };
   }, [controller, coveyTownController]);
 
-  console.log('Ranking Data:');
-  console.log(controller.playerStandings);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const openLeaderboardModal = useCallback(() => {
