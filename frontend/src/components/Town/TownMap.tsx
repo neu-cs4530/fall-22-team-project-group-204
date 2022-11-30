@@ -1,6 +1,9 @@
+import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import Phaser from 'phaser';
 import React, { useEffect } from 'react';
+import db from '../../../../townService/src/database';
 import useTownController from '../../hooks/useTownController';
+import { PlayerStanding } from '../../types/CoveyTownSocket';
 import LeaderboardModal from '../Leaderboard/LeaderboardModal';
 import SocialSidebar from '../SocialSidebar/SocialSidebar';
 import BlackjackModal from './interactables/BlackjackModal';
@@ -47,22 +50,22 @@ export default function TownMap(): JSX.Element {
   }, [coveyTownController]);
 
   // Leaderboard
-  // const docRef = collection(db, 'users');
-  // const orderRef = query(docRef, orderBy('wins', 'desc'), orderBy('balance', 'desc'));
-  // const docsSnap = await getDocs(orderRef);
+  const docRef = collection(db, 'users');
+  const orderRef = query(docRef, orderBy('wins', 'desc'), orderBy('balance', 'desc'));
+  const docsSnap = await getDocs(orderRef);
 
-  // const leaderboardData: PlayerStanding[] = [];
-  // let count = 1;
-  // docsSnap.forEach(doc => {
-  //   const playerRank: PlayerStanding = {
-  //     ranking: count,
-  //     name: doc.data().name,
-  //     wins: doc.data().wins,
-  //     balance: doc.data().balance,
-  //   };
-  //   leaderboardData.push(playerRank);
-  //   count += 1;
-  // });
+  const leaderboardData: PlayerStanding[] = [];
+  let count = 1;
+  docsSnap.forEach(doc => {
+    const playerRank: PlayerStanding = {
+      ranking: count,
+      name: doc.data().name,
+      wins: doc.data().wins,
+      balance: doc.data().balance,
+    };
+    leaderboardData.push(playerRank);
+    count += 1;
+  });
 
   return (
     <div id='app-container'>

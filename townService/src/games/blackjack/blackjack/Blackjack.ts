@@ -4,6 +4,7 @@ import { TownEmitter } from 'src/types/CoveyTownSocket';
 import GameStatus from '../players/GameStatus';
 import DealerPlayer from '../players/DealerPlayer';
 import HumanPlayer from '../players/HumanPlayer';
+// eslint-disable-next-line import/no-cycle
 import BlackjackArea from '../../../town/BlackjackArea';
 import Card from '../../cards/Card';
 import BlackjackAction from './BlackjackAction';
