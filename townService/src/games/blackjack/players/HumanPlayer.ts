@@ -123,20 +123,25 @@ export default class HumanPlayer {
   public static async getPlayerRecord(id: string) {
     const docRef = doc(db, HumanPlayer._tableName, id);
     const docSnap = await getDoc(docRef);
-    // if (docSnap.exists()) return;
+    if (!docSnap.exists()) {
+      throw new Error('Player does not exist in database!');
+    }
+
+    return docSnap.data();
   }
 
   public async updatePlayerRecord() {
     const docRef = doc(db, HumanPlayer._tableName, this._id);
     const docSnap = await getDoc(docRef);
     if (!docSnap.exists()) {
-      throw new Error('Player does not exist in database');
+      throw new Error('Player does not exist in database!');
     }
     setDoc(docRef, this._document());
   }
 
   public async addToDatabase() {
     const docRef = doc(db, HumanPlayer._tableName, this._id);
+    /* eslint-disable no-console */
     console.log(`PlayerId: ${this._id}`);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) return;

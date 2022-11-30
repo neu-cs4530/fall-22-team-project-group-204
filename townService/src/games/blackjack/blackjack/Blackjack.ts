@@ -1,15 +1,12 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import mock from 'jest-mock-extended/lib/Mock';
 import { TownEmitter } from 'src/types/CoveyTownSocket';
-import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import GameStatus from '../players/GameStatus';
 import DealerPlayer from '../players/DealerPlayer';
 import HumanPlayer from '../players/HumanPlayer';
-// eslint-disable-next-line import/no-cycle
 import BlackjackArea from '../../../town/BlackjackArea';
 import Card from '../../cards/Card';
 import BlackjackAction from './BlackjackAction';
-import db from '../../../database';
 
 export default class BlackJack {
   // Going to have this DealerPlayer class handle the responsiblites of the Dealer and the Player.
@@ -95,10 +92,6 @@ export default class BlackJack {
   }
 
   public startGame(doDealing = true): void {
-    console.log('c');
-    console.log(this._players);
-    console.log('d');
-    console.log(this._getActiveHumanPlayers());
     const players: HumanPlayer[] = this._getActiveHumanPlayers();
     this._updateToPlaying();
 
