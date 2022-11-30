@@ -11,7 +11,7 @@ import { nanoid } from 'nanoid';
 // import CardFactory from '../games/cards/CardFactory';
 import Player from '../lib/Player';
 import { getLastEmittedEvent } from '../TestUtils';
-import { BlackjackPlayer, TownEmitter } from '../types/CoveyTownSocket';
+import { BlackjackPlayer, PlayerStanding, TownEmitter } from '../types/CoveyTownSocket';
 import BlackjackArea from './BlackjackArea';
 // import Hand from '../games/blackjack/players/Hand';
 
@@ -25,11 +25,12 @@ describe('BlackjackArea', () => {
   const players: BlackjackPlayer[] = [];
   const update = undefined;
   const bettingAmount = 0;
+  const playerStandings: PlayerStanding[] = [];
 
   beforeEach(() => {
     mockClear(townEmitter);
     testArea = new BlackjackArea(
-      { id, dealer, players, update, bettingAmount },
+      { id, dealer, players, update, bettingAmount, playerStandings },
       testAreaBox,
       townEmitter,
     );
