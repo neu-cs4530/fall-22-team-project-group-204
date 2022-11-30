@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import mock from 'jest-mock-extended/lib/Mock';
-import { TownEmitter } from 'src/types/CoveyTownSocket';
+import { PlayerStanding, TownEmitter } from 'src/types/CoveyTownSocket';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import GameStatus from '../players/GameStatus';
 import DealerPlayer from '../players/DealerPlayer';
@@ -11,12 +11,6 @@ import Card from '../../cards/Card';
 import BlackjackAction from './BlackjackAction';
 import db from '../../../database';
 
-export type PlayerStanding = {
-  ranking: number;
-  name: string;
-  wins: number;
-  balance: number;
-};
 export default class BlackJack {
   // Going to have this DealerPlayer class handle the responsiblites of the Dealer and the Player.
   // I thought about this for a while, and think this is the best solution, if anyone disagrees lmk.
@@ -35,6 +29,12 @@ export default class BlackJack {
     return this._players;
   }
 
+  private _leaderboard: PlayerStanding[];
+
+  public get leaderboard(): PlayerStanding[] {
+    return this._leaderboard;
+  }
+
   // contains a reference to the BlackjackArea for sending notifications of changes
   private _gamingArea: BlackjackArea;
 
@@ -50,7 +50,7 @@ export default class BlackJack {
         players: [],
         update: undefined,
         bettingAmount: 0,
-        leaderboard: BlackJack.getLeaderboard(),
+        leaderboard: [],
       },
       { x: 0, y: 0, width: 0, height: 0 },
       mock<TownEmitter>(), // NOTE: may need to change in the future
@@ -59,6 +59,7 @@ export default class BlackJack {
     this._dealer = dealer;
     this._players = players;
     this._gamingArea = gamingArea;
+    this._leaderboard = [];
   }
 
   public updatePlayerCards(allCards: Card[][]): void {
@@ -157,6 +158,6 @@ export default class BlackJack {
       leaderboardData.push(playerRank);
       count += 1;
     });
-    return leaderboardData;
+    return leaderboardData as PlayerStanding[];
   }
 }

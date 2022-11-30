@@ -8,7 +8,7 @@ import GamingAreaController, { GamingAreaEvents } from '../../../classes/GamingA
 import TownController from '../../../classes/TownController';
 import TownControllerContext from '../../../contexts/TownControllerContext';
 import { BlackjackPlayer } from '../../../types/CoveyTownSocket';
-import { Blackjack, PlayingCardImage, Hand, Hands } from './BlackjackModal';
+import { Blackjack, Hand, Hands, PlayingCardImage } from './BlackjackModal';
 
 const mockToast = jest.fn();
 
@@ -65,12 +65,14 @@ describe('Blackjack Modal', () => {
       dealer: dealer,
       players: players,
       bettingAmount: 0,
+      leaderboard: [],
     });
     townController.createBlackjackArea({
       id: 'test',
       dealer: dealer,
       players: players,
       bettingAmount: 0,
+      leaderboard: [],
     });
     addListenerSpy = jest.spyOn(gamingArea, 'addListener');
     removeListenerSpy = jest.spyOn(gamingArea, 'removeListener');
@@ -95,7 +97,7 @@ describe('Blackjack Modal', () => {
         `Expected to find exactly one addListener call for ${eventName} but found ${addedListeners.length}`,
       );
     }
-    return addedListeners[0][1] as unknown as GamingAreaEvents[Ev];
+    return (addedListeners[0][1] as unknown) as GamingAreaEvents[Ev];
   }
   /**
    * Retrieve the listener pased to "removeListener" for a given eventName
@@ -112,7 +114,7 @@ describe('Blackjack Modal', () => {
         `Expected to find exactly one removeListeners call for ${eventName} but found ${removedListeners.length}`,
       );
     }
-    return removedListeners[0][1] as unknown as GamingAreaEvents[Ev];
+    return (removedListeners[0][1] as unknown) as GamingAreaEvents[Ev];
   }
   describe('Rendering Blackjack for first time', () => {
     it('Has Blackjack button and text components', async () => {

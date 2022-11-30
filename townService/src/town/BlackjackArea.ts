@@ -6,6 +6,7 @@ import {
   PlayingCard,
   BlackjackPlayer,
   BlackjackUpdate,
+  PlayerStanding,
 } from '../types/CoveyTownSocket';
 import InteractableArea from './InteractableArea';
 // eslint-disable-next-line import/no-cycle
@@ -21,6 +22,8 @@ export default class BlackjackArea extends InteractableArea {
   private _dealer: BlackjackPlayer;
 
   private _players: BlackjackPlayer[];
+
+  private _leaderboard: PlayerStanding[];
 
   private _lastUpdate: BlackjackUpdate | undefined;
 
@@ -58,7 +61,7 @@ export default class BlackjackArea extends InteractableArea {
    * @param townEmitter a broadcast emitter that can be used to emit updates to players
    */
   public constructor(
-    { id, dealer, players, update }: GamingAreaModel,
+    { id, dealer, players, leaderboard, update }: GamingAreaModel,
     coordinates: BoundingBox,
     townEmitter: TownEmitter,
   ) {
@@ -66,6 +69,7 @@ export default class BlackjackArea extends InteractableArea {
     console.log(players);
     this._dealer = dealer;
     this._players = players;
+    this._leaderboard = leaderboard;
     this._lastUpdate = update;
     const dealerProper = new DealerPlayer(GameStatus.Waiting, dealer.id);
     const playersProper = players.map(player => new HumanPlayer(GameStatus.Waiting, player.id));
@@ -97,6 +101,7 @@ export default class BlackjackArea extends InteractableArea {
         await this._game.addPlayer(new HumanPlayer(GameStatus.Waiting, p.id));
       }
     });
+
     console.log(players);
     this._players.forEach(playerHand => {
       if (
@@ -310,7 +315,7 @@ export default class BlackjackArea extends InteractableArea {
       players: this._players,
       update: this._lastUpdate,
       bettingAmount: 0,
-      leaderboard: BlackJack.getLeaderboard(),
+      leaderboard: this._leaderboard,
     };
   }
 
@@ -335,7 +340,7 @@ export default class BlackjackArea extends InteractableArea {
         dealer,
         update: undefined,
         bettingAmount: 0,
-        leaderboard: BlackJack.getLeaderboard(),
+        leaderboard: [],
       },
       rect,
       townEmitter,

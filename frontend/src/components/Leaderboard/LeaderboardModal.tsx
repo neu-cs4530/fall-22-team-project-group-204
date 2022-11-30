@@ -8,26 +8,17 @@ import {
 } from '@chakra-ui/react';
 import { createColumnHelper } from '@tanstack/react-table';
 import React, { useCallback, useEffect } from 'react';
-import { useGamingAreaController } from '../../classes/TownController';
+import { PlayerStanding } from '../../../../shared/types/CoveyTownSocket';
+import { useGamingAreaController, useInteractable } from '../../classes/TownController';
 import useTownController from '../../hooks/useTownController';
 import BlackjackArea from '../Town/interactables/GamingArea';
 import { DataTable } from './DataTable';
 
-export type PlayerStanding = {
-  ranking: number;
-  name: string;
-  wins: number;
-  balance: number;
-};
-
-export default function LeaderboardModal({
-  gamingArea,
-}: {
-  gamingArea: BlackjackArea;
-}): JSX.Element {
+export default function LeaderboardModal(): JSX.Element {
+  const gamingArea = useInteractable<BlackjackArea>('gamingArea') as BlackjackArea;
   const gamingAreaController = useGamingAreaController(gamingArea.name);
   const coveyTownController = useTownController();
-  const data: Promise<PlayerStanding[]> = gamingAreaController.leaderboard;
+  const data: PlayerStanding[] = gamingAreaController.leaderboard;
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
