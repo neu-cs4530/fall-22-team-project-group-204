@@ -15,7 +15,7 @@ export type PlayerStanding = {
   ranking: number;
   name: string;
   wins: number;
-  reward: number;
+  balance: number;
 };
 export default class BlackJack {
   // Going to have this DealerPlayer class handle the responsiblites of the Dealer and the Player.
@@ -122,7 +122,6 @@ export default class BlackJack {
     // Also not sure when to call updateFromBlackjack
     this._gamingArea.updateFromBlackjack(this.dealer, this.players);
 
-    console.log('Leaderboard data:');
     BlackJack.getLeaderboard();
   }
 
@@ -147,9 +146,18 @@ export default class BlackJack {
     const orderRef = query(docRef, orderBy('wins', 'desc'), orderBy('balance', 'desc'));
     const docsSnap = await getDocs(orderRef);
 
+    const leaderboardData: PlayerStanding[] = [];
+    let count = 1;
     docsSnap.forEach(doc => {
-      console.log(doc.data());
+      const playerRank: PlayerStanding = {
+        ranking: count,
+        name: doc.data().name,
+        wins: doc.data().wins,
+        balance: doc.data().balance,
+      };
+      leaderboardData.push(playerRank);
+      count += 1;
     });
-    return [];
+    return leaderboardData;
   }
 }
