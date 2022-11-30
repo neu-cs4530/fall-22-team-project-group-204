@@ -59,8 +59,8 @@ export default class BlackJack {
   }
 
   public async addPlayer(player: HumanPlayer): Promise<void> {
-    await player.addToDatabase();
     this._players.push(player);
+    await player.addToDatabase();
   }
 
   // update everyones status to Playing
