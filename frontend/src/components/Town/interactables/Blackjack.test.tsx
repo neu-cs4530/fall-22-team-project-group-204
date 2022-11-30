@@ -61,18 +61,18 @@ describe('Blackjack Modal', () => {
     };
     const players: BlackjackPlayer[] = [];
     gamingArea = new GamingAreaController({
-      playerStandings: [],
       id: 'test',
       dealer: dealer,
       players: players,
       bettingAmount: 0,
+      playerStandings: [],
     });
     townController.createBlackjackArea({
-      playerStandings: [],
       id: 'test',
       dealer: dealer,
       players: players,
       bettingAmount: 0,
+      playerStandings: [],
     });
     addListenerSpy = jest.spyOn(gamingArea, 'addListener');
     removeListenerSpy = jest.spyOn(gamingArea, 'removeListener');
